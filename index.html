@@ -1,0 +1,486 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NexRise — Ethics & Humanity Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                green: '#00FF00',
+                dark: '#0B0F0C',
+                card: '#141A16',
+                border: '#222C25'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { 
+        background-color: #0B0F0C; 
+        color: #FFFFFF; 
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+      }
+      .snap-y-mandatory { scroll-snap-type: y mandatory; }
+      .snap-start { scroll-snap-align: start; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .neon-glow { filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4)); }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+    </style>
+</head>
+<body class="bg-brand-dark text-white min-h-screen flex flex-col pb-20 select-none">
+
+    <!-- Top Header with Google Login Option -->
+    <header class="sticky top-0 z-40 bg-black/90 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between max-w-md mx-auto w-full">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-green/20 border border-brand-green flex items-center justify-center">
+                <span class="text-brand-green font-extrabold text-lg">N</span>
+            </div>
+            <div>
+                <span class="font-extrabold tracking-wide text-base block leading-none">NexRise</span>
+                <span class="text-[9px] text-gray-400 tracking-wider uppercase">Ethical Media Platform</span>
+            </div>
+        </div>
+        
+        <!-- Google Login & AI Search Switcher -->
+        <div class="flex items-center gap-2">
+            <button onclick="toggleAISearch()" class="p-2 text-brand-green hover:bg-brand-green/10 rounded-full transition" title="Search Ethical AI">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </button>
+
+            <!-- Google Sign-in Mock Button -->
+            <button id="googleAuthBtn" onclick="toggleGoogleLogin()" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-xs font-semibold transition">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                <span id="authText">Login</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- AI Ethics Topic Search Bar -->
+    <div id="aiSearchPanel" class="hidden bg-brand-card border-b border-brand-border p-4 max-w-md mx-auto w-full">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-brand-green font-semibold">NexRise AI Moral Finder</span>
+            <button onclick="toggleAISearch()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="flex gap-2">
+            <input type="text" id="aiQueryInput" placeholder="Enter topic e.g. Respect, Honesty, Help..." class="flex-1 bg-black/60 border border-white/20 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-green">
+            <button onclick="runAISearch()" class="bg-brand-green text-black px-4 py-2 rounded-lg font-bold text-xs hover:bg-green-400 transition">Search</button>
+        </div>
+        <div id="aiSuggestions" class="mt-2 text-xs text-gray-400"></div>
+    </div>
+
+    <!-- MAIN APP BODY -->
+    <main class="flex-1 max-w-md mx-auto w-full px-3 pt-3">
+        
+        <!-- 1. HOME TAB (Figma Exact Layout) -->
+        <section id="tab-home" class="space-y-4">
+            <!-- Hero Banner -->
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-green-950/60 via-brand-card to-black border border-brand-green/30 relative overflow-hidden">
+                <span class="text-[10px] font-bold tracking-wider text-brand-green uppercase bg-brand-green/10 px-2.5 py-1 rounded-full border border-brand-green/20">Clean Media Ecosystem</span>
+                <h1 class="text-xl font-black mt-3 leading-tight">Empowering Ethical Content Creators.</h1>
+                <p class="text-xs text-gray-400 mt-1">Promoting positive videos without copyright infringement or distraction.</p>
+            </div>
+
+            <!-- Featured Quick Cards -->
+            <div class="grid grid-cols-2 gap-3">
+                <div onclick="switchTab('nextip')" class="cursor-pointer bg-brand-card p-3.5 rounded-xl border border-brand-border hover:border-brand-green/50 transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center text-brand-green mb-2">
+                            <i data-lucide="zap" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-sm">NexTip</h3>
+                        <p class="text-[10px] text-gray-400">Ethical Reels & Shorts</p>
+                    </div>
+                    <span class="text-[10px] text-brand-green font-medium mt-3 flex items-center gap-1">Watch Now <i data-lucide="chevron-right" class="w-3 h-3"></i></span>
+                </div>
+
+                <div onclick="switchTab('nexvid')" class="cursor-pointer bg-brand-card p-3.5 rounded-xl border border-brand-border hover:border-brand-green/50 transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center text-brand-green mb-2">
+                            <i data-lucide="monitor-play" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-sm">NexVid</h3>
+                        <p class="text-[10px] text-gray-400">Long Video Lectures</p>
+                    </div>
+                    <span class="text-[10px] text-brand-green font-medium mt-3 flex items-center gap-1">Explore Streams <i data-lucide="chevron-right" class="w-3 h-3"></i></span>
+                </div>
+            </div>
+
+            <!-- Approved Curators & Verified Partners Header -->
+            <div class="bg-brand-card p-3.5 rounded-xl border border-brand-border">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold text-gray-200 uppercase tracking-wider">Approved Partners & Muawan</h3>
+                    <i data-lucide="shield-check" class="w-4 h-4 text-brand-green"></i>
+                </div>
+                <div class="flex items-center gap-3 overflow-x-auto pb-1 no-scrollbar">
+                    <div class="flex flex-col items-center flex-shrink-0">
+                        <div class="w-11 h-11 rounded-full border-2 border-brand-green bg-gradient-to-tr from-green-900 to-black flex items-center justify-center text-xs font-bold">NR</div>
+                        <span class="text-[9px] text-gray-300 font-medium mt-1">NexTeam</span>
+                    </div>
+                    <div class="flex flex-col items-center flex-shrink-0">
+                        <div class="w-11 h-11 rounded-full border-2 border-brand-green bg-gradient-to-tr from-gray-800 to-black flex items-center justify-center text-xs font-bold">AK</div>
+                        <span class="text-[9px] text-gray-300 font-medium mt-1">AkhlaqLab</span>
+                    </div>
+                    <div class="flex flex-col items-center flex-shrink-0">
+                        <div class="w-11 h-11 rounded-full border-2 border-white/20 bg-gradient-to-tr from-gray-900 to-black flex items-center justify-center text-xs font-bold">EP</div>
+                        <span class="text-[9px] text-gray-400 font-medium mt-1">EthicPartner</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. NEXTIP TAB (SHORTS REELS FEED) -->
+        <section id="tab-nextip" class="hidden space-y-3">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-bold text-brand-green flex items-center gap-1.5">
+                    <i data-lucide="zap" class="w-4 h-4"></i> NexTip Ethical Shorts
+                </h2>
+                <span class="text-[10px] text-gray-400">Scroll Down for Next</span>
+            </div>
+            
+            <div id="shortsContainer" class="h-[74vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black">
+                <!-- Shorts Dynamic Feed Items -->
+            </div>
+        </section>
+
+        <!-- 3. NEXVID TAB (LONG VIDEOS FEED) -->
+        <section id="tab-nexvid" class="hidden space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-bold text-brand-green flex items-center gap-1.5">
+                    <i data-lucide="monitor-play" class="w-4 h-4"></i> NexVid Long Form Videos
+                </h2>
+            </div>
+            
+            <div id="longVideosContainer" class="space-y-4">
+                <!-- Long Video Dynamic Stream Items -->
+            </div>
+        </section>
+
+        <!-- 4. UPLOAD / ADMIN TAB -->
+        <section id="tab-admin" class="hidden space-y-4">
+            <div class="bg-brand-card p-4 rounded-xl border border-brand-border">
+                <h2 class="text-sm font-bold text-white mb-1">Submit YouTube Video Link</h2>
+                <p class="text-[11px] text-gray-400 mb-4">Paste YouTube link. All views directly credit the original channel on YouTube.</p>
+                
+                <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
+                    <div>
+                        <label class="text-[10px] font-medium uppercase text-gray-400 block mb-1">Video Format</label>
+                        <select id="videoType" class="w-full bg-black/70 border border-white/20 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
+                            <option value="short">NexTip (Short / Reel)</option>
+                            <option value="long">NexVid (Long Video)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-medium uppercase text-gray-400 block mb-1">YouTube URL</label>
+                        <input type="url" id="videoUrl" required placeholder="https://youtube.com/watch?v=... or shorts/..." class="w-full bg-black/70 border border-white/20 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-medium uppercase text-gray-400 block mb-1">Title / Moral Lesson</label>
+                        <input type="text" id="videoTitle" required placeholder="Main takeaway or ethical message" class="w-full bg-black/70 border border-white/20 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-medium uppercase text-gray-400 block mb-1">Creator / Muawan Partner ID</label>
+                        <input type="text" id="creatorName" required placeholder="Your Name or Team Partner Title" class="w-full bg-black/70 border border-white/20 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand-green text-black font-extrabold py-3 rounded-lg text-xs hover:bg-green-400 transition mt-2">
+                        Submit Video Link for Review
+                    </button>
+                </form>
+            </div>
+
+            <!-- Admin Queue Panel -->
+            <div class="bg-brand-card p-4 rounded-xl border border-brand-border">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold text-gray-200">Admin Verification Queue</h3>
+                    <span id="pendingBadge" class="bg-yellow-500/20 text-yellow-400 text-[10px] px-2.5 py-0.5 rounded-full font-bold">0 Pending</span>
+                </div>
+                <div id="adminQueue" class="space-y-2 text-xs text-gray-400">
+                    <!-- Pending Admin Submissions Render Here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FIGMA EXACT BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-t border-white/10 h-16 pb-safe">
+        <div class="grid grid-cols-4 h-full max-w-md mx-auto">
+            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center gap-1 text-brand-green transition-all duration-200">
+                <i data-lucide="home" class="w-6 h-6 neon-glow"></i>
+                <span class="text-[10px] font-medium uppercase tracking-wider">Home</span>
+            </button>
+            <button onclick="switchTab('nextip')" id="nav-nextip" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition-all duration-200">
+                <i data-lucide="zap" class="w-6 h-6"></i>
+                <span class="text-[10px] font-medium uppercase tracking-wider">NexTip</span>
+            </button>
+            <button onclick="switchTab('nexvid')" id="nav-nexvid" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition-all duration-200">
+                <i data-lucide="monitor-play" class="w-6 h-6"></i>
+                <span class="text-[10px] font-medium uppercase tracking-wider">NexVid</span>
+            </button>
+            <button onclick="switchTab('admin')" id="nav-admin" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition-all duration-200">
+                <i data-lucide="plus-square" class="w-6 h-6"></i>
+                <span class="text-[10px] font-medium uppercase tracking-wider">Upload</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- CORE JAVASCRIPT LOGIC ENGINE -->
+    <script>
+        // Version Migration Storage Key
+        const APP_VERSION = "1.0.0";
+        const STORAGE_KEY = "NEXRISE_STABLE_DATA_v" + APP_VERSION;
+
+        // Default Seed Data
+        const defaultData = [
+            {
+                id: "1",
+                type: "short",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
+                title: "Power of Honesty in Daily Life",
+                creator: "NexTeam Admin",
+                likes: 42,
+                status: "approved"
+            },
+            {
+                id: "2",
+                type: "long",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
+                title: "Detailed Ethics & Character Development Course",
+                creator: "EthicPartner Official",
+                likes: 128,
+                status: "approved"
+            }
+        ];
+
+        // Safe Storage Loader
+        function loadData() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (!stored) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+                    return defaultData;
+                }
+                return JSON.parse(stored);
+            } catch(e) {
+                return defaultData;
+            }
+        }
+
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // YouTube Embed Url Generator
+        function getYouTubeEmbedUrl(url) {
+            let videoId = "";
+            if (url.includes("shorts/")) {
+                videoId = url.split("shorts/")[1].split("?")[0];
+            } else if (url.includes("watch?v=")) {
+                videoId = url.split("watch?v=")[1].split("&")[0];
+            } else if (url.includes("youtu.be/")) {
+                videoId = url.split("youtu.be/")[1].split("?")[0];
+            } else if (url.includes("embed/")) {
+                return url;
+            }
+            return videoId ? "https://www.youtube.com/embed/" + videoId + "?rel=0&modestbranding=1" : url;
+        }
+
+        // Tab Navigation Logic
+        function switchTab(tabId) {
+            ['home', 'nextip', 'nexvid', 'admin'].forEach(t => {
+                document.getElementById('tab-' + t).classList.add('hidden');
+                const btn = document.getElementById('nav-' + t);
+                btn.className = "flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition-all duration-200";
+                const icon = btn.querySelector('i');
+                if (icon) icon.classList.remove('neon-glow');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('nav-' + tabId);
+            activeBtn.className = "flex flex-col items-center justify-center gap-1 text-brand-green transition-all duration-200";
+            const activeIcon = activeBtn.querySelector('i');
+            if (activeIcon) activeIcon.classList.add('neon-glow');
+            
+            lucide.createIcons();
+            renderApp();
+        }
+
+        // Google Auth Toggle Mock
+        let isLoggedIn = false;
+        function toggleGoogleLogin() {
+            isLoggedIn = !isLoggedIn;
+            const text = document.getElementById('authText');
+            if(isLoggedIn) {
+                text.innerText = "Partner ID Active";
+                alert("Google Account Signed In Successfully!");
+            } else {
+                text.innerText = "Login";
+            }
+        }
+
+        // AI Assistant Toggle
+        function toggleAISearch() {
+            document.getElementById('aiSearchPanel').classList.toggle('hidden');
+        }
+
+        function runAISearch() {
+            const query = document.getElementById('aiQueryInput').value;
+            const res = document.getElementById('aiSuggestions');
+            if(!query) return;
+            res.innerHTML = `✨ <b>Suggested Ethical Videos for "${query}":</b><br>• Respecting Elders & Neighbors<br>• Moral Leadership Essentials`;
+        }
+
+        // Like Counter Logic (Internal App Engagement)
+        function toggleLike(id) {
+            const data = loadData();
+            const item = data.find(x => x.id === id);
+            if (item) {
+                item.likes = (item.likes || 0) + 1;
+                saveData(data);
+                renderApp();
+            }
+        }
+
+        // Link Submission Form Handler
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('videoType').value;
+            const rawUrl = document.getElementById('videoUrl').value;
+            const title = document.getElementById('videoTitle').value;
+            const creator = document.getElementById('creatorName').value;
+
+            const embedUrl = getYouTubeEmbedUrl(rawUrl);
+            const data = loadData();
+
+            const newItem = {
+                id: Date.now().toString(),
+                type: type,
+                url: embedUrl,
+                title: title,
+                creator: creator,
+                likes: 0,
+                status: "pending"
+            };
+
+            data.push(newItem);
+            saveData(data);
+
+            alert("Video Link submitted successfully! Pending Admin verification.");
+            document.getElementById('uploadForm').reset();
+            renderApp();
+        }
+
+        // Admin Approval Actions
+        function approveVideo(id) {
+            const data = loadData();
+            const item = data.find(x => x.id === id);
+            if (item) {
+                item.status = "approved";
+                saveData(data);
+                renderApp();
+            }
+        }
+
+        function rejectVideo(id) {
+            let data = loadData();
+            data = data.filter(x => x.id !== id);
+            saveData(data);
+            renderApp();
+        }
+
+        // Dynamic Renderer
+        function renderApp() {
+            const data = loadData();
+            
+            // 1. Render NexTip (Reels format)
+            const shortsContainer = document.getElementById('shortsContainer');
+            const approvedShorts = data.filter(x => x.type === 'short' && x.status === 'approved');
+            
+            shortsContainer.innerHTML = approvedShorts.map(item => `
+                <div class="h-full w-full snap-start relative bg-black flex flex-col justify-between p-3 border-b border-white/10">
+                    <iframe class="w-full h-[78%] rounded-xl shadow-lg" src="${item.url}" frameborder="0" allowfullscreen></iframe>
+                    <div class="mt-2 bg-brand-card p-3 rounded-xl border border-brand-border flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-white">${item.title}</p>
+                            <span class="text-[10px] text-brand-green font-semibold flex items-center gap-1 mt-1">
+                                <i data-lucide="shield-check" class="w-3 h-3"></i> Verified Muawan: <b>${item.creator}</b>
+                            </span>
+                        </div>
+                        <button onclick="toggleLike('${item.id}')" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-brand-green transition">
+                            <i data-lucide="heart" class="w-5 h-5"></i>
+                            <span class="text-[9px] font-bold">${item.likes || 0}</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // 2. Render NexVid (Long format)
+            const longContainer = document.getElementById('longVideosContainer');
+            const approvedLong = data.filter(x => x.type === 'long' && x.status === 'approved');
+            
+            longContainer.innerHTML = approvedLong.map(item => `
+                <div class="bg-brand-card p-3.5 rounded-xl border border-brand-border space-y-2">
+                    <iframe class="w-full h-48 rounded-lg" src="${item.url}" frameborder="0" allowfullscreen></iframe>
+                    <h3 class="text-xs font-bold text-white">${item.title}</h3>
+                    <div class="flex items-center justify-between pt-2 border-t border-white/10 text-[10px]">
+                        <span class="text-gray-400">Curated by: <b class="text-brand-green">${item.creator}</b></span>
+                        <button onclick="toggleLike('${item.id}')" class="flex items-center gap-1 text-gray-400 hover:text-brand-green">
+                            <i data-lucide="heart" class="w-4 h-4"></i>
+                            <span>${item.likes || 0} Likes</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // 3. Render Admin Approval Queue
+            const pendingItems = data.filter(x => x.status === 'pending');
+            document.getElementById('pendingBadge').innerText = pendingItems.length + " Pending";
+            
+            const adminQueue = document.getElementById('adminQueue');
+            if(pendingItems.length === 0) {
+                adminQueue.innerHTML = `<p class="text-center py-3 text-[11px] text-gray-500">No pending video submissions in queue.</p>`;
+            } else {
+                adminQueue.innerHTML = pendingItems.map(item => `
+                    <div class="p-2.5 bg-black/50 border border-white/10 rounded-lg flex items-center justify-between">
+                        <div>
+                            <p class="text-white font-semibold text-xs">${item.title}</p>
+                            <p class="text-[10px] text-gray-400">By: ${item.creator} (${item.type.toUpperCase()})</p>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="approveVideo('${item.id}')" class="bg-brand-green text-black px-2.5 py-1 rounded text-[10px] font-bold">Approve</button>
+                            <button onclick="rejectVideo('${item.id}')" class="bg-red-500 text-white px-2.5 py-1 rounded text-[10px] font-bold">Reject</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            lucide.createIcons();
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            renderApp();
+        };
+    </script>
+</body>
+</html>

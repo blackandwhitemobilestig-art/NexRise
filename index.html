@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise — Powered by TiG Official</title>
+    <title>NexRise — Powered by TiG</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,17 +11,8 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        window.FirebaseSDK = {
-            initializeApp, getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut,
-            getFirestore, collection, doc, setDoc, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc
-        };
-    </script>
+    <!-- Three.js CDN for 3D Particle Intro -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
       tailwind.config = {
@@ -31,6 +22,7 @@
             colors: {
               brand: {
                 green: '#00FF00',
+                lime: '#39FF14',
                 dark: '#0B0F0C',
                 card: '#141A16',
                 border: '#222C25',
@@ -39,3 +31,985 @@
             },
             screens: {
               'tablet': '640px',
+              'desktop': '1024px'
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      body { 
+        background-color: #0B0F0C; 
+        color: #FFFFFF; 
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+        overflow-x: hidden;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Light mode overrides when toggled */
+      html.light body {
+        background-color: #F4F6F5;
+        color: #0B0F0C;
+      }
+      html.light .bg-brand-dark { background-color: #F4F6F5 !important; }
+      html.light .bg-brand-card { background-color: #FFFFFF !important; }
+      html.light .border-brand-border { border-color: #E2E8F0 !important; }
+      html.light .text-white { color: #090D0A !important; }
+      html.light .text-gray-400 { color: #4A5568 !important; }
+      html.light header, html.light nav { background-color: rgba(255, 255, 255, 0.95) !important; border-color: #E2E8F0 !important; }
+
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .neon-glow { filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6)); }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+
+      .aspect-video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+      }
+      .aspect-video-container iframe {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+      }
+
+      /* Wave Audio Visualizer Animation */
+      @keyframes waveBar {
+        0%, 100% { height: 12px; }
+        50% { height: 48px; }
+      }
+      .wave-bar {
+        animation: waveBar 1.2s infinite ease-in-out;
+      }
+    </style>
+</head>
+<body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
+
+    <!-- 1. 3D PARTICLE SPLASH SCREEN (THREE.JS ENGINE) -->
+    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden pointer-events-none">
+        <div id="threejsCanvasContainer" class="absolute inset-0 z-0"></div>
+
+        <div class="text-center z-10">
+            <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-green bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
+                Powered by TiG
+            </span>
+        </div>
+
+        <div class="relative w-48 h-48 flex items-center justify-center z-10">
+            <div class="w-32 h-32 rounded-3xl bg-gradient-to-tr from-green-950 via-black to-green-900 border-2 border-brand-green flex items-center justify-center neon-glow shadow-2xl">
+                <!-- CUSTOM N-LOGO MATCHING BRAND IMAGE -->
+                <svg viewBox="0 0 100 100" class="w-20 h-20">
+                    <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="#00FF00" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <polygon points="44,40 44,60 58,50" fill="#FFFFFF"/>
+                    <path d="M78 22 Q84 28 84 34" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
+                    <path d="M83 17 Q92 26 92 35" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="text-center z-10 space-y-2 px-4">
+            <h1 class="text-4xl font-black tracking-wider flex items-center justify-center">
+                <span class="text-white">Nex</span><span class="text-brand-green">Rise</span>
+            </h1>
+            <p class="text-[11px] font-bold uppercase tracking-[0.25em] text-gray-300 border-t border-brand-green/30 pt-2 max-w-xs mx-auto">
+                Clean &amp; Ethical Media Stream
+            </p>
+        </div>
+    </div>
+
+    <!-- 2. PUBLIC HEADER WITH SECRET LOGO CLICK TRIGGER -->
+    <header class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-green hover:bg-brand-card rounded-xl transition" title="Toggle Navigation Menu">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+
+            <!-- CLICK LOGO TO TRIGGER ADMIN ACCESS SAFELY -->
+            <div class="flex items-center gap-2.5 cursor-pointer" onclick="triggerAdminSecretPrompt()">
+                <div class="w-9 h-9 rounded-xl bg-black border border-brand-green flex items-center justify-center neon-glow flex-shrink-0 p-1">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="#00FF00" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <polygon points="44,40 44,60 58,50" fill="#FFFFFF"/>
+                        <path d="M78 22 Q84 28 84 34" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
+                        <path d="M83 17 Q92 26 92 35" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="font-black tracking-wider text-base block leading-none">
+                        <span class="text-white">Nex</span><span class="text-brand-green">Rise</span>
+                    </div>
+                    <span class="text-[8px] text-brand-green tracking-widest uppercase font-bold">Powered by TiG</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH BAR WITH DEDICATED WORKING SEARCH BUTTON & VOICE MIC -->
+        <div class="hidden sm:flex flex-1 max-w-md mx-6 gap-2">
+            <div class="relative flex-1 flex items-center">
+                <span class="absolute left-3 pointer-events-none text-gray-400">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </span>
+                <input type="text" id="desktopSearchInput" onkeypress="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search clean lectures, cartoons, gaming..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition">
+                <button onclick="openVoiceSearchModal()" class="absolute right-2 text-gray-400 hover:text-brand-green p-1.5 rounded-lg transition" title="AI Voice Search">
+                    <i data-lucide="mic" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <button onclick="executeSearch('desktopSearchInput')" class="px-4 py-2 bg-brand-green text-black font-black text-xs rounded-xl hover:bg-green-400 transition flex items-center gap-1">
+                Search
+            </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="toggleThemeMode()" class="p-2 text-brand-green hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
+                <span class="text-lg">✌️</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MOBILE GLOBAL SEARCH INPUT & BUTTON -->
+    <div class="sm:hidden w-full px-3 pt-3 flex gap-2">
+        <div class="relative flex-1 flex items-center">
+            <span class="absolute left-3 pointer-events-none text-gray-400">
+                <i data-lucide="search" class="w-4 h-4"></i>
+            </span>
+            <input type="text" id="mobileSearchInput" onkeypress="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Search multi-platform content..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition">
+            <button onclick="openVoiceSearchModal()" class="absolute right-2 text-gray-400 hover:text-brand-green p-1.5 rounded-lg transition" title="AI Voice Search">
+                <i data-lucide="mic" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <button onclick="executeSearch('mobileSearchInput')" class="px-3 py-2 bg-brand-green text-black font-extrabold text-xs rounded-xl">
+            Search
+        </button>
+    </div>
+
+    <!-- 3. COLLAPSIBLE SIDE DRAWER MENU -->
+    <div id="sideDrawerOverlay" onclick="toggleSideMenu()" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity"></div>
+    <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b border-brand-border pb-4">
+                <div class="flex items-center gap-2">
+                    <span class="font-black text-sm text-white tracking-wider">NexRise Menu</span>
+                </div>
+                <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-1.5">
+                <p class="px-3 text-[10px] font-black uppercase tracking-wider text-gray-500 mb-2">Navigation</p>
+                <button onclick="selectMenuTab('home')" id="drawer-home" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-brand-green bg-brand-green/10 transition">
+                    <i data-lucide="home" class="w-4 h-4"></i> Home Stream
+                </button>
+                <button onclick="selectMenuTab('nextip')" id="drawer-nextip" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
+                    <i data-lucide="zap" class="w-4 h-4"></i> NexTip (Short Reels)
+                </button>
+                <button onclick="selectMenuTab('nexvid')" id="drawer-nexvid" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
+                    <i data-lucide="monitor-play" class="w-4 h-4"></i> NexVid (Long Videos)
+                </button>
+                <button onclick="selectMenuTab('upload')" id="drawer-upload" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
+                    <i data-lucide="plus-square" class="w-4 h-4"></i> Submit Content
+                </button>
+                <button onclick="toggleThemeMode()" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
+                    <span class="flex items-center gap-3"><span class="text-base">✌️</span> Toggle Light/Dark Mode</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-brand-card p-3.5 rounded-xl border border-brand-border space-y-1">
+            <p class="text-[10px] font-extrabold text-brand-green uppercase">Powered by TiG</p>
+            <p class="text-[11px] text-gray-400 leading-tight">Ethically moderated streaming for global audiences.</p>
+        </div>
+    </aside>
+
+    <!-- 4. MAIN VIEWPORT & TAB SECTIONS -->
+    <div class="flex-1 flex w-full max-w-7xl mx-auto">
+        <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
+
+            <!-- STICKY TOP VIDEO PLAYER CONTAINER (WHEN ACTIVE) -->
+            <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-green p-3 shadow-2xl relative">
+                <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
+                    <span id="playerVideoTitle" class="text-xs font-black text-white truncate max-w-md">Playing Selected Stream</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleIframeFullscreen()" class="p-1 bg-brand-green/20 text-brand-green rounded-lg hover:bg-brand-green hover:text-black font-bold text-xs flex items-center gap-1">
+                            <i data-lucide="maximize" class="w-3.5 h-3.5"></i> Fullscreen
+                        </button>
+                        <button onclick="closeActivePlayer()" class="p-1 text-gray-400 hover:text-white">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="aspect-video-container bg-black rounded-xl overflow-hidden">
+                    <iframe id="activeMainIframe" src="" frameborder="0" allow="fullscreen" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <!-- TAB 1: HOME STREAM -->
+            <section id="tab-home" class="space-y-6">
+                <!-- CATEGORY FILTER CHIPS -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                    <button onclick="filterCategory('All')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-green text-black border border-brand-green">All</button>
+                    <button onclick="filterCategory('Moral & Islamic')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-green">Moral &amp; Islamic</button>
+                    <button onclick="filterCategory('Cartoons')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-green">Cartoons &amp; Kids</button>
+                    <button onclick="filterCategory('Educational')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-green">Educational</button>
+                    <button onclick="filterCategory('Gaming')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-green">Gaming</button>
+                </div>
+
+                <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
+            </section>
+
+            <!-- TAB 2: NEXTIP (SHORT REELS SNAP FEED) -->
+            <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
+                <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black"></div>
+            </section>
+
+            <!-- TAB 3: NEXVID (LONG VIDEOS GRID) -->
+            <section id="tab-nexvid" class="hidden space-y-4">
+                <h2 class="text-base font-bold text-brand-green flex items-center gap-2">
+                    <i data-lucide="monitor-play" class="w-5 h-5"></i> NexVid Dedicated Streams
+                </h2>
+                <div id="longVideosContainer" class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5"></div>
+            </section>
+
+            <!-- TAB 4: PUBLIC CONTENT SUBMISSION -->
+            <section id="tab-upload" class="hidden space-y-6 max-w-2xl mx-auto">
+                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border space-y-4">
+                    <h2 class="text-base font-bold text-white">Submit Ethical Content Link</h2>
+                    <p class="text-xs text-gray-400">Creators can submit verified content links to be reviewed by TiG Administrators.</p>
+                    
+                    <form onsubmit="handleFormSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Content Format</label>
+                            <select id="videoType" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
+                                <option value="short">NexTip (Short Reel)</option>
+                                <option value="long">NexVid (Long Video)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Category</label>
+                            <select id="videoCategory" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
+                                <option value="Moral & Islamic">Moral &amp; Islamic</option>
+                                <option value="Cartoons">Cartoons &amp; Kids</option>
+                                <option value="Educational">Educational</option>
+                                <option value="Gaming">Gaming</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Embed Link (YouTube / Facebook Embed URL)</label>
+                            <input type="url" id="videoUrl" required placeholder="https://www.youtube.com/embed/..." class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Title</label>
+                            <input type="text" id="videoTitle" required placeholder="Content title..." class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Creator / Scholar Name</label>
+                            <input type="text" id="creatorName" required placeholder="Channel or Creator ID" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
+                        </div>
+                        <button type="submit" class="w-full bg-brand-green text-black font-extrabold py-3.5 rounded-xl text-xs hover:bg-green-400 transition shadow-lg">
+                            Submit for TiG Verification
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 5: PROFILE & SECRET UNLOCKED DASHBOARD -->
+            <section id="tab-profile" class="hidden space-y-6 max-w-3xl mx-auto">
+                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-black border border-brand-green flex items-center justify-center p-2 text-brand-green">
+                            <i data-lucide="user" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold">Public Viewer</h3>
+                            <p class="text-xs text-gray-400">NexRise User Account</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECRET UNLOCKED ADMIN STUDIO (REVEALED ONLY AFTER PIN 3835 IS VERIFIED) -->
+                <div id="unlockedAdminDashboard" class="hidden space-y-6">
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-green space-y-5 shadow-2xl">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                            <h3 class="text-xs font-black uppercase text-brand-green tracking-wider flex items-center gap-2">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Official Creator Studio
+                            </h3>
+                            <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
+                        </div>
+
+                        <!-- LIVE METRICS -->
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div class="bg-black/60 p-3 rounded-xl border border-white/10">
+                                <p class="text-[9px] text-gray-400 uppercase font-semibold">Active Streams</p>
+                                <p id="statActiveStreams" class="text-base font-black text-brand-green mt-0.5">6</p>
+                            </div>
+                            <div class="bg-black/60 p-3 rounded-xl border border-white/10">
+                                <p class="text-[9px] text-gray-400 uppercase font-semibold">User Rating</p>
+                                <p class="text-base font-black text-white mt-0.5">99.4%</p>
+                            </div>
+                            <div class="bg-black/60 p-3 rounded-xl border border-white/10">
+                                <p class="text-[9px] text-gray-400 uppercase font-semibold">Security</p>
+                                <p class="text-base font-black text-brand-green mt-0.5">PIN 3835</p>
+                            </div>
+                        </div>
+
+                        <!-- PUBLISH DIRECTLY FROM STUDIO -->
+                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
+                            <h4 class="text-xs font-bold text-gray-200">Instant Content Publish Control</h4>
+                            <form onsubmit="handleDirectAdminPublish(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                <input type="text" id="adminPubTitle" placeholder="Title" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
+                                <input type="text" id="adminPubCreator" placeholder="Creator / Scholar" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
+                                <input type="url" id="adminPubUrl" placeholder="Embed URL" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
+                                <select id="adminPubType" class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
+                                    <option value="long">NexVid Stream</option>
+                                    <option value="short">NexTip Reel</option>
+                                </select>
+                                <button type="submit" class="sm:col-span-2 py-2 bg-brand-green text-black font-extrabold rounded-lg hover:bg-green-400">
+                                    Publish Directly to Live Feed
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- MODERATION QUEUE & DIRECT DELETE MANAGEMENT -->
+                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
+                            <h4 class="text-xs font-bold text-gray-200 flex items-center justify-between">
+                                <span>Published Videos &amp; Moderation Manager</span>
+                                <span class="text-[10px] text-brand-green">Single-Click Delete Enabled</span>
+                            </h4>
+                            <div id="adminVideoManagerList" class="space-y-2 text-xs"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-t border-white/10 h-16 pb-safe">
+        <div class="grid grid-cols-4 h-full max-w-md mx-auto">
+            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center gap-1 text-brand-green transition">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[9px] font-medium uppercase tracking-wider">Home</span>
+            </button>
+            <button onclick="switchTab('nextip')" id="nav-nextip" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+                <span class="text-[9px] font-medium uppercase tracking-wider">NexTip</span>
+            </button>
+            <button onclick="switchTab('nexvid')" id="nav-nexvid" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
+                <i data-lucide="monitor-play" class="w-5 h-5"></i>
+                <span class="text-[9px] font-medium uppercase tracking-wider">NexVid</span>
+            </button>
+            <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
+                <i data-lucide="plus-square" class="w-5 h-5"></i>
+                <span class="text-[9px] font-medium uppercase tracking-wider">Submit</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 5. GREEN AI VOICE SEARCH OVERLAY MODAL -->
+    <div id="voiceSearchModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-6">
+        <div class="relative flex items-center justify-center">
+            <div class="w-24 h-24 rounded-full bg-brand-green/20 border-2 border-brand-green flex items-center justify-center text-brand-green neon-glow">
+                <i data-lucide="mic" class="w-10 h-10 animate-bounce"></i>
+            </div>
+        </div>
+
+        <!-- ANIMATED AUDIO WAVE VISUALIZER -->
+        <div class="flex items-center justify-center gap-1.5 h-12">
+            <div class="w-1.5 bg-brand-green rounded-full wave-bar" style="animation-delay: 0.1s;"></div>
+            <div class="w-1.5 bg-brand-green rounded-full wave-bar" style="animation-delay: 0.3s;"></div>
+            <div class="w-1.5 bg-brand-green rounded-full wave-bar" style="animation-delay: 0.2s;"></div>
+            <div class="w-1.5 bg-brand-green rounded-full wave-bar" style="animation-delay: 0.4s;"></div>
+            <div class="w-1.5 bg-brand-green rounded-full wave-bar" style="animation-delay: 0.15s;"></div>
+        </div>
+
+        <div class="space-y-2 max-w-sm">
+            <h3 class="text-base font-extrabold text-white">Green AI Voice Assistant</h3>
+            <p id="voiceRecognizedText" class="text-xs text-brand-green font-mono min-h-[20px]">Listening... Say something like "Quran recitation" or "Gaming"</p>
+        </div>
+
+        <button onclick="closeVoiceSearchModal()" class="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-gray-300 font-bold text-xs rounded-xl">
+            Cancel
+        </button>
+    </div>
+
+    <!-- SECRET ADMIN LOGIN AUTH MODAL (TRIGGERED ONLY BY CTRL+SHIFT+J OR LOGO CLICK) -->
+    <div id="adminAuthModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-brand-green max-w-sm w-full p-6 rounded-2xl space-y-4 shadow-2xl">
+            <div class="text-center space-y-1">
+                <h3 class="text-base font-bold text-white">TiG Admin Authentication</h3>
+                <p class="text-xs text-gray-400">Enter Official Admin Email &amp; 4-Digit Security PIN</p>
+            </div>
+
+            <form onsubmit="verifyAdminPinLogin(event)" class="space-y-3">
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Official Email</label>
+                    <input type="email" id="adminEmailInput" required placeholder="admin@tig.official" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">4-Digit Security PIN</label>
+                    <input type="password" id="adminPinInput" maxlength="4" required placeholder="••••" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green text-center text-lg tracking-widest">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 bg-white/10 text-gray-300 font-bold text-xs rounded-xl">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-brand-green text-black font-extrabold text-xs rounded-xl hover:bg-green-400">Unlock Studio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- COMMENTS MODAL -->
+    <div id="commentsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center">
+        <div class="bg-brand-card border border-brand-border p-5 rounded-t-3xl sm:rounded-2xl max-w-md w-full h-[65vh] sm:h-[500px] flex flex-col justify-between">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                    <i data-lucide="message-circle" class="w-4 h-4 text-brand-green"></i> Community Discussion
+                </h3>
+                <button onclick="closeCommentsModal()" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="commentsList" class="flex-1 overflow-y-auto py-3 space-y-3 text-xs"></div>
+            <form onsubmit="handleAddComment(event)" class="flex gap-2 pt-3 border-t border-white/10">
+                <input type="text" id="commentInput" placeholder="Add a respectful comment..." required class="flex-1 bg-black/60 border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-green">
+                <button type="submit" class="px-4 py-2 bg-brand-green text-black font-extrabold text-xs rounded-xl">Post</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP ENGINE JS -->
+    <script>
+        const APP_VERSION = "2.8.0";
+        const STORAGE_KEY = "NEXRISE_V28_DATA";
+        const SECURITY_PIN = "3835";
+        const OFFICIAL_EMAIL = "admin@tig.official";
+
+        let isAdminUnlocked = false;
+        let activeSelectedCategory = "All";
+        let activeCommentVideoId = null;
+
+        // Expanded Ethical & Safe Content Base
+        const defaultData = [
+            {
+                id: "1",
+                type: "long",
+                category: "Moral & Islamic",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                title: "Beautiful Quran Recitation & Moral Guidance",
+                creator: "Qari Official",
+                likes: 420,
+                comments: ["MashaAllah very peaceful."],
+                status: "approved"
+            },
+            {
+                id: "2",
+                type: "long",
+                category: "Educational",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                title: "Ethical Technology & Modern Innovation",
+                creator: "TiG Tech",
+                likes: 198,
+                comments: ["Great educational video."],
+                status: "approved"
+            },
+            {
+                id: "3",
+                type: "long",
+                category: "Cartoons",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                title: "Moral Lessons Cartoon Series for Children",
+                creator: "Clean Animation Studio",
+                likes: 512,
+                comments: ["100% safe for kids!"],
+                status: "approved"
+            },
+            {
+                id: "4",
+                type: "short",
+                category: "Moral & Islamic",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                title: "Daily Moral Reflection in 60 Seconds",
+                creator: "NexTip Daily",
+                likes: 890,
+                comments: ["Powerful message."],
+                status: "approved"
+            },
+            {
+                id: "5",
+                type: "short",
+                category: "Educational",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                title: "Quick Science & Tech Insight",
+                creator: "TiG Shorts",
+                likes: 340,
+                comments: ["Very helpful!"],
+                status: "approved"
+            }
+        ];
+
+        let videoData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+
+        // KEYBOARD SHORTCUT (Ctrl + Shift + J or Cmd + Shift + J)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
+                e.preventDefault();
+                triggerAdminSecretPrompt();
+            }
+        });
+
+        window.onload = function() {
+            lucide.createIcons();
+            init3DIntroParticleCanvas();
+
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.remove(), 700);
+                }
+            }, 2000);
+
+            renderFeeds();
+            renderAdminVideoManager();
+        };
+
+        // THREE.JS 3D PARTICLE INTRO ENGINE
+        function init3DIntroParticleCanvas() {
+            const container = document.getElementById('threejsCanvasContainer');
+            if (!container || typeof Three === 'undefined') return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const particlesGeometry = new THREE.BufferGeometry();
+            const count = 350;
+            const positions = new Float32Array(count * 3);
+
+            for(let i=0; i<count*3; i++) {
+                positions[i] = (Math.random() - 0.5) * 10;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.035,
+                color: 0x00FF00
+            });
+
+            const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particleSystem);
+            camera.position.z = 3;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                particleSystem.rotation.y += 0.003;
+                particleSystem.rotation.x += 0.0015;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        // SIDEBAR DRAWER MENU TOGGLE
+        function toggleSideMenu() {
+            const drawer = document.getElementById('collapsibleSidebar');
+            const overlay = document.getElementById('sideDrawerOverlay');
+            if (!drawer || !overlay) return;
+
+            const isHidden = drawer.classList.contains('-translate-x-full');
+            if (isHidden) {
+                drawer.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function selectMenuTab(tabId) {
+            toggleSideMenu();
+            switchTab(tabId);
+        }
+
+        function switchTab(tabId) {
+            ['home', 'nextip', 'nexvid', 'upload', 'profile'].forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                if (sec) sec.classList.toggle('hidden', t !== tabId);
+
+                const nbtn = document.getElementById(`nav-${t}`);
+                if (nbtn) {
+                    nbtn.className = (t === tabId) 
+                        ? "flex flex-col items-center justify-center gap-1 text-brand-green transition" 
+                        : "flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition";
+                }
+            });
+            renderFeeds();
+        }
+
+        // LIGHT / DARK MODE TOGGLE (VICTORY ICON ✌️)
+        function toggleThemeMode() {
+            const html = document.documentElement;
+            html.classList.toggle('light');
+        }
+
+        // LIVE SEARCH EXECUTION
+        function executeSearch(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const query = input.value.trim().toLowerCase();
+            renderFeeds(query);
+        }
+
+        function filterCategory(cat) {
+            activeSelectedCategory = cat;
+            document.querySelectorAll('.category-chip').forEach(btn => {
+                if (btn.innerText.includes(cat) || (cat === 'All' && btn.innerText === 'All')) {
+                    btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-green text-black border border-brand-green";
+                } else {
+                    btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-green";
+                }
+            });
+            renderFeeds();
+        }
+
+        // RENDER FEEDS
+        function renderFeeds(filterQuery = '') {
+            const approved = videoData.filter(v => v.status === 'approved' &&
+                (activeSelectedCategory === 'All' || v.category === activeSelectedCategory) &&
+                (v.title.toLowerCase().includes(filterQuery) || v.creator.toLowerCase().includes(filterQuery)));
+
+            const homeFeed = document.getElementById('youtubeStyleHomeFeed');
+            if (homeFeed) {
+                const longs = approved.filter(v => v.type === 'long');
+                const shorts = approved.filter(v => v.type === 'short');
+
+                let html = '';
+                if (longs.length > 0) {
+                    html += `<div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">
+                        ${longs.map(v => renderCardHtml(v)).join('')}
+                    </div>`;
+                }
+
+                if (shorts.length > 0) {
+                    html += `
+                        <div class="bg-brand-card p-4 rounded-2xl border border-brand-border space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-black uppercase text-white tracking-wider flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i> NexTip Reels Shelf
+                                </h3>
+                                <button onclick="switchTab('nextip')" class="text-xs text-brand-green font-bold hover:underline">View All</button>
+                            </div>
+                            <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                                ${shorts.map(s => `
+                                    <div onclick="playStreamInTopPlayer('${s.url}', '${s.title.replace(/'/g, "\\'")}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
+                                        <iframe src="${s.url}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
+                                            <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
+                                            <p class="text-[9px] text-brand-green mt-1">@${s.creator}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                homeFeed.innerHTML = html || `<p class="text-gray-500 text-center py-8 text-xs">No streams match your filter.</p>`;
+            }
+
+            // NexVid Tab
+            const nexvidFeed = document.getElementById('longVideosContainer');
+            if (nexvidFeed) {
+                const longs = approved.filter(v => v.type === 'long');
+                nexvidFeed.innerHTML = longs.map(v => renderCardHtml(v)).join('');
+            }
+
+            // NexTip Shorts Tab
+            const shortsContainer = document.getElementById('shortsContainer');
+            if (shortsContainer) {
+                const shorts = approved.filter(v => v.type === 'short');
+                shortsContainer.innerHTML = shorts.map(v => `
+                    <div class="h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border">
+                        <iframe src="${v.url}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                        <div class="absolute bottom-4 left-4 right-4 bg-black/70 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-white">${v.title}</p>
+                                <p class="text-[10px] text-brand-green">@${v.creator}</p>
+                            </div>
+                            <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-green text-black font-extrabold text-xs rounded-lg">
+                                ❤️ ${v.likes}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            lucide.createIcons();
+        }
+
+        function renderCardHtml(v) {
+            return `
+                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-green/50 transition group">
+                    <div class="aspect-video-container bg-black cursor-pointer" onclick="playStreamInTopPlayer('${v.url}', '${v.title.replace(/'/g, "\\'")}')">
+                        <iframe src="${v.url}" title="${v.title}" frameborder="0" class="pointer-events-none"></iframe>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <span class="text-[9px] font-black uppercase tracking-wider text-brand-green bg-brand-green/10 px-2 py-0.5 rounded-md">
+                            ${v.category}
+                        </span>
+                        <h3 class="font-bold text-sm text-white line-clamp-2 cursor-pointer hover:text-brand-green" onclick="playStreamInTopPlayer('${v.url}', '${v.title.replace(/'/g, "\\'")}')">${v.title}</h3>
+                        <div class="flex items-center justify-between pt-2 text-xs text-gray-400 border-t border-white/5">
+                            <span class="font-medium text-gray-300">${v.creator}</span>
+                            <div class="flex items-center gap-3">
+                                <button onclick="toggleLike('${v.id}')" class="hover:text-brand-green flex items-center gap-1">
+                                    ❤️ ${v.likes}
+                                </button>
+                                <button onclick="openCommentsModal('${v.id}')" class="hover:text-brand-green flex items-center gap-1">
+                                    💬 ${v.comments.length}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // TOP DEDICATED PLAYER ENGINE
+        function playStreamInTopPlayer(url, title) {
+            const playerBox = document.getElementById('stickyVideoPlayerBox');
+            const iframe = document.getElementById('activeMainIframe');
+            const titleEl = document.getElementById('playerVideoTitle');
+
+            if (playerBox && iframe) {
+                iframe.src = url + "?autoplay=1";
+                if (titleEl) titleEl.innerText = title;
+                playerBox.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function closeActivePlayer() {
+            const playerBox = document.getElementById('stickyVideoPlayerBox');
+            const iframe = document.getElementById('activeMainIframe');
+            if (playerBox && iframe) {
+                iframe.src = "";
+                playerBox.classList.add('hidden');
+            }
+        }
+
+        function toggleIframeFullscreen() {
+            const iframe = document.getElementById('activeMainIframe');
+            if (iframe) {
+                if (iframe.requestFullscreen) iframe.requestFullscreen();
+                else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+            }
+        }
+
+        function toggleLike(id) {
+            const item = videoData.find(v => v.id === id);
+            if (item) {
+                item.likes += 1;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
+                renderFeeds();
+            }
+        }
+
+        // GREEN AI VOICE SEARCH OVERLAY ENGINE
+        function openVoiceSearchModal() {
+            const modal = document.getElementById('voiceSearchModal');
+            const textEl = document.getElementById('voiceRecognizedText');
+            if (modal) modal.classList.remove('hidden');
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.start();
+
+                recognition.onresult = (e) => {
+                    const transcript = e.results[0][0].transcript;
+                    if (textEl) textEl.innerText = `Recognized: "${transcript}"`;
+                    setTimeout(() => {
+                        closeVoiceSearchModal();
+                        renderFeeds(transcript.toLowerCase());
+                    }, 1200);
+                };
+            } else {
+                // Dynamic Typing Stream Fallback Simulation
+                let phrases = ["Moral Lectures", "Children Cartoons", "Educational Tech"];
+                let chosen = phrases[Math.floor(Math.random() * phrases.length)];
+                let idx = 0;
+                let timer = setInterval(() => {
+                    if (idx <= chosen.length) {
+                        textEl.innerText = `AI Assistant Stream: "${chosen.slice(0, idx)}"`;
+                        idx++;
+                    } else {
+                        clearInterval(timer);
+                        setTimeout(() => {
+                            closeVoiceSearchModal();
+                            renderFeeds(chosen.toLowerCase());
+                        }, 1000);
+                    }
+                }, 100);
+            }
+        }
+
+        function closeVoiceSearchModal() {
+            const modal = document.getElementById('voiceSearchModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // SECRET PIN-PROTECTED ADMIN STUDIO ("3835")
+        function triggerAdminSecretPrompt() {
+            document.getElementById('adminAuthModal').classList.remove('hidden');
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+        }
+
+        function verifyAdminPinLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmailInput').value;
+            const pin = document.getElementById('adminPinInput').value;
+
+            if (email === OFFICIAL_EMAIL && pin === SECURITY_PIN) {
+                isAdminUnlocked = true;
+                closeAdminAuthModal();
+                document.getElementById('unlockedAdminDashboard').classList.remove('hidden');
+                switchTab('profile');
+                renderAdminVideoManager();
+            } else {
+                alert('Invalid Official Admin Email or Security PIN!');
+            }
+        }
+
+        function lockAdminDashboard() {
+            isAdminUnlocked = false;
+            document.getElementById('unlockedAdminDashboard').classList.add('hidden');
+        }
+
+        // DIRECT ADMIN CONTENT MANAGER & SINGLE-CLICK DELETE
+        function renderAdminVideoManager() {
+            const container = document.getElementById('adminVideoManagerList');
+            const activeStreamsCount = document.getElementById('statActiveStreams');
+            if (!container) return;
+
+            if (activeStreamsCount) activeStreamsCount.innerText = videoData.length;
+
+            container.innerHTML = videoData.map(v => `
+                <div class="flex items-center justify-between p-2.5 bg-black/60 rounded-xl border border-white/10">
+                    <div class="truncate max-w-[200px]">
+                        <p class="font-bold text-white truncate">${v.title}</p>
+                        <p class="text-[10px] text-gray-400">By ${v.creator} • ${v.category}</p>
+                    </div>
+                    <button onclick="deleteVideoItem('${v.id}')" class="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold text-[10px] rounded-lg transition">
+                        Delete
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function deleteVideoItem(id) {
+            if (confirm('Are you sure you want to delete this stream?')) {
+                videoData = videoData.filter(v => v.id !== id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
+                renderAdminVideoManager();
+                renderFeeds();
+            }
+        }
+
+        function handleDirectAdminPublish(e) {
+            e.preventDefault();
+            const title = document.getElementById('adminPubTitle').value;
+            const creator = document.getElementById('adminPubCreator').value;
+            const url = document.getElementById('adminPubUrl').value;
+            const type = document.getElementById('adminPubType').value;
+
+            const newItem = {
+                id: Date.now().toString(),
+                type,
+                category: "Moral & Islamic",
+                url, title, creator,
+                likes: 0,
+                comments: [],
+                status: "approved"
+            };
+
+            videoData.unshift(newItem);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
+            renderAdminVideoManager();
+            renderFeeds();
+            e.target.reset();
+            alert('Stream Published Directly!');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('videoType').value;
+            const category = document.getElementById('videoCategory').value;
+            const url = document.getElementById('videoUrl').value;
+            const title = document.getElementById('videoTitle').value;
+            const creator = document.getElementById('creatorName').value;
+
+            const newItem = {
+                id: Date.now().toString(),
+                type, category, url, title, creator,
+                likes: 0,
+                comments: [],
+                status: "approved"
+            };
+
+            videoData.unshift(newItem);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
+            renderFeeds();
+            alert('Content Submitted & Verified Successfully!');
+            e.target.reset();
+        }
+
+        // COMMENTS ENGINE
+        function openCommentsModal(id) {
+            activeCommentVideoId = id;
+            document.getElementById('commentsModal').classList.remove('hidden');
+            renderComments();
+        }
+
+        function closeCommentsModal() {
+            document.getElementById('commentsModal').classList.add('hidden');
+        }
+
+        function renderComments() {
+            const container = document.getElementById('commentsList');
+            const item = videoData.find(v => v.id === activeCommentVideoId);
+            if (!item || item.comments.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center py-4">No comments yet. Share your thoughts!</p>`;
+                return;
+            }
+            container.innerHTML = item.comments.map(c => `
+                <div class="bg-black/50 p-2.5 rounded-xl border border-white/5">
+                    <p class="text-gray-200">${c}</p>
+                </div>
+            `).join('');
+        }
+
+        function handleAddComment(e) {
+            e.preventDefault();
+            const input = document.getElementById('commentInput');
+            const item = videoData.find(v => v.id === activeCommentVideoId);
+            if (item && input.value.trim()) {
+                item.comments.push(input.value.trim());
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
+                input.value = '';
+                renderComments();
+                renderFeeds();
+            }
+        }
+    </script>
+</body>
+</html>
+    

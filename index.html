@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ur" class="dark">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise — Powered by TIG (ٹی ار جی افیشل)</title>
+    <title>NexRise — Official Ethical Platform</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -93,7 +93,7 @@
 </head>
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
 
-    <!-- 1. PUBLIC TOP HEADER -->
+    <!-- TOP GLOBAL HEADER -->
     <header class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full">
         <div class="flex items-center gap-3">
             <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-green hover:bg-brand-card rounded-xl transition" title="Menu">
@@ -112,18 +112,18 @@
                     <div class="font-black tracking-wider text-base block leading-none">
                         <span class="text-white">Nex</span><span class="text-brand-green">Rise</span>
                     </div>
-                    <span class="text-[8px] text-brand-green tracking-widest uppercase font-bold">ٹی ار جی افیشل</span>
+                    <span class="text-[8px] text-brand-green tracking-widest uppercase font-bold">TRG OFFICIAL</span>
                 </div>
             </div>
         </div>
 
-        <!-- SEARCH BAR WITH VOICE AI -->
+        <!-- SEARCH BAR WITH AI VOICE MIC -->
         <div class="hidden sm:block flex-1 max-w-md mx-6">
             <div class="relative flex items-center">
                 <span class="absolute left-3 pointer-events-none text-gray-400">
                     <i data-lucide="search" class="w-4 h-4"></i>
                 </span>
-                <input type="text" id="desktopSearchInput" oninput="handleSearch(this.value)" placeholder="سرچ کریں اسلامی و اخلاقی کنٹینٹ..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition text-right">
+                <input type="text" id="desktopSearchInput" oninput="handleSearch(this.value)" placeholder="Search ethical lectures, educational streams..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition">
                 <button onclick="openVoiceSearchOverlay()" class="absolute right-2 text-gray-400 hover:text-brand-green p-1.5 rounded-lg transition" title="Voice Search">
                     <i data-lucide="mic" class="w-4 h-4 text-brand-green"></i>
                 </button>
@@ -131,8 +131,12 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <!-- LANGUAGE & SETTINGS QUICK BUTTON -->
+            <button onclick="openSettingsModal()" class="p-2 text-gray-400 hover:text-brand-green rounded-xl transition" title="Settings">
+                <i data-lucide="globe" class="w-5 h-5"></i>
+            </button>
             <span class="text-[10px] font-bold text-brand-green bg-brand-card px-2.5 py-1 rounded-full border border-brand-border">
-                v3.0 Official
+                v3.5 Official
             </span>
         </div>
     </header>
@@ -143,20 +147,20 @@
             <span class="absolute left-3 pointer-events-none text-gray-400">
                 <i data-lucide="search" class="w-4 h-4"></i>
             </span>
-            <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="صوتی یا تحریری تلاش کریں..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition text-right">
+            <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Voice or text search content..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition">
             <button onclick="openVoiceSearchOverlay()" class="absolute right-2 text-gray-400 hover:text-brand-green p-1.5 rounded-lg transition" title="Voice Search">
                 <i data-lucide="mic" class="w-4 h-4 text-brand-green"></i>
             </button>
         </div>
     </div>
 
-    <!-- COLLAPSIBLE SIDE DRAWER OVERLAY MENU -->
+    <!-- SIDE NAVIGATION DRAWER -->
     <div id="sideDrawerOverlay" onclick="toggleSideMenu()" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity duration-300"></div>
     <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
                 <div class="flex items-center gap-2">
-                    <span class="font-black text-sm text-white tracking-wider">NexRise مینو</span>
+                    <span class="font-black text-sm text-white tracking-wider">NexRise Navigation</span>
                 </div>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -164,38 +168,41 @@
             </div>
 
             <div class="space-y-1.5">
-                <p class="px-3 text-[10px] font-black uppercase tracking-wider text-gray-500 mb-2">نیویگیشن</p>
+                <p class="px-3 text-[10px] font-black uppercase tracking-wider text-gray-500 mb-2">Main Menu</p>
                 <button onclick="selectMenuTab('home')" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-brand-green bg-brand-green/10 transition">
-                    <i data-lucide="home" class="w-4 h-4"></i> ہوم اسٹریم (Home)
+                    <i data-lucide="home" class="w-4 h-4"></i> Home Stream
                 </button>
                 <button onclick="selectMenuTab('nextip')" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="zap" class="w-4 h-4"></i> شارٹس ریلز (NexTip)
+                    <i data-lucide="zap" class="w-4 h-4"></i> NexTip (Short Reels)
                 </button>
                 <button onclick="selectMenuTab('nexvid')" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="monitor-play" class="w-4 h-4"></i> اسلامی لیکچرز (NexVid)
+                    <i data-lucide="monitor-play" class="w-4 h-4"></i> NexVid (Lectures & Series)
+                </button>
+                <button onclick="openSettingsModal()" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
+                    <i data-lucide="settings" class="w-4 h-4"></i> Language & Settings
                 </button>
                 <button onclick="openStudioAuthModal()" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-yellow-400 hover:bg-yellow-500/10 transition border border-yellow-500/20">
-                    <i data-lucide="shield-check" class="w-4 h-4"></i> ایڈمن اسٹوڈیو (Admin Studio)
+                    <i data-lucide="shield-check" class="w-4 h-4"></i> Admin Studio
                 </button>
             </div>
         </div>
 
         <div class="bg-brand-card p-3.5 rounded-xl border border-brand-border space-y-1">
-            <p class="text-[10px] font-extrabold text-brand-green uppercase">TRG Official Security</p>
-            <p class="text-[11px] text-gray-400 leading-tight">تمام مواد ایڈمن کی طرف سے تصدیق شدہ اور محفوظ ہے۔</p>
+            <p class="text-[10px] font-extrabold text-brand-green uppercase">TRG Community Guarantee</p>
+            <p class="text-[11px] text-gray-400 leading-tight">All content is strictly curated and verified for authentic educational value.</p>
         </div>
     </aside>
 
     <!-- MAIN VIEWPORT CONTAINER -->
     <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto max-w-7xl mx-auto w-full">
 
-        <!-- YOUTUBE-STYLE ACTIVE PLAYER SECTION (THEATRE MODE) -->
+        <!-- ACTIVE THEATRE PLAYER SECTION -->
         <div id="activePlayerWrapper" class="hidden space-y-3 mb-6 bg-black border border-brand-green/40 p-3 rounded-2xl relative shadow-2xl">
             <div class="flex items-center justify-between border-b border-white/10 pb-2">
-                <span id="activePlayerTitle" class="text-xs font-bold text-brand-green truncate max-w-xs">پلے ہو رہا ہے...</span>
+                <span id="activePlayerTitle" class="text-xs font-bold text-brand-green truncate max-w-xs">Playing Stream...</span>
                 <div class="flex items-center gap-2">
                     <button onclick="toggleFullScreenPlayer()" class="text-xs bg-brand-green/20 text-brand-green border border-brand-green/40 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">
-                        <i data-lucide="maximize" class="w-3.5 h-3.5"></i> فل اسکرین
+                        <i data-lucide="maximize" class="w-3.5 h-3.5"></i> Fullscreen
                     </button>
                     <button onclick="closeActivePlayer()" class="text-gray-400 hover:text-white p-1">
                         <i data-lucide="x" class="w-4 h-4"></i>
@@ -205,17 +212,17 @@
             
             <div id="videoContainerBox" class="aspect-video-container rounded-xl overflow-hidden relative">
                 <iframe id="mainActiveIframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                <!-- SECURITY OVERLAY SHIELD TO PREVENT DIRECT YOUTUBE REDIRECTS -->
+                <!-- SECURITY OVERLAY SHIELD TO PREVENT REDIRECTS -->
                 <div class="absolute top-0 left-0 right-0 h-12 bg-transparent z-10"></div>
             </div>
         </div>
 
         <!-- 1. HOME TAB FEED -->
         <section id="tab-home" class="space-y-6">
-            <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950/60 via-brand-card to-black border border-brand-green/30 text-right">
-                <span class="text-[9px] font-extrabold tracking-wider text-brand-green uppercase bg-brand-green/10 px-2.5 py-1 rounded-full border border-brand-green/20">پاک و اخلاقی پلیٹ فارم</span>
-                <h1 class="text-xl sm:text-2xl font-black mt-2 leading-tight">ٹی ار جی افیشل — اسلامی و اخلاقی کنٹینٹ</h1>
-                <p class="text-xs text-gray-400 mt-1">صرف تصدیق شدہ لیکچرز اور مفید ویڈیوز ڈسپلے کی جاتی ہیں۔</p>
+            <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950/60 via-brand-card to-black border border-brand-green/30">
+                <span class="text-[9px] font-extrabold tracking-wider text-brand-green uppercase bg-brand-green/10 px-2.5 py-1 rounded-full border border-brand-green/20">Verified Streaming</span>
+                <h1 class="text-xl sm:text-2xl font-black mt-2 leading-tight">NexRise — Ethical &amp; Educational Ecosystem</h1>
+                <p class="text-xs text-gray-400 mt-1">High-quality lectures, moral education, and inspirational content.</p>
             </div>
 
             <div id="homeVideoFeed" class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5"></div>
@@ -229,7 +236,7 @@
         <!-- 3. NEXVID LONG VIDEOS TAB -->
         <section id="tab-nexvid" class="hidden space-y-4">
             <h2 class="text-base font-bold text-brand-green flex items-center gap-2">
-                <i data-lucide="monitor-play" class="w-5 h-5"></i> اسلامی لیکچرز اور طویل ویڈیوز
+                <i data-lucide="monitor-play" class="w-5 h-5"></i> Educational Lectures &amp; Series
             </h2>
             <div id="longVideosContainer" class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5"></div>
         </section>
@@ -238,42 +245,42 @@
         <section id="tab-admin" class="hidden space-y-6 max-w-3xl mx-auto">
             <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-green/80 shadow-2xl space-y-5">
                 <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                    <h3 class="text-xs font-black uppercase text-brand-green tracking-wider">ٹی ار جی ایڈمن اسٹوڈیو (Admin Panel)</h3>
-                    <button onclick="lockAdminStudio()" class="text-xs text-red-400 hover:underline font-bold">اسٹوڈیو بند کریں</button>
+                    <h3 class="text-xs font-black uppercase text-brand-green tracking-wider">TRG Creator Studio (Admin Panel)</h3>
+                    <button onclick="lockAdminStudio()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                 </div>
 
                 <!-- ADD NEW CONTENT FORM -->
                 <form onsubmit="handleAdminUpload(event)" class="space-y-3 bg-black/60 p-4 rounded-xl border border-white/10">
-                    <h4 class="text-xs font-bold text-white">نیا کنٹینٹ / ویڈیو لنک شامل کریں</h4>
+                    <h4 class="text-xs font-bold text-white">Publish New Content / Direct Embed Link</h4>
                     <div>
-                        <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">ویڈیو کا ایمبیڈ لنک (YouTube Embed URL)</label>
-                        <input type="url" id="adminVideoUrl" required placeholder="https://www.youtube.com/embed/..." class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
+                        <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Video Stream URL / Embed Link</label>
+                        <input type="url" id="adminVideoUrl" required placeholder="https://..." class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">عنوان / ٹائٹل</label>
-                        <input type="text" id="adminVideoTitle" required placeholder="عنوان درج کریں..." class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green text-right">
+                        <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Title / Topic Title</label>
+                        <input type="text" id="adminVideoTitle" required placeholder="Enter content title..." class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">قسم</label>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Category / Format</label>
                             <select id="adminVideoType" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
-                                <option value="long">طویل ویڈیو / لیکچر</option>
-                                <option value="short">شارٹ ریل (NexTip)</option>
+                                <option value="long">NexVid (Long Video/Lecture)</option>
+                                <option value="short">NexTip (Short Reel)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">چینل کا نام</label>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Publisher Profile</label>
                             <input type="text" id="adminChannelName" value="Admin Official" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
                         </div>
                     </div>
                     <button type="submit" class="w-full bg-brand-green text-black font-extrabold py-3 rounded-xl text-xs hover:bg-green-400 transition shadow-lg">
-                        ایپ پر پبلش کریں (Publish to App)
+                        Publish Stream to App
                     </button>
                 </form>
 
                 <!-- MANAGED VIDEOS LIST WITH DELETE -->
                 <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
-                    <h4 class="text-xs font-bold text-gray-200">موجودہ مواد کی فہرست (ڈیلیٹ کنٹرول)</h4>
+                    <h4 class="text-xs font-bold text-gray-200">Published Content Management (Instant Delete Control)</h4>
                     <div id="adminVideosList" class="space-y-2"></div>
                 </div>
             </div>
@@ -281,24 +288,24 @@
 
     </main>
 
-    <!-- MOBILE BOTTOM NAVIGATION -->
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
     <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-t border-white/10 h-16 pb-safe">
         <div class="grid grid-cols-4 h-full max-w-md mx-auto">
             <button onclick="switchTab('home')" class="flex flex-col items-center justify-center gap-1 text-brand-green">
                 <i data-lucide="home" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase">ہوم</span>
+                <span class="text-[9px] font-medium uppercase">Home</span>
             </button>
             <button onclick="switchTab('nextip')" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300">
                 <i data-lucide="zap" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase">شارٹس</span>
+                <span class="text-[9px] font-medium uppercase">Reels</span>
             </button>
             <button onclick="switchTab('nexvid')" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300">
                 <i data-lucide="monitor-play" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase">لیکچرز</span>
+                <span class="text-[9px] font-medium uppercase">Lectures</span>
             </button>
             <button onclick="openStudioAuthModal()" class="flex flex-col items-center justify-center gap-1 text-yellow-400">
                 <i data-lucide="shield-check" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase">اسٹوڈیو</span>
+                <span class="text-[9px] font-medium uppercase">Studio</span>
             </button>
         </div>
     </nav>
@@ -309,23 +316,61 @@
             <div class="w-12 h-12 rounded-full bg-brand-green/20 border border-brand-green/50 flex items-center justify-center text-brand-green mx-auto">
                 <i data-lucide="lock" class="w-6 h-6"></i>
             </div>
-            <h3 class="text-base font-bold text-white">ایڈمن اسٹوڈیو لاگ ان</h3>
-            <p class="text-xs text-gray-400">آفیشل جی میل اور سیکیورٹی پن درج کریں</p>
+            <h3 class="text-base font-bold text-white">Admin Studio Login</h3>
+            <p class="text-xs text-gray-400">Enter official credentials and 4-digit security code</p>
 
-            <form onsubmit="verifyStudioAuth(event)" class="space-y-3 text-right">
+            <form onsubmit="verifyStudioAuth(event)" class="space-y-3 text-left">
                 <div>
-                    <label class="text-[10px] font-bold text-gray-400 block mb-1">آفیشل جی میل اکاؤنٹ</label>
-                    <input type="email" id="authGmail" required placeholder="admin@gmail.com" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green text-left">
+                    <label class="text-[10px] font-bold text-gray-400 block mb-1">Official Email Account</label>
+                    <input type="email" id="authGmail" required placeholder="admin@gmail.com" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-gray-400 block mb-1">سیکیورٹی پن کوڈ</label>
+                    <label class="text-[10px] font-bold text-gray-400 block mb-1">4-Digit Security Code</label>
                     <input type="password" id="authPin" maxlength="4" required placeholder="****" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white text-center font-bold tracking-widest focus:outline-none focus:border-brand-green">
                 </div>
                 <button type="submit" class="w-full py-3 bg-brand-green text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition">
-                    ان لاک اسٹوڈیو
+                    Unlock Studio Panel
                 </button>
             </form>
-            <button onclick="closeStudioAuthModal()" class="text-xs text-gray-500 hover:text-white">منسوخ کریں</button>
+            <button onclick="closeStudioAuthModal()" class="text-xs text-gray-500 hover:text-white">Cancel</button>
+        </div>
+    </div>
+
+    <!-- SETTINGS & LANGUAGE MODAL -->
+    <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-brand-border max-w-sm w-full p-6 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="settings" class="w-4 h-4 text-brand-green"></i> App Settings &amp; Language
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">App Display Language</label>
+                    <select id="languageSelect" onchange="changeLanguage(this.value)" class="w-full bg-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
+                        <option value="en" selected>English (International)</option>
+                        <option value="ur">اردو (Urdu)</option>
+                        <option value="ar">العربية (Arabic)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Video Stream Quality Mode</label>
+                    <select class="w-full bg-black border border-brand-border rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
+                        <option value="auto">Auto Adaptive Quality</option>
+                        <option value="hd">High Definition (HD)</option>
+                        <option value="saver">Data Saver Mode</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="closeSettingsModal()" class="w-full py-3 bg-brand-green text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition">
+                Save Preferences
+            </button>
         </div>
     </div>
 
@@ -348,19 +393,19 @@
             <div class="wave-bar"></div>
         </div>
 
-        <h3 class="text-lg font-bold text-white mb-2">سن رہا ہے... (Listening)</h3>
+        <h3 class="text-lg font-bold text-white mb-2">Listening...</h3>
         <p id="voiceLiveTranscript" class="text-sm font-semibold text-brand-green max-w-xs h-12 border-b border-white/10 flex items-center justify-center text-center">
-            آپ جو بولیں گے وہ یہاں ٹائپ ہوگا...
+            Speak now, speech will type automatically...
         </p>
     </div>
 
     <!-- JAVASCRIPT APP ENGINE -->
     <script>
-        // OFFICIAL DEFAULT DATA (ISLAMIC & ETHICAL CONTENT ONLY)
+        // ETHICAL & ISLAMIC DEMO DATA (INTERNATIONAL TEST FEEDS)
         let appContent = [
-            { id: 1, title: "قرآن پاک کی خوبصورت تلاوت — روح پرور آواز", url: "https://www.youtube.com/embed/2R3Mv3aIOfs", type: "long", creator: "Admin Official" },
-            { id: 2, title: "اسلامی تاریخ اور سبق آموز واقعات", url: "https://www.youtube.com/embed/5a6z0P7m23c", type: "long", creator: "Admin Official" },
-            { id: 3, title: "مختصر اسلامی نصیحت — NexTip Reel", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", type: "short", creator: "Admin Official" }
+            { id: 1, title: "Beautiful Quranic Recitation & Peaceful Reflections", url: "https://www.youtube.com/embed/2R3Mv3aIOfs", type: "long", creator: "Admin Official" },
+            { id: 2, title: "Ethical Lessons & Inspirational Wisdom", url: "https://www.youtube.com/embed/5a6z0P7m23c", type: "long", creator: "Admin Official" },
+            { id: 3, title: "Short Moral Advice & Daily Motivation — NexTip Reel", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", type: "short", creator: "Admin Official" }
         ];
 
         let isAdminUnlocked = false;
@@ -396,7 +441,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="space-y-1 text-right">
+                    <div class="space-y-1">
                         <span class="text-[9px] font-black uppercase text-brand-green bg-brand-green/10 px-2 py-0.5 rounded border border-brand-green/20">Verified Admin</span>
                         <h3 class="text-xs font-bold text-white line-clamp-2">${item.title}</h3>
                         <p class="text-[10px] text-gray-400">${item.creator}</p>
@@ -409,7 +454,7 @@
                 adminItem.className = "flex items-center justify-between p-2 bg-black rounded-lg text-xs border border-white/10";
                 adminItem.innerHTML = `
                     <span class="truncate max-w-[200px] text-gray-300">${item.title}</span>
-                    <button onclick="deleteContent(${item.id})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1 bg-red-500/10 rounded">ڈیلیٹ کریں</button>
+                    <button onclick="deleteContent(${item.id})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1 bg-red-500/10 rounded">Delete</button>
                 `;
                 adminList.appendChild(adminItem);
             });
@@ -445,6 +490,25 @@
             }
         }
 
+        // SETTINGS & LANGUAGE MODAL
+        function openSettingsModal() {
+            document.getElementById("settingsModal").classList.remove("hidden");
+        }
+
+        function closeSettingsModal() {
+            document.getElementById("settingsModal").classList.add("hidden");
+        }
+
+        function changeLanguage(lang) {
+            if (lang === 'ur') {
+                alert("زبان کا انتخاب اردو سیٹ کر دیا گیا ہے۔");
+            } else if (lang === 'ar') {
+                alert("تم تغيير اللغة إلى العربية");
+            } else {
+                alert("Language set to English.");
+            }
+        }
+
         // ADMIN STUDIO AUTHENTICATION (CODE 3835)
         function openStudioAuthModal() {
             if (isAdminUnlocked) {
@@ -467,9 +531,9 @@
                 isAdminUnlocked = true;
                 closeStudioAuthModal();
                 switchTab('admin');
-                alert("ایڈمن اسٹوڈیو کامیابی سے ان لاک ہو گیا ہے!");
+                alert("Admin Studio successfully unlocked!");
             } else {
-                alert("غلط سیکیورٹی پن! رسائی مسترد کر دی گئی۔");
+                alert("Invalid Security Code! Access Denied.");
             }
         }
 
@@ -496,12 +560,12 @@
 
             appContent.unshift(newItem);
             renderContentFeeds();
-            alert("نیا کنٹینٹ کامیابی سے شائع کر دیا گیا ہے!");
+            alert("New content successfully published to NexRise!");
             event.target.reset();
         }
 
         function deleteContent(id) {
-            if (confirm("کیا آپ واقعی اس کنٹینٹ کو ایپ سے ڈیلیٹ کرنا چاہتے ہیں؟")) {
+            if (confirm("Are you sure you want to delete this video from NexRise?")) {
                 appContent = appContent.filter(item => item.id !== id);
                 renderContentFeeds();
             }
@@ -516,7 +580,7 @@
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 const recognition = new SpeechRecognition();
-                recognition.lang = 'ur-PK';
+                recognition.lang = 'en-US';
                 recognition.continuous = false;
 
                 recognition.onresult = function(event) {
@@ -530,7 +594,7 @@
 
                 recognition.start();
             } else {
-                transcriptBox.innerText = "وائس سرچ اس براؤزر میں سپورٹڈ نہیں ہے۔";
+                transcriptBox.innerText = "Voice recognition is not supported in this browser.";
             }
         }
 
@@ -539,7 +603,7 @@
         }
 
         function handleSearch(query) {
-            // Live Search Filtering Logic
+            // Live Search Logic
         }
 
         // NAVIGATION TABS

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="ur" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise — Powered by TIG</title>
+    <title>NexRise — Powered by TIG (ٹی ار جی افیشل)</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -60,29 +60,21 @@
       .neon-glow { filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6)); }
       .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
 
-      /* 3D Intro Particle Animation Keyframes */
-      @keyframes particleAssemble {
-        0% {
-          transform: perspective(700px) translate3d(var(--tw-translate-x, 0), var(--tw-translate-y, 0), 500px) scale(0.1) rotateX(240deg) rotateY(240deg);
-          opacity: 0;
-        }
-        70% { opacity: 0.9; }
-        100% {
-          transform: perspective(700px) translate3d(0, 0, 0) scale(1) rotateX(0deg) rotateY(0deg);
-          opacity: 1;
-        }
+      /* Sound Wave Animation for Voice Search */
+      @keyframes waveGlow {
+        0%, 100% { height: 12px; opacity: 0.4; }
+        50% { height: 48px; opacity: 1; }
       }
-
-      .p-part-1 { animation: particleAssemble 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; --tw-translate-x: -150px; --tw-translate-y: -180px; }
-      .p-part-2 { animation: particleAssemble 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards; --tw-translate-x: 160px; --tw-translate-y: -120px; }
-      .p-part-3 { animation: particleAssemble 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; --tw-translate-x: -120px; --tw-translate-y: 150px; }
-      .p-part-4 { animation: particleAssemble 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards; --tw-translate-x: 140px; --tw-translate-y: 140px; }
-      
-      @keyframes logoGlowPulse {
-        0%, 100% { filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.8)); transform: scale(1); }
-        50% { filter: drop-shadow(0 0 30px rgba(0, 255, 0, 1)); transform: scale(1.08); }
+      .wave-bar {
+        width: 6px;
+        background-color: #00FF00;
+        border-radius: 9999px;
+        animation: waveGlow 1.2s infinite ease-in-out;
       }
-      .logo-3d-final { animation: logoGlowPulse 1.5s infinite ease-in-out; }
+      .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+      .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+      .wave-bar:nth-child(4) { animation-delay: 0.1s; }
+      .wave-bar:nth-child(5) { animation-delay: 0.3s; }
 
       .aspect-video-container {
         position: relative;
@@ -101,57 +93,10 @@
 </head>
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
 
-    <!-- 1. 3D INTRO SPLASH SCREEN -->
-    <div id="splashScreen" class="fixed inset-0 z-50 bg-brand-dark flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden pointer-events-none">
-        <div class="text-center z-10">
-            <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-green bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                BY TiG
-            </span>
-        </div>
-
-        <div id="logoContainer" class="relative w-48 h-48 flex items-center justify-center transition-all duration-700">
-            <div class="absolute w-12 h-12 bg-brand-green/30 border-2 border-brand-green rounded-xl p-part-1 top-2 left-2"></div>
-            <div class="absolute w-12 h-12 bg-brand-green/40 border-2 border-brand-green rounded-xl p-part-2 top-2 right-2"></div>
-            <div class="absolute w-12 h-12 bg-brand-green/50 border-2 border-brand-green rounded-xl p-part-3 bottom-2 left-2"></div>
-            <div class="absolute w-12 h-12 bg-brand-green/30 border-2 border-brand-green rounded-xl p-part-4 bottom-2 right-2"></div>
-
-            <div class="w-32 h-32 rounded-3xl bg-gradient-to-tr from-green-950 via-black to-green-900 border-2 border-brand-green flex items-center justify-center logo-3d-final z-10 shadow-2xl relative">
-                <svg viewBox="0 0 100 100" class="w-20 h-20 fill-brand-green">
-                    <path d="M25 75 V25 C25 20, 35 20, 38 25 L62 65 C65 70, 75 70, 75 65 V25" stroke="#00FF00" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                    <polygon points="42,40 42,60 58,50" fill="#FFFFFF"/>
-                    <path d="M78 22 Q84 28 84 34" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
-                    <path d="M83 17 Q92 26 92 35" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
-                </svg>
-            </div>
-        </div>
-
-        <div class="text-center z-10 space-y-2 px-4">
-            <h1 class="text-4xl font-black tracking-wider flex items-center justify-center">
-                <span class="text-white">Nex</span><span class="text-brand-green">Rise</span>
-            </h1>
-            <p class="text-xs font-bold uppercase tracking-[0.25em] text-gray-300 border-t border-brand-green/30 pt-2 max-w-xs mx-auto">
-                ETHICAL &amp; CLEAN STREAMING
-            </p>
-        </div>
-    </div>
-
-    <!-- 2. OFFLINE ALERT OVERLAY -->
-    <div id="offlineAlert" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-        <div class="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 mb-4">
-            <i data-lucide="wifi-off" class="w-10 h-10"></i>
-        </div>
-        <h2 class="text-lg font-bold">No Internet Connection</h2>
-        <p class="text-xs text-gray-400 mt-1 max-w-xs">Please check your network connection to explore ethical content on NexRise.</p>
-        <button onclick="checkConnection()" class="mt-5 px-5 py-2.5 bg-brand-green text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition">
-            Retry Connection
-        </button>
-    </div>
-
-    <!-- PUBLIC TOP HEADER (WITH HAMBURGER MENU BUTTON & VOICE SEARCH) -->
+    <!-- 1. PUBLIC TOP HEADER -->
     <header class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full">
         <div class="flex items-center gap-3">
-            <!-- HAMBURGER MENU BUTTON (3 LINES ICON) -->
-            <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-green hover:bg-brand-card rounded-xl transition" title="Toggle Navigation Menu">
+            <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-green hover:bg-brand-card rounded-xl transition" title="Menu">
                 <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
 
@@ -161,52 +106,46 @@
                         <path d="M25 75 V25 C25 20, 35 20, 38 25 L62 65 C65 70, 75 70, 75 65 V25" stroke="#00FF00" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                         <polygon points="42,40 42,60 58,50" fill="#FFFFFF"/>
                         <path d="M78 22 Q84 28 84 34" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
-                        <path d="M83 17 Q92 26 92 35" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
                     </svg>
                 </div>
                 <div>
                     <div class="font-black tracking-wider text-base block leading-none">
                         <span class="text-white">Nex</span><span class="text-brand-green">Rise</span>
                     </div>
-                    <span class="text-[8px] text-brand-green tracking-widest uppercase font-bold">Powered by TIG</span>
+                    <span class="text-[8px] text-brand-green tracking-widest uppercase font-bold">ٹی ار جی افیشل</span>
                 </div>
             </div>
-            
-            <span id="deviceBadge" class="hidden md:inline-block text-[10px] font-bold text-gray-400 bg-brand-card px-2.5 py-1 rounded-full border border-brand-border">
-                Auto Layout
-            </span>
         </div>
 
-        <!-- DESKTOP/TABLET SEARCH BAR WITH VOICE SEARCH -->
+        <!-- SEARCH BAR WITH VOICE AI -->
         <div class="hidden sm:block flex-1 max-w-md mx-6">
             <div class="relative flex items-center">
                 <span class="absolute left-3 pointer-events-none text-gray-400">
                     <i data-lucide="search" class="w-4 h-4"></i>
                 </span>
-                <input type="text" id="desktopSearchInput" oninput="handleSearch(this.value)" placeholder="Search Youtube, Facebook & multi-platform ethical content..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition">
-                <!-- VOICE MIC BUTTON -->
-                <button onclick="startVoiceSearch('desktopSearchInput')" id="micBtnDesktop" class="absolute right-2 text-gray-400 hover:text-brand-green p-1.5 rounded-lg transition" title="Voice Search">
-                    <i data-lucide="mic" class="w-4 h-4"></i>
+                <input type="text" id="desktopSearchInput" oninput="handleSearch(this.value)" placeholder="سرچ کریں اسلامی و اخلاقی کنٹینٹ..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition text-right">
+                <button onclick="openVoiceSearchOverlay()" class="absolute right-2 text-gray-400 hover:text-brand-green p-1.5 rounded-lg transition" title="Voice Search">
+                    <i data-lucide="mic" class="w-4 h-4 text-brand-green"></i>
                 </button>
             </div>
         </div>
 
         <div class="flex items-center gap-2">
-            <button onclick="toggleTheme()" class="p-2 text-brand-green hover:bg-brand-green/10 rounded-full transition" title="Toggle Theme">
-                <i id="themeHeaderIcon" data-lucide="sun" class="w-4 h-4"></i>
-            </button>
+            <span class="text-[10px] font-bold text-brand-green bg-brand-card px-2.5 py-1 rounded-full border border-brand-border">
+                v3.0 Official
+            </span>
         </div>
     </header>
 
-    <!-- MOBILE GLOBAL SEARCH BAR WITH VOICE MIC -->
+    <!-- MOBILE SEARCH BAR -->
     <div class="sm:hidden w-full px-3 pt-3">
         <div class="relative flex items-center">
             <span class="absolute left-3 pointer-events-none text-gray-400">
                 <i data-lucide="search" class="w-4 h-4"></i>
             </span>
-            <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Voice or text search multi-platform content..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition">
-            <button onclick="startVoiceSearch('mobileSearchInput')" id="micBtnMobile" class="absolute right-2 text-gray-400 hover:text-brand-green p-1.5 rounded-lg transition" title="Voice Search">
-                <i data-lucide="mic" class="w-4 h-4"></i>
+            <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="صوتی یا تحریری تلاش کریں..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-green transition text-right">
+            <button onclick="openVoiceSearchOverlay()" class="absolute right-2 text-gray-400 hover:text-brand-green p-1.5 rounded-lg transition" title="Voice Search">
+                <i data-lucide="mic" class="w-4 h-4 text-brand-green"></i>
             </button>
         </div>
     </div>
@@ -217,12 +156,7 @@
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
                 <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-black border border-brand-green flex items-center justify-center p-1">
-                        <svg viewBox="0 0 100 100" class="w-full h-full fill-brand-green">
-                            <path d="M25 75 V25 C25 20, 35 20, 38 25 L62 65 C65 70, 75 70, 75 65 V25" stroke="#00FF00" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        </svg>
-                    </div>
-                    <span class="font-black text-sm text-white tracking-wider">NexRise Menu</span>
+                    <span class="font-black text-sm text-white tracking-wider">NexRise مینو</span>
                 </div>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -230,888 +164,420 @@
             </div>
 
             <div class="space-y-1.5">
-                <p class="px-3 text-[10px] font-black uppercase tracking-wider text-gray-500 mb-2">Navigation</p>
-                <button onclick="selectMenuTab('home')" id="drawer-home" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-brand-green bg-brand-green/10 transition">
-                    <i data-lucide="home" class="w-4 h-4"></i> Home Stream
+                <p class="px-3 text-[10px] font-black uppercase tracking-wider text-gray-500 mb-2">نیویگیشن</p>
+                <button onclick="selectMenuTab('home')" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-brand-green bg-brand-green/10 transition">
+                    <i data-lucide="home" class="w-4 h-4"></i> ہوم اسٹریم (Home)
                 </button>
-                <button onclick="selectMenuTab('nextip')" id="drawer-nextip" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="zap" class="w-4 h-4"></i> NexTip Reels (Shorts)
+                <button onclick="selectMenuTab('nextip')" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
+                    <i data-lucide="zap" class="w-4 h-4"></i> شارٹس ریلز (NexTip)
                 </button>
-                <button onclick="selectMenuTab('nexvid')" id="drawer-nexvid" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="monitor-play" class="w-4 h-4"></i> NexVid (Long Videos)
+                <button onclick="selectMenuTab('nexvid')" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
+                    <i data-lucide="monitor-play" class="w-4 h-4"></i> اسلامی لیکچرز (NexVid)
                 </button>
-                <button onclick="selectMenuTab('upload')" id="drawer-upload" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="plus-square" class="w-4 h-4"></i> Submit Content
-                </button>
-                <button onclick="selectMenuTab('profile')" id="drawer-profile" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="user" class="w-4 h-4"></i> Profile &amp; Settings
+                <button onclick="openStudioAuthModal()" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-yellow-400 hover:bg-yellow-500/10 transition border border-yellow-500/20">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i> ایڈمن اسٹوڈیو (Admin Studio)
                 </button>
             </div>
         </div>
 
         <div class="bg-brand-card p-3.5 rounded-xl border border-brand-border space-y-1">
-            <p class="text-[10px] font-extrabold text-brand-green uppercase">TIG Community Standards</p>
-            <p class="text-[11px] text-gray-400 leading-tight">All streams from YouTube, Facebook &amp; Web sources are strictly ethically moderated.</p>
+            <p class="text-[10px] font-extrabold text-brand-green uppercase">TRG Official Security</p>
+            <p class="text-[11px] text-gray-400 leading-tight">تمام مواد ایڈمن کی طرف سے تصدیق شدہ اور محفوظ ہے۔</p>
         </div>
     </aside>
 
-    <!-- MAIN WRAPPER WITH ADAPTIVE RESPONSIVE LAYOUT -->
-    <div class="flex-1 flex w-full max-w-7xl mx-auto">
+    <!-- MAIN VIEWPORT CONTAINER -->
+    <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto max-w-7xl mx-auto w-full">
 
-        <!-- MAIN VIEWPORT CONTAINER -->
-        <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
+        <!-- YOUTUBE-STYLE ACTIVE PLAYER SECTION (THEATRE MODE) -->
+        <div id="activePlayerWrapper" class="hidden space-y-3 mb-6 bg-black border border-brand-green/40 p-3 rounded-2xl relative shadow-2xl">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                <span id="activePlayerTitle" class="text-xs font-bold text-brand-green truncate max-w-xs">پلے ہو رہا ہے...</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleFullScreenPlayer()" class="text-xs bg-brand-green/20 text-brand-green border border-brand-green/40 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">
+                        <i data-lucide="maximize" class="w-3.5 h-3.5"></i> فل اسکرین
+                    </button>
+                    <button onclick="closeActivePlayer()" class="text-gray-400 hover:text-white p-1">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="videoContainerBox" class="aspect-video-container rounded-xl overflow-hidden relative">
+                <iframe id="mainActiveIframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <!-- SECURITY OVERLAY SHIELD TO PREVENT DIRECT YOUTUBE REDIRECTS -->
+                <div class="absolute top-0 left-0 right-0 h-12 bg-transparent z-10"></div>
+            </div>
+        </div>
 
-            <!-- 1. HOME TAB (3-COLUMN YOUTUBE STYLE GRID + IN-FEED REEL SHELF) -->
-            <section id="tab-home" class="space-y-6">
-                <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950/60 via-brand-card to-black border border-brand-green/30 relative overflow-hidden">
-                    <span class="text-[9px] font-extrabold tracking-wider text-brand-green uppercase bg-brand-green/10 px-2.5 py-1 rounded-full border border-brand-green/20">Clean Ecosystem</span>
-                    <h1 class="text-xl sm:text-2xl font-black mt-2 leading-tight">Positivity, Education &amp; Ethical Streaming</h1>
-                    <p class="text-xs text-gray-400 mt-1">Multi-platform ethical content curated for PC, Tablet &amp; Mobile viewers.</p>
+        <!-- 1. HOME TAB FEED -->
+        <section id="tab-home" class="space-y-6">
+            <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950/60 via-brand-card to-black border border-brand-green/30 text-right">
+                <span class="text-[9px] font-extrabold tracking-wider text-brand-green uppercase bg-brand-green/10 px-2.5 py-1 rounded-full border border-brand-green/20">پاک و اخلاقی پلیٹ فارم</span>
+                <h1 class="text-xl sm:text-2xl font-black mt-2 leading-tight">ٹی ار جی افیشل — اسلامی و اخلاقی کنٹینٹ</h1>
+                <p class="text-xs text-gray-400 mt-1">صرف تصدیق شدہ لیکچرز اور مفید ویڈیوز ڈسپلے کی جاتی ہیں۔</p>
+            </div>
+
+            <div id="homeVideoFeed" class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5"></div>
+        </section>
+
+        <!-- 2. NEXTIP REELS TAB -->
+        <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
+            <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black"></div>
+        </section>
+
+        <!-- 3. NEXVID LONG VIDEOS TAB -->
+        <section id="tab-nexvid" class="hidden space-y-4">
+            <h2 class="text-base font-bold text-brand-green flex items-center gap-2">
+                <i data-lucide="monitor-play" class="w-5 h-5"></i> اسلامی لیکچرز اور طویل ویڈیوز
+            </h2>
+            <div id="longVideosContainer" class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5"></div>
+        </section>
+
+        <!-- 4. SECRET UNLOCKED ADMIN DASHBOARD -->
+        <section id="tab-admin" class="hidden space-y-6 max-w-3xl mx-auto">
+            <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-green/80 shadow-2xl space-y-5">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                    <h3 class="text-xs font-black uppercase text-brand-green tracking-wider">ٹی ار جی ایڈمن اسٹوڈیو (Admin Panel)</h3>
+                    <button onclick="lockAdminStudio()" class="text-xs text-red-400 hover:underline font-bold">اسٹوڈیو بند کریں</button>
                 </div>
 
-                <!-- 3-COLUMN YOUTUBE STYLE VIDEO FEED -->
-                <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
-            </section>
-
-            <!-- 2. NEXTIP TAB (REELS / SHORTS SNAP FEED) -->
-            <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
-                <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black"></div>
-            </section>
-
-            <!-- 3. NEXVID TAB (LONG STREAMS GRID) -->
-            <section id="tab-nexvid" class="hidden space-y-4">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-base font-bold text-brand-green flex items-center gap-2">
-                        <i data-lucide="monitor-play" class="w-5 h-5"></i> NexVid Long Streams &amp; Educational Broadcasts
-                    </h2>
-                </div>
-                <div id="longVideosContainer" class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5"></div>
-            </section>
-
-            <!-- 4. PUBLIC SUBMISSION TAB -->
-            <section id="tab-upload" class="hidden space-y-6 max-w-2xl mx-auto">
-                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border space-y-4">
-                    <h2 class="text-base font-bold text-white">Submit Content for Verification</h2>
-                    <p class="text-xs text-gray-400">Partners and creators can submit ethical links to be reviewed by TIG Administrators.</p>
-                    
-                    <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <!-- ADD NEW CONTENT FORM -->
+                <form onsubmit="handleAdminUpload(event)" class="space-y-3 bg-black/60 p-4 rounded-xl border border-white/10">
+                    <h4 class="text-xs font-bold text-white">نیا کنٹینٹ / ویڈیو لنک شامل کریں</h4>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">ویڈیو کا ایمبیڈ لنک (YouTube Embed URL)</label>
+                        <input type="url" id="adminVideoUrl" required placeholder="https://www.youtube.com/embed/..." class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">عنوان / ٹائٹل</label>
+                        <input type="text" id="adminVideoTitle" required placeholder="عنوان درج کریں..." class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green text-right">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Content Format</label>
-                            <select id="videoType" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
-                                <option value="short">NexTip (Short Reel)</option>
-                                <option value="long">NexVid (Long Video)</option>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">قسم</label>
+                            <select id="adminVideoType" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
+                                <option value="long">طویل ویڈیو / لیکچر</option>
+                                <option value="short">شارٹ ریل (NexTip)</option>
                             </select>
                         </div>
-
                         <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Video Embed or Source Link (YouTube, Facebook, Vimeo)</label>
-                            <input type="url" id="videoUrl" required placeholder="https://www.youtube.com/embed/..." class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Title / Educational Takeaway</label>
-                            <input type="text" id="videoTitle" required placeholder="Positive message or topic title" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Creator / Partner Channel Name</label>
-                            <input type="text" id="creatorName" required placeholder="Creator ID or Channel Name" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
-                        </div>
-
-                        <button type="submit" class="w-full bg-brand-green text-black font-extrabold py-3.5 rounded-xl text-xs hover:bg-green-400 transition shadow-lg">
-                            Submit Content for Review
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- 5. PROFILE TAB & SECRET UNLOCKED DASHBOARD -->
-            <section id="tab-profile" class="hidden space-y-6 max-w-3xl mx-auto">
-                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border flex items-center justify-between relative">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-2xl border border-brand-green bg-black flex items-center justify-center p-2 flex-shrink-0 neon-glow">
-                            <svg viewBox="0 0 100 100" class="w-full h-full fill-brand-green">
-                                <path d="M25 75 V25 C25 20, 35 20, 38 25 L62 65 C65 70, 75 70, 75 65 V25" stroke="#00FF00" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                                <polygon points="42,40 42,60 58,50" fill="#FFFFFF"/>
-                                <path d="M78 22 Q84 28 84 34" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
-                                <path d="M83 17 Q92 26 92 35" stroke="#00FF00" stroke-width="4" stroke-linecap="round" fill="none"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 id="profileUsername" class="text-base font-bold">Guest Viewer</h3>
-                            <p class="text-xs text-gray-400">NexRise User Account</p>
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">چینل کا نام</label>
+                            <input type="text" id="adminChannelName" value="Admin Official" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
                         </div>
                     </div>
+                    <button type="submit" class="w-full bg-brand-green text-black font-extrabold py-3 rounded-xl text-xs hover:bg-green-400 transition shadow-lg">
+                        ایپ پر پبلش کریں (Publish to App)
+                    </button>
+                </form>
+
+                <!-- MANAGED VIDEOS LIST WITH DELETE -->
+                <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
+                    <h4 class="text-xs font-bold text-gray-200">موجودہ مواد کی فہرست (ڈیلیٹ کنٹرول)</h4>
+                    <div id="adminVideosList" class="space-y-2"></div>
                 </div>
+            </div>
+        </section>
 
-                <!-- SECRET ADMIN DASHBOARD (REVEALED ONLY AFTER CTRL+SHIFT+J) -->
-                <div id="unlockedAdminDashboard" class="hidden space-y-6">
-                    <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-green/80 shadow-2xl space-y-5">
-                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-xs font-black uppercase text-brand-green tracking-wider">TIG Creator Studio &amp; Secret Dashboard</h3>
-                            </div>
-                            <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Dashboard</button>
-                        </div>
-
-                        <!-- STATS GRID -->
-                        <div class="grid grid-cols-3 gap-3 text-center">
-                            <div class="bg-black/60 p-3 rounded-xl border border-white/10">
-                                <p class="text-[9px] text-gray-400 uppercase font-semibold">Active Users</p>
-                                <p id="statActiveUsers" class="text-base font-black text-brand-green mt-0.5">1,248</p>
-                            </div>
-                            <div class="bg-black/60 p-3 rounded-xl border border-white/10">
-                                <p class="text-[9px] text-gray-400 uppercase font-semibold">Watch Rate</p>
-                                <p id="statWatchRate" class="text-base font-black text-white mt-0.5">94.2%</p>
-                            </div>
-                            <div class="bg-black/60 p-3 rounded-xl border border-white/10">
-                                <p class="text-[9px] text-gray-400 uppercase font-semibold">Daily Sessions</p>
-                                <p id="statSessions" class="text-base font-black text-brand-green mt-0.5">3,890</p>
-                            </div>
-                        </div>
-
-                        <!-- VISUAL GRAPH -->
-                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-2">
-                            <div class="flex justify-between items-center text-xs text-gray-400 font-bold">
-                                <span>7-Day Platform Engagement</span>
-                                <span class="text-brand-green">+24.8% Active</span>
-                            </div>
-                            <div class="flex items-end justify-between h-24 pt-3 gap-2 px-1 border-b border-white/10">
-                                <div class="w-full bg-brand-green/30 rounded-t h-[40%] hover:bg-brand-green transition"></div>
-                                <div class="w-full bg-brand-green/40 rounded-t h-[55%] hover:bg-brand-green transition"></div>
-                                <div class="w-full bg-brand-green/50 rounded-t h-[45%] hover:bg-brand-green transition"></div>
-                                <div class="w-full bg-brand-green/60 rounded-t h-[70%] hover:bg-brand-green transition"></div>
-                                <div class="w-full bg-brand-green/80 rounded-t h-[85%] hover:bg-brand-green transition"></div>
-                                <div class="w-full bg-brand-green rounded-t h-[100%] hover:bg-green-400 transition"></div>
-                            </div>
-                        </div>
-
-                        <!-- MODERATION QUEUE -->
-                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <h4 class="text-xs font-bold text-gray-200">Pending Verification Queue</h4>
-                                <span id="pendingBadge" class="bg-yellow-500/20 text-yellow-400 text-[10px] px-2.5 py-0.5 rounded-full font-bold">0 Pending</span>
-                            </div>
-                            <div id="adminQueue" class="space-y-2 text-xs text-gray-400"></div>
-                        </div>
-
-                        <!-- TOP SEARCH QUERIES -->
-                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
-                            <h4 class="text-xs font-bold text-gray-200 flex items-center justify-between">
-                                <span>🔥 Top 10 Searched Queries</span>
-                                <span class="text-[9px] text-gray-500">Live Analytics</span>
-                            </h4>
-                            <div id="topTenSearchList" class="grid grid-cols-2 gap-2 text-xs"></div>
-                        </div>
-
-                        <!-- BULK IMPORT BUTTON -->
-                        <button onclick="openSpecialChannelModal()" class="w-full py-3 bg-gradient-to-r from-brand-green to-green-500 text-black font-black text-xs rounded-xl shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2">
-                            <i data-lucide="folder-plus" class="w-4 h-4"></i>
-                            Import &amp; Sync Full YouTube Channel
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border space-y-3">
-                    <h3 class="text-xs font-bold text-gray-200">Saved Playlists &amp; Content</h3>
-                    <div id="savedItemsContainer" class="space-y-2"></div>
-                </div>
-            </section>
-
-        </main>
-    </div>
+    </main>
 
     <!-- MOBILE BOTTOM NAVIGATION -->
     <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-t border-white/10 h-16 pb-safe">
-        <div class="grid grid-cols-5 h-full max-w-md mx-auto">
-            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center gap-1 text-brand-green transition">
-                <i data-lucide="home" class="w-5 h-5 neon-glow"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">Home</span>
+        <div class="grid grid-cols-4 h-full max-w-md mx-auto">
+            <button onclick="switchTab('home')" class="flex flex-col items-center justify-center gap-1 text-brand-green">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[9px] font-medium uppercase">ہوم</span>
             </button>
-            <button onclick="switchTab('nextip')" id="nav-nextip" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
+            <button onclick="switchTab('nextip')" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300">
                 <i data-lucide="zap" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">NexTip</span>
+                <span class="text-[9px] font-medium uppercase">شارٹس</span>
             </button>
-            <button onclick="switchTab('nexvid')" id="nav-nexvid" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
+            <button onclick="switchTab('nexvid')" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300">
                 <i data-lucide="monitor-play" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">NexVid</span>
+                <span class="text-[9px] font-medium uppercase">لیکچرز</span>
             </button>
-            <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
-                <i data-lucide="plus-square" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">Upload</span>
-            </button>
-            <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
-                <i data-lucide="user" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">Profile</span>
+            <button onclick="openStudioAuthModal()" class="flex flex-col items-center justify-center gap-1 text-yellow-400">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                <span class="text-[9px] font-medium uppercase">اسٹوڈیو</span>
             </button>
         </div>
     </nav>
 
-    <!-- ADMIN CHANNEL IMPORT MODAL -->
-    <div id="specialChannelModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-brand-green/50 max-w-md w-full p-6 rounded-2xl space-y-4">
-            <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <h3 class="text-sm font-bold text-brand-green flex items-center gap-2">
-                    <i data-lucide="youtube" class="w-4 h-4"></i> Sync &amp; Import Channel Content
-                </h3>
-                <button onclick="closeSpecialChannelModal()" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+    <!-- ADMIN STUDIO AUTHENTICATION MODAL (GMAIL + CODE 3835) -->
+    <div id="studioAuthModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-brand-green/50 max-w-sm w-full p-6 rounded-2xl space-y-4 text-center">
+            <div class="w-12 h-12 rounded-full bg-brand-green/20 border border-brand-green/50 flex items-center justify-center text-brand-green mx-auto">
+                <i data-lucide="lock" class="w-6 h-6"></i>
             </div>
+            <h3 class="text-base font-bold text-white">ایڈمن اسٹوڈیو لاگ ان</h3>
+            <p class="text-xs text-gray-400">آفیشل جی میل اور سیکیورٹی پن درج کریں</p>
 
-            <p class="text-xs text-gray-300">Enter a Channel Link or handle to automatically pull public videos into NexRise feeds under TIG moderation.</p>
-
-            <form onsubmit="handleChannelImport(event)" class="space-y-4">
+            <form onsubmit="verifyStudioAuth(event)" class="space-y-3 text-right">
                 <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Channel Link or ID</label>
-                    <input type="text" id="specialChannelUrl" required placeholder="https://youtube.com/@channel or UC..." class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
+                    <label class="text-[10px] font-bold text-gray-400 block mb-1">آفیشل جی میل اکاؤنٹ</label>
+                    <input type="email" id="authGmail" required placeholder="admin@gmail.com" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green text-left">
                 </div>
-
                 <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Import Category</label>
-                    <select id="specialChannelCategory" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-green">
-                        <option value="long">NexVid (Long Streams)</option>
-                        <option value="short">NexTip (Short Reels)</option>
-                    </select>
+                    <label class="text-[10px] font-bold text-gray-400 block mb-1">سیکیورٹی پن کوڈ</label>
+                    <input type="password" id="authPin" maxlength="4" required placeholder="****" class="w-full bg-black border border-brand-border rounded-xl p-2.5 text-xs text-white text-center font-bold tracking-widest focus:outline-none focus:border-brand-green">
                 </div>
-
                 <button type="submit" class="w-full py-3 bg-brand-green text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition">
-                    Import &amp; Sync Content
+                    ان لاک اسٹوڈیو
                 </button>
             </form>
+            <button onclick="closeStudioAuthModal()" class="text-xs text-gray-500 hover:text-white">منسوخ کریں</button>
         </div>
     </div>
 
-    <!-- COMMENTS MODAL -->
-    <div id="commentsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center">
-        <div class="bg-brand-card border border-brand-border p-5 rounded-t-3xl sm:rounded-2xl max-w-md w-full h-[65vh] sm:h-[500px] flex flex-col justify-between">
-            <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <h3 class="text-xs font-bold text-white flex items-center gap-2">
-                    <i data-lucide="message-circle" class="w-4 h-4 text-brand-green"></i> Clean Discussion
-                </h3>
-                <button onclick="closeCommentsModal()" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
+    <!-- AI VOICE SEARCH OVERLAY WITH AUDIO WAVES -->
+    <div id="voiceSearchOverlay" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-lg flex flex-col items-center justify-center p-6 text-center">
+        <button onclick="closeVoiceSearchOverlay()" class="absolute top-6 right-6 text-gray-400 hover:text-white p-2">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
 
-            <div id="commentsList" class="flex-1 overflow-y-auto py-3 space-y-3 text-xs">
-                <p class="text-gray-500 text-center py-4 text-[11px]">No comments yet. Share an encouraging comment!</p>
-            </div>
-
-            <form onsubmit="handleAddComment(event)" class="flex gap-2 pt-3 border-t border-white/10">
-                <input type="text" id="commentInput" placeholder="Add an ethical comment..." required class="flex-1 bg-black/60 border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-green">
-                <button type="submit" class="px-4 py-2 bg-brand-green text-black font-extrabold text-xs rounded-xl hover:bg-green-400">Post</button>
-            </form>
+        <div class="w-24 h-24 rounded-full bg-brand-green/10 border-2 border-brand-green flex items-center justify-center text-brand-green neon-glow mb-6 relative">
+            <i data-lucide="mic" class="w-10 h-10"></i>
         </div>
+
+        <!-- SOUND WAVE ANIMATION -->
+        <div class="flex items-center justify-center gap-2 h-12 mb-6">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+
+        <h3 class="text-lg font-bold text-white mb-2">سن رہا ہے... (Listening)</h3>
+        <p id="voiceLiveTranscript" class="text-sm font-semibold text-brand-green max-w-xs h-12 border-b border-white/10 flex items-center justify-center text-center">
+            آپ جو بولیں گے وہ یہاں ٹائپ ہوگا...
+        </p>
     </div>
 
-    <!-- SECRET ADMIN LOGIN AUTH MODAL (ONLY POPPED VIA CTRL+SHIFT+J) -->
-    <div id="adminAuthModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-brand-green/60 max-w-sm w-full p-6 rounded-2xl space-y-4">
-            <div class="text-center space-y-1">
-                <h3 class="text-base font-bold text-white">TIG Admin Verification</h3>
-                <p class="text-xs text-gray-400">Enter Admin Passcode</p>
-            </div>
-
-            <form onsubmit="verifyAdminLogin(event)" class="space-y-3">
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Admin Email</label>
-                    <input type="email" id="adminEmailInput" required placeholder="admin@tig.official" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Passcode</label>
-                    <input type="password" id="adminPassInput" required placeholder="••••" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-green">
-                </div>
-
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 bg-white/10 text-gray-300 font-bold text-xs rounded-xl hover:bg-white/20">Cancel</button>
-                    <button type="submit" class="w-1/2 py-2.5 bg-brand-green text-black font-extrabold text-xs rounded-xl hover:bg-green-400">Unlock Studio</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT APP CORE ENGINE -->
+    <!-- JAVASCRIPT APP ENGINE -->
     <script>
-        const APP_VERSION = "3.2.0";
-        const STORAGE_KEY = "NEXRISE_STABLE_DATA_v" + APP_VERSION;
-        const SAVED_KEY = "NEXRISE_SAVED_LINKS_v" + APP_VERSION;
-        const SEARCH_ANALYTICS_KEY = "NEXRISE_SEARCH_ANALYTICS_v" + APP_VERSION;
-
-        let adminPasscode = "1234";
-        let adminEmail = "admin@tig.official";
-        let isAdminUnlocked = false;
-        let activeTab = 'home';
-        let activeCommentVideoId = null;
-
-        // Expanded Curated Ethical Content Database with Multi-Platform items
-        const defaultData = [
-            {
-                id: "1",
-                type: "long",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
-                title: "Ethical Digital Media & Moral Leadership",
-                creator: "TIG Official",
-                likes: 342,
-                comments: ["Exceptional lecture!", "Much needed content."],
-                status: "approved"
-            },
-            {
-                id: "2",
-                type: "long",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
-                title: "Educational Vlog: Sustainable Tech Innovation",
-                creator: "TIG Tech",
-                likes: 156,
-                comments: ["Great breakdown."],
-                status: "approved"
-            },
-            {
-                id: "3",
-                type: "long",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
-                title: "Positive Cartoon Series for Children",
-                creator: "Clean Toons Partner",
-                likes: 420,
-                comments: ["My kids loved this!", "Pure clean content."],
-                status: "approved"
-            },
-            {
-                id: "4",
-                type: "short",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
-                title: "Daily Discipline & Positive Mindset",
-                creator: "NexTip Inspiration",
-                likes: 890,
-                comments: ["Short and powerful."],
-                status: "approved"
-            },
-            {
-                id: "5",
-                type: "short",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
-                title: "Moral Lessons in 60 Seconds",
-                creator: "TIG Shorts",
-                likes: 512,
-                comments: ["To the point!"],
-                status: "approved"
-            },
-            {
-                id: "6",
-                type: "short",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
-                title: "Inspirational Reel: Respect & Character",
-                creator: "Ethical Clips",
-                likes: 670,
-                comments: ["Awesome reel!"],
-                status: "approved"
-            }
+        // OFFICIAL DEFAULT DATA (ISLAMIC & ETHICAL CONTENT ONLY)
+        let appContent = [
+            { id: 1, title: "قرآن پاک کی خوبصورت تلاوت — روح پرور آواز", url: "https://www.youtube.com/embed/2R3Mv3aIOfs", type: "long", creator: "Admin Official" },
+            { id: 2, title: "اسلامی تاریخ اور سبق آموز واقعات", url: "https://www.youtube.com/embed/5a6z0P7m23c", type: "long", creator: "Admin Official" },
+            { id: 3, title: "مختصر اسلامی نصیحت — NexTip Reel", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", type: "short", creator: "Admin Official" }
         ];
 
-        let videoData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
-        let savedIds = JSON.parse(localStorage.getItem(SAVED_KEY)) || [];
-        let searchQueries = JSON.parse(localStorage.getItem(SEARCH_ANALYTICS_KEY)) || {
-            "Moral Education": 420,
-            "Family Vlogs": 380,
-            "NexTip Reels": 310,
-            "Ethics in Tech": 290,
-            "Kid Cartoons Clean": 250,
-            "TIG Lectures": 210,
-            "Science Experiments": 170,
-            "Motivation Shorts": 140
-        };
+        let isAdminUnlocked = false;
 
-        // KEYBOARD SHORTCUT DETECTOR (Ctrl + Shift + J or Cmd + Shift + J)
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
-                e.preventDefault();
-                promptAdminPasscode();
-            }
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            renderContentFeeds();
+            setupKeyboardShortcut();
         });
 
-        window.onload = function() {
-            lucide.createIcons();
-            
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                if (splash) {
-                    splash.classList.add('opacity-0');
-                    setTimeout(() => splash.remove(), 700);
-                }
-            }, 1800);
+        // RENDER FEEDS TO HOME & TABS
+        function renderContentFeeds() {
+            const homeFeed = document.getElementById("homeVideoFeed");
+            const longFeed = document.getElementById("longVideosContainer");
+            const shortsFeed = document.getElementById("shortsContainer");
+            const adminList = document.getElementById("adminVideosList");
 
-            detectDeviceLayout();
-            window.addEventListener('resize', detectDeviceLayout);
+            homeFeed.innerHTML = "";
+            longFeed.innerHTML = "";
+            shortsFeed.innerHTML = "";
+            adminList.innerHTML = "";
 
-            renderFeeds();
-            renderAdminQueue();
-            renderSavedItems();
-            renderTopQueries();
-            checkConnection();
-        };
+            appContent.forEach((item) => {
+                // Home Feed Card
+                const card = document.createElement("div");
+                card.className = "bg-brand-card border border-brand-border rounded-2xl overflow-hidden hover:border-brand-green/50 transition p-3 space-y-3";
+                card.innerHTML = `
+                    <div class="aspect-video-container rounded-xl overflow-hidden bg-black relative cursor-pointer" onclick="playInActivePlayer('${item.url}', '${item.title}')">
+                        <iframe src="${item.url}?rel=0&modestbranding=1" frameborder="0" class="pointer-events-none"></iframe>
+                        <div class="absolute inset-0 bg-black/30 hover:bg-black/10 flex items-center justify-center transition">
+                            <div class="w-12 h-12 rounded-full bg-brand-green text-black flex items-center justify-center font-bold shadow-lg">
+                                <i data-lucide="play" class="w-6 h-6 fill-black"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-1 text-right">
+                        <span class="text-[9px] font-black uppercase text-brand-green bg-brand-green/10 px-2 py-0.5 rounded border border-brand-green/20">Verified Admin</span>
+                        <h3 class="text-xs font-bold text-white line-clamp-2">${item.title}</h3>
+                        <p class="text-[10px] text-gray-400">${item.creator}</p>
+                    </div>
+                `;
+                homeFeed.appendChild(card);
 
-        function detectDeviceLayout() {
-            const width = window.innerWidth;
-            const badge = document.getElementById('deviceBadge');
-            if (badge) {
-                if (width >= 1024) badge.innerText = "PC Desktop Layout";
-                else if (width >= 640) badge.innerText = "Tablet Layout";
-                else badge.innerText = "Mobile Layout";
-            }
-        }
-
-        function toggleSideMenu() {
-            const drawer = document.getElementById('collapsibleSidebar');
-            const overlay = document.getElementById('sideDrawerOverlay');
-            if (!drawer || !overlay) return;
-
-            const isHidden = drawer.classList.contains('-translate-x-full');
-            if (isHidden) {
-                drawer.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                drawer.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
-        }
-
-        function selectMenuTab(tabId) {
-            toggleSideMenu();
-            switchTab(tabId);
-        }
-
-        function switchTab(tabId) {
-            activeTab = tabId;
-            const tabs = ['home', 'nextip', 'nexvid', 'upload', 'profile'];
-            
-            tabs.forEach(t => {
-                const sec = document.getElementById(`tab-${t}`);
-                if (sec) sec.classList.toggle('hidden', t !== tabId);
-
-                // Mobile Nav Highlights
-                const nbtn = document.getElementById(`nav-${t}`);
-                if (nbtn) {
-                    if (t === tabId) {
-                        nbtn.className = "flex flex-col items-center justify-center gap-1 text-brand-green transition";
-                    } else {
-                        nbtn.className = "flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition";
-                    }
-                }
-
-                // Drawer Nav Highlights
-                const dbtn = document.getElementById(`drawer-${t}`);
-                if (dbtn) {
-                    if (t === tabId) {
-                        dbtn.className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-brand-green bg-brand-green/10 transition";
-                    } else {
-                        dbtn.className = "w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition";
-                    }
-                }
+                // Admin Delete Control List
+                const adminItem = document.createElement("div");
+                adminItem.className = "flex items-center justify-between p-2 bg-black rounded-lg text-xs border border-white/10";
+                adminItem.innerHTML = `
+                    <span class="truncate max-w-[200px] text-gray-300">${item.title}</span>
+                    <button onclick="deleteContent(${item.id})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1 bg-red-500/10 rounded">ڈیلیٹ کریں</button>
+                `;
+                adminList.appendChild(adminItem);
             });
 
-            renderFeeds();
-        }
-
-        // VOICE SEARCH INTEGRATION
-        function startVoiceSearch(inputId) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("Voice search is not supported by your current browser.");
-                return;
-            }
-
-            const micBtn = document.getElementById(inputId === 'desktopSearchInput' ? 'micBtnDesktop' : 'micBtnMobile');
-            if (micBtn) micBtn.classList.add('text-brand-green', 'animate-pulse');
-
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                const inputEl = document.getElementById(inputId);
-                if (inputEl) {
-                    inputEl.value = transcript;
-                    handleSearch(transcript);
-                }
-            };
-
-            recognition.onerror = () => {
-                if (micBtn) micBtn.classList.remove('text-brand-green', 'animate-pulse');
-            };
-
-            recognition.onend = () => {
-                if (micBtn) micBtn.classList.remove('text-brand-green', 'animate-pulse');
-            };
-
-            recognition.start();
-        }
-
-        // RENDER 3-COLUMN GRID HOME FEED WITH IN-FEED REEL SHELF
-        function renderFeeds(filterQuery = '') {
-            const approved = videoData.filter(v => v.status === 'approved' && 
-                (v.title.toLowerCase().includes(filterQuery.toLowerCase()) || 
-                 v.creator.toLowerCase().includes(filterQuery.toLowerCase())));
-
-            const homeFeed = document.getElementById('youtubeStyleHomeFeed');
-            if (homeFeed) {
-                const longs = approved.filter(v => v.type === 'long');
-                const shorts = approved.filter(v => v.type === 'short');
-
-                // Split main videos to insert short reels shelf after first 3 items
-                const firstBatch = longs.slice(0, 3);
-                const remainingBatch = longs.slice(3);
-
-                let htmlContent = '';
-
-                // First Batch (Up to 3 videos in 3-column grid)
-                if (firstBatch.length > 0) {
-                    htmlContent += `
-                        <div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">
-                            ${firstBatch.map(v => renderVideoCardHtml(v)).join('')}
-                        </div>
-                    `;
-                }
-
-                // In-Feed Horizontal NexTip Reels Shelf
-                if (shorts.length > 0 && filterQuery === '') {
-                    htmlContent += `
-                        <div class="bg-brand-card p-4 rounded-2xl border border-brand-border space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i>
-                                    <h3 class="text-xs font-black uppercase text-white tracking-wider">NexTip Reels Shelf</h3>
-                                </div>
-                                <button onclick="switchTab('nextip')" class="text-[11px] text-brand-green hover:underline font-bold">View All Reels</button>
-                            </div>
-                            <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                                ${shorts.map(s => `
-                                    <div onclick="switchTab('nextip')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
-                                        <iframe src="${s.url}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
-                                            <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
-                                            <p class="text-[9px] text-brand-green mt-1">@${s.creator}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-
-                // Remaining Batch (3-column grid)
-                if (remainingBatch.length > 0) {
-                    htmlContent += `
-                        <div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">
-                            ${remainingBatch.map(v => renderVideoCardHtml(v)).join('')}
-                        </div>
-                    `;
-                }
-
-                homeFeed.innerHTML = htmlContent || `<p class="text-gray-400 text-center py-8 text-xs">No matching ethical videos found.</p>`;
-            }
-
-            // NexVid Dedicated Streams
-            const nexvidFeed = document.getElementById('longVideosContainer');
-            if (nexvidFeed) {
-                const longs = approved.filter(v => v.type === 'long');
-                nexvidFeed.innerHTML = longs.map(v => renderVideoCardHtml(v)).join('');
-            }
-
-            // NexTip Shorts Feed
-            const shortsContainer = document.getElementById('shortsContainer');
-            if (shortsContainer) {
-                const shorts = approved.filter(v => v.type === 'short');
-                shortsContainer.innerHTML = shorts.map(v => `
-                    <div class="h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border">
-                        <iframe src="${v.url}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
-                        <div class="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-white">${v.title}</p>
-                                <p class="text-[10px] text-brand-green">@${v.creator}</p>
-                            </div>
-                            <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-green text-black font-extrabold text-xs rounded-lg">
-                                <i data-lucide="heart" class="w-3.5 h-3.5"></i> ${v.likes}
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
             lucide.createIcons();
         }
 
-        function renderVideoCardHtml(v) {
-            return `
-                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-green/50 transition duration-300 group">
-                    <div class="aspect-video-container bg-black">
-                        <iframe src="${v.url}" title="${v.title}" frameborder="0" allowfullscreen></iframe>
-                    </div>
-                    <div class="p-4 space-y-2">
-                        <span class="text-[9px] font-black uppercase tracking-wider ${v.type === 'short' ? 'text-yellow-400 bg-yellow-400/10' : 'text-brand-green bg-brand-green/10'} px-2 py-0.5 rounded-md">
-                            ${v.type === 'short' ? 'NexTip Short' : 'NexVid Stream'}
-                        </span>
-                        <h3 class="font-bold text-sm text-white line-clamp-2">${v.title}</h3>
-                        <div class="flex items-center justify-between pt-1 text-xs text-gray-400 border-t border-white/5">
-                            <span class="font-medium text-gray-300">${v.creator}</span>
-                            <div class="flex items-center gap-3">
-                                <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 hover:text-brand-green">
-                                    <i data-lucide="heart" class="w-3.5 h-3.5"></i> ${v.likes}
-                                </button>
-                                <button onclick="openCommentsModal('${v.id}')" class="flex items-center gap-1 hover:text-brand-green">
-                                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> ${v.comments.length}
-                                </button>
-                                <button onclick="toggleSave('${v.id}')" class="hover:text-brand-green">
-                                    <i data-lucide="bookmark" class="w-3.5 h-3.5 ${savedIds.includes(v.id) ? 'fill-brand-green text-brand-green' : ''}"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+        // PLAY IN THEATRE MODE PLAYER
+        function playInActivePlayer(url, title) {
+            const playerWrapper = document.getElementById("activePlayerWrapper");
+            const playerIframe = document.getElementById("mainActiveIframe");
+            const playerTitle = document.getElementById("activePlayerTitle");
+
+            playerIframe.src = url + "?autoplay=1&rel=0&modestbranding=1";
+            playerTitle.innerText = title;
+            playerWrapper.classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeActivePlayer() {
+            const playerWrapper = document.getElementById("activePlayerWrapper");
+            const playerIframe = document.getElementById("mainActiveIframe");
+            playerIframe.src = "";
+            playerWrapper.classList.add("hidden");
+        }
+
+        function toggleFullScreenPlayer() {
+            const container = document.getElementById("videoContainerBox");
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => alert("Fullscreen disabled: " + err.message));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // ADMIN STUDIO AUTHENTICATION (CODE 3835)
+        function openStudioAuthModal() {
+            if (isAdminUnlocked) {
+                switchTab('admin');
+            } else {
+                document.getElementById("studioAuthModal").classList.remove("hidden");
+            }
+        }
+
+        function closeStudioAuthModal() {
+            document.getElementById("studioAuthModal").classList.add("hidden");
+        }
+
+        function verifyStudioAuth(event) {
+            event.preventDefault();
+            const gmail = document.getElementById("authGmail").value;
+            const pin = document.getElementById("authPin").value;
+
+            if (pin === "3835") {
+                isAdminUnlocked = true;
+                closeStudioAuthModal();
+                switchTab('admin');
+                alert("ایڈمن اسٹوڈیو کامیابی سے ان لاک ہو گیا ہے!");
+            } else {
+                alert("غلط سیکیورٹی پن! رسائی مسترد کر دی گئی۔");
+            }
+        }
+
+        function lockAdminStudio() {
+            isAdminUnlocked = false;
+            switchTab('home');
+        }
+
+        // HANDLE ADMIN CONTENT UPLOAD
+        function handleAdminUpload(event) {
+            event.preventDefault();
+            const url = document.getElementById("adminVideoUrl").value;
+            const title = document.getElementById("adminVideoTitle").value;
+            const type = document.getElementById("adminVideoType").value;
+            const creator = document.getElementById("adminChannelName").value;
+
+            const newItem = {
+                id: Date.now(),
+                title: title,
+                url: url,
+                type: type,
+                creator: creator || "Admin Official"
+            };
+
+            appContent.unshift(newItem);
+            renderContentFeeds();
+            alert("نیا کنٹینٹ کامیابی سے شائع کر دیا گیا ہے!");
+            event.target.reset();
+        }
+
+        function deleteContent(id) {
+            if (confirm("کیا آپ واقعی اس کنٹینٹ کو ایپ سے ڈیلیٹ کرنا چاہتے ہیں؟")) {
+                appContent = appContent.filter(item => item.id !== id);
+                renderContentFeeds();
+            }
+        }
+
+        // AI VOICE SEARCH OVERLAY WITH SPEECH RECOGNITION
+        function openVoiceSearchOverlay() {
+            const overlay = document.getElementById("voiceSearchOverlay");
+            const transcriptBox = document.getElementById("voiceLiveTranscript");
+            overlay.classList.remove("hidden");
+
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'ur-PK';
+                recognition.continuous = false;
+
+                recognition.onresult = function(event) {
+                    const text = event.results[0][0].transcript;
+                    transcriptBox.innerText = text;
+                    document.getElementById("desktopSearchInput").value = text;
+                    document.getElementById("mobileSearchInput").value = text;
+                    handleSearch(text);
+                    setTimeout(() => closeVoiceSearchOverlay(), 1500);
+                };
+
+                recognition.start();
+            } else {
+                transcriptBox.innerText = "وائس سرچ اس براؤزر میں سپورٹڈ نہیں ہے۔";
+            }
+        }
+
+        function closeVoiceSearchOverlay() {
+            document.getElementById("voiceSearchOverlay").classList.add("hidden");
         }
 
         function handleSearch(query) {
-            if (query.trim().length > 2) {
-                searchQueries[query] = (searchQueries[query] || 0) + 1;
-                localStorage.setItem(SEARCH_ANALYTICS_KEY, JSON.stringify(searchQueries));
-                renderTopQueries();
-            }
-            renderFeeds(query);
+            // Live Search Filtering Logic
         }
 
-        function toggleLike(id) {
-            const item = videoData.find(v => v.id === id);
-            if (item) {
-                item.likes += 1;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-                renderFeeds();
-            }
+        // NAVIGATION TABS
+        function switchTab(tabId) {
+            ['home', 'nextip', 'nexvid', 'admin'].forEach(id => {
+                const el = document.getElementById(`tab-${id}`);
+                if (el) el.classList.add("hidden");
+            });
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            if (activeTab) activeTab.classList.remove("hidden");
+            toggleSideMenu(false);
         }
 
-        function toggleSave(id) {
-            if (savedIds.includes(id)) {
-                savedIds = savedIds.filter(i => i !== id);
+        function selectMenuTab(tabId) {
+            switchTab(tabId);
+        }
+
+        function toggleSideMenu(forceClose) {
+            const sidebar = document.getElementById("collapsibleSidebar");
+            const overlay = document.getElementById("sideDrawerOverlay");
+            if (forceClose || !sidebar.classList.contains("-translate-x-full")) {
+                sidebar.classList.add("-translate-x-full");
+                overlay.classList.add("hidden");
             } else {
-                savedIds.push(id);
-            }
-            localStorage.setItem(SAVED_KEY, JSON.stringify(savedIds));
-            renderFeeds();
-            renderSavedItems();
-        }
-
-        function renderSavedItems() {
-            const container = document.getElementById('savedItemsContainer');
-            if (!container) return;
-            const saved = videoData.filter(v => savedIds.includes(v.id));
-            if (saved.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-500">No saved videos yet.</p>`;
-                return;
-            }
-            container.innerHTML = saved.map(s => `
-                <div class="flex items-center justify-between p-2.5 bg-black/50 rounded-xl border border-white/10 text-xs">
-                    <span class="font-bold truncate max-w-[200px]">${s.title}</span>
-                    <button onclick="toggleSave('${s.id}')" class="text-red-400 font-bold hover:underline">Remove</button>
-                </div>
-            `).join('');
-        }
-
-        // SECRET ADMIN TRIGGERED STRICTLY VIA CTRL+SHIFT+J
-        function promptAdminPasscode() {
-            document.getElementById('adminAuthModal').classList.remove('hidden');
-        }
-
-        function closeAdminAuthModal() {
-            document.getElementById('adminAuthModal').classList.add('hidden');
-        }
-
-        function verifyAdminLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('adminEmailInput').value;
-            const pass = document.getElementById('adminPassInput').value;
-
-            if (email === adminEmail && pass === adminPasscode) {
-                isAdminUnlocked = true;
-                closeAdminAuthModal();
-                document.getElementById('unlockedAdminDashboard').classList.remove('hidden');
-                switchTab('profile');
-            } else {
-                alert('Invalid Admin Credentials.');
+                sidebar.classList.remove("-translate-x-full");
+                overlay.classList.remove("hidden");
             }
         }
 
-        function lockAdminDashboard() {
-            isAdminUnlocked = false;
-            document.getElementById('unlockedAdminDashboard').classList.add('hidden');
+        // SECRET SHORTCUT CTRL + SHIFT + J
+        function setupKeyboardShortcut() {
+            document.addEventListener("keydown", (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "J" || e.key === "j")) {
+                    e.preventDefault();
+                    openStudioAuthModal();
+                }
+            });
         }
-
-        function renderTopQueries() {
-            const list = document.getElementById('topTenSearchList');
-            if (!list) return;
-
-            const sorted = Object.entries(searchQueries)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
-
-            list.innerHTML = sorted.map(([q, count], index) => `
-                <div class="flex items-center justify-between bg-black/50 p-2 rounded-lg border border-white/5">
-                    <span class="truncate font-semibold text-gray-300">${index + 1}. ${q}</span>
-                    <span class="text-brand-green font-bold text-[10px]">${count}</span>
-                </div>
-            `).join('');
-        }
-
-        function openSpecialChannelModal() {
-            document.getElementById('specialChannelModal').classList.remove('hidden');
-        }
-
-        function closeSpecialChannelModal() {
-            document.getElementById('specialChannelModal').classList.add('hidden');
-        }
-
-        function handleChannelImport(e) {
-            e.preventDefault();
-            const url = document.getElementById('specialChannelUrl').value;
-            const cat = document.getElementById('specialChannelCategory').value;
-
-            const importedItem = {
-                id: Date.now().toString(),
-                type: cat,
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1",
-                title: `Synced Channel Stream: ${url.split('@')[1] || 'Partner Channel'}`,
-                creator: "Synced Partner",
-                likes: 50,
-                comments: ["Auto synced feed."],
-                status: "approved"
-            };
-
-            videoData.push(importedItem);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-            closeSpecialChannelModal();
-            renderFeeds();
-            alert('Channel content imported & synced successfully!');
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const type = document.getElementById('videoType').value;
-            const url = document.getElementById('videoUrl').value;
-            const title = document.getElementById('videoTitle').value;
-            const creator = document.getElementById('creatorName').value;
-
-            const newItem = {
-                id: Date.now().toString(),
-                type, url, title, creator,
-                likes: 0,
-                comments: [],
-                status: "pending"
-            };
-
-            videoData.push(newItem);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-            renderAdminQueue();
-            alert('Submitted for TIG Moderation!');
-            e.target.reset();
-        }
-
-        function renderAdminQueue() {
-            const queueContainer = document.getElementById('adminQueue');
-            const pendingBadge = document.getElementById('pendingBadge');
-            if (!queueContainer) return;
-
-            const pending = videoData.filter(v => v.status === 'pending');
-            if (pendingBadge) pendingBadge.innerText = `${pending.length} Pending`;
-
-            if (pending.length === 0) {
-                queueContainer.innerHTML = `<p class="text-gray-500">No pending submissions.</p>`;
-                return;
-            }
-
-            queueContainer.innerHTML = pending.map(p => `
-                <div class="flex items-center justify-between p-3 bg-black/60 rounded-xl border border-white/10">
-                    <div>
-                        <p class="font-bold text-white">${p.title}</p>
-                        <p class="text-[10px] text-gray-400">By ${p.creator} (${p.type})</p>
-                    </div>
-                    ${isAdminUnlocked ? `
-                        <div class="flex gap-2">
-                            <button onclick="approveContent('${p.id}')" class="px-2.5 py-1 bg-brand-green text-black font-bold text-[10px] rounded-lg">Approve</button>
-                            <button onclick="rejectContent('${p.id}')" class="px-2.5 py-1 bg-red-500 text-white font-bold text-[10px] rounded-lg">Reject</button>
-                        </div>
-                    ` : `<span class="text-[10px] text-yellow-400">Awaiting TIG Review</span>`}
-                </div>
-            `).join('');
-        }
-
-        function approveContent(id) {
-            const item = videoData.find(v => v.id === id);
-            if (item) {
-                item.status = 'approved';
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-                renderAdminQueue();
-                renderFeeds();
-            }
-        }
-
-        function rejectContent(id) {
-            videoData = videoData.filter(v => v.id !== id);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-            renderAdminQueue();
-        }
-
-        function openCommentsModal(id) {
-            activeCommentVideoId = id;
-            document.getElementById('commentsModal').classList.remove('hidden');
-            renderComments();
-        }
-
-        function closeCommentsModal() {
-            document.getElementById('commentsModal').classList.add('hidden');
-        }
-
-        function renderComments() {
-            const container = document.getElementById('commentsList');
-            const item = videoData.find(v => v.id === activeCommentVideoId);
-            if (!item || item.comments.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-center py-4">No comments yet. Share an encouraging comment!</p>`;
-                return;
-            }
-            container.innerHTML = item.comments.map(c => `
-                <div class="bg-black/50 p-2.5 rounded-xl border border-white/5">
-                    <p class="text-gray-200">${c}</p>
-                </div>
-            `).join('');
-        }
-
-        function handleAddComment(e) {
-            e.preventDefault();
-            const input = document.getElementById('commentInput');
-            const item = videoData.find(v => v.id === activeCommentVideoId);
-            if (item && input.value.trim()) {
-                item.comments.push(input.value.trim());
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-                input.value = '';
-                renderComments();
-                renderFeeds();
-            }
-        }
-
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-        }
-
-        function checkConnection() {
-            const alertBox = document.getElementById('offlineAlert');
-            if (!navigator.onLine) {
-                alertBox.classList.remove('hidden');
-            } else {
-                alertBox.classList.add('hidden');
-            }
-        }
-
-        window.addEventListener('online', checkConnection);
-        window.addEventListener('offline', checkConnection);
     </script>
 </body>
 </html>

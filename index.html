@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.1 — Powered by TiG</title>
+    <title>NexRise v2.8.2 — Powered by TiG</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -165,7 +165,7 @@
 
         <div class="flex items-center gap-2">
             <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
-                <span class="text-lg">✌️</span>
+                <span class="text-lg">🌓</span>
             </button>
         </div>
     </header>
@@ -211,7 +211,7 @@
                     <i data-lucide="plus-square" class="w-4 h-4"></i> Submit Content
                 </button>
                 <button onclick="toggleThemeMode()" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <span class="flex items-center gap-3"><span class="text-base">✌️</span> Light/Dark Theme</span>
+                    <span class="flex items-center gap-3"><span class="text-base">🌓</span> Light/Dark Theme</span>
                 </button>
             </div>
         </div>
@@ -489,12 +489,29 @@
         </div>
     </div>
 
-    <!-- APP CORE ENGINE JS -->
-    <script>
+    <!-- APP CORE ENGINE & FIREBASE JS -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+        // Firebase Configuration (TRG Official Project)
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9Hk71ZWaJHw66p_lJ068wKAz6eIS4f1g",
+            authDomain: "tig-official-ad68f.firebaseapp.com",
+            projectId: "tig-official-ad68f",
+            storageBucket: "tig-official-ad68f.firebasestorage.app",
+            messagingSenderId: "619651857336",
+            appId: "1:619651857336:web:e8ea8a0ad2a7541472ed4d",
+            measurementId: "G-QB5J1TYJDR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         const APP_VERSION = "2.8.1";
-        const STORAGE_KEY = "NEXRISE_V281_DATA";
+        const LOCAL_STORAGE_KEY = "NEXRISE_V281_DATA";
         const SECURITY_PIN = "3835";
-        const OFFICIAL_EMAIL ="blackandwhitemobilestig@gmail.com";
+        const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
 
         let activeTargetInputId = "desktopSearchInput";
         let activeSelectedCategory = "All";
@@ -527,7 +544,7 @@
             }
         ];
 
-        let videoData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+        let videoData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || defaultData;
 
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
@@ -546,7 +563,7 @@
             }
         });
 
-        window.onload = function() {
+        window.onload = async function() {
             lucide.createIcons();
             init3DIntroParticleCanvas();
 
@@ -558,16 +575,31 @@
                 }
             }, 2000);
 
-            renderFeeds();
+            // Fetch live data from Firebase Firestore
+            await loadDataFromFirebase();
             renderAdminVideoManager();
             updateLiveUsersCounter();
         };
 
-        // LIVE USERS COUNTER SIMULATION
+        async function loadDataFromFirebase() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "nexrise_videos"));
+                if (!querySnapshot.empty) {
+                    const fbData = [];
+                    querySnapshot.forEach((docSnap) => {
+                        fbData.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    videoData = fbData;
+                }
+            } catch (err) {
+                console.log("Using local cache due to network or rules:", err);
+            }
+            renderFeeds();
+        }
+
         function updateLiveUsersCounter() {
             const counterEl = document.getElementById('liveUsersCount');
             if (counterEl) {
-                // Simulated online viewer count based on local activity
                 let count = Math.floor(Math.random() * 3) + 1;
                 counterEl.innerText = count;
             }
@@ -605,7 +637,7 @@
             animate();
         }
 
-        function toggleSideMenu() {
+        window.toggleSideMenu = function() {
             const drawer = document.getElementById('collapsibleSidebar');
             const overlay = document.getElementById('sideDrawerOverlay');
             if (!drawer || !overlay) return;
@@ -619,12 +651,12 @@
             }
         }
 
-        function selectMenuTab(tabId) {
+        window.selectMenuTab = function(tabId) {
             toggleSideMenu();
             switchTab(tabId);
         }
 
-        function switchTab(tabId) {
+        window.switchTab = function(tabId) {
             ['home', 'nextip', 'nexvid', 'upload', 'profile'].forEach(t => {
                 const sec = document.getElementById(`tab-${t}`);
                 if (sec) sec.classList.toggle('hidden', t !== tabId);
@@ -639,11 +671,11 @@
             renderFeeds();
         }
 
-        function toggleThemeMode() {
+        window.toggleThemeMode = function() {
             document.documentElement.classList.toggle('light');
         }
 
-        function startVoiceTyping(targetInputId) {
+        window.startVoiceTyping = function(targetInputId) {
             activeTargetInputId = targetInputId;
             const modal = document.getElementById('voiceSearchModal');
             const textEl = document.getElementById('voiceRecognizedText');
@@ -688,18 +720,18 @@
             }
         }
 
-        function closeVoiceSearchModal() {
+        window.closeVoiceSearchModal = function() {
             const modal = document.getElementById('voiceSearchModal');
             if (modal) modal.classList.add('hidden');
         }
 
-        function executeSearch(inputId) {
+        window.executeSearch = function(inputId) {
             const input = document.getElementById(inputId);
             if (!input) return;
             renderFeeds(input.value.trim().toLowerCase());
         }
 
-        function filterCategory(cat) {
+        window.filterCategory = function(cat) {
             activeSelectedCategory = cat;
             document.querySelectorAll('.category-chip').forEach(btn => {
                 if (btn.innerText.includes(cat) || (cat === 'All' && btn.innerText === 'All')) {
@@ -773,7 +805,7 @@
                                 <p class="text-[10px] text-brand-parrot">@${v.creator}</p>
                             </div>
                             <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">
-                                ❤️ ${v.likes}
+                                👍 ${v.likes}
                             </button>
                         </div>
                     </div>
@@ -803,7 +835,7 @@
                             <span class="font-medium text-gray-300">${v.creator}</span>
                             <div class="flex items-center gap-3">
                                 <button onclick="toggleLike('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
-                                    ❤️ ${v.likes}
+                                    👍 ${v.likes}
                                 </button>
                                 <button onclick="openCommentsModal('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
                                     💬 ${v.comments.length}
@@ -815,7 +847,7 @@
             `;
         }
 
-        function playStreamInTopPlayer(url, title) {
+        window.playStreamInTopPlayer = function(url, title) {
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             const iframe = document.getElementById('activeMainIframe');
             const titleEl = document.getElementById('playerVideoTitle');
@@ -828,7 +860,7 @@
             }
         }
 
-        function closeActivePlayer() {
+        window.closeActivePlayer = function() {
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             const iframe = document.getElementById('activeMainIframe');
             if (playerBox && iframe) {
@@ -837,7 +869,7 @@
             }
         }
 
-        function toggleIframeFullscreen() {
+        window.toggleIframeFullscreen = function() {
             const iframe = document.getElementById('activeMainIframe');
             if (iframe) {
                 if (iframe.requestFullscreen) iframe.requestFullscreen();
@@ -845,24 +877,24 @@
             }
         }
 
-        function toggleLike(id) {
+        window.toggleLike = async function(id) {
             const item = videoData.find(v => v.id === id);
             if (item) {
                 item.likes += 1;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 renderFeeds();
             }
         }
 
-        function triggerAdminSecretPrompt() {
+        window.triggerAdminSecretPrompt = function() {
             document.getElementById('adminAuthModal').classList.remove('hidden');
         }
 
-        function closeAdminAuthModal() {
+        window.closeAdminAuthModal = function() {
             document.getElementById('adminAuthModal').classList.add('hidden');
         }
 
-        function verifyAdminPinLogin(e) {
+        window.verifyAdminPinLogin = function(e) {
             e.preventDefault();
             const email = document.getElementById('adminEmailInput').value;
             const pin = document.getElementById('adminPinInput').value;
@@ -877,21 +909,20 @@
             }
         }
 
-        function lockAdminDashboard() {
+        window.lockAdminDashboard = function() {
             document.getElementById('unlockedAdminDashboard').classList.add('hidden');
         }
 
-        // NEW: EXPORT UPDATED CODE HELPER
-        function exportUpdatedCode() {
+        window.exportUpdatedCode = function() {
             const currentHTML = document.documentElement.outerHTML;
             navigator.clipboard.writeText(currentHTML).then(() => {
-                alert('Full updated HTML code copied to clipboard successfully! You can paste it into your new version file.');
+                alert('Full updated HTML code copied to clipboard successfully!');
             }).catch(err => {
-                alert('Failed to copy code automatically. Please check browser permissions.');
+                alert('Failed to copy code automatically.');
             });
         }
 
-        function syncFullChannel() {
+        window.syncFullChannel = async function() {
             const input = document.getElementById('syncChannelInput');
             if (!input || !input.value.trim()) {
                 alert('Please enter a valid Channel URL or ID');
@@ -900,7 +931,6 @@
 
             const channelVal = input.value.trim();
             const syncedItem = {
-                id: Date.now().toString(),
                 type: "long",
                 category: "Moral & Islamic",
                 url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
@@ -911,12 +941,18 @@
                 status: "approved"
             };
 
-            videoData.unshift(syncedItem);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-            renderAdminVideoManager();
-            renderFeeds();
-            input.value = '';
-            alert('Channel synced successfully!');
+            try {
+                const docRef = await addDoc(collection(db, "nexrise_videos"), syncedItem);
+                syncedItem.id = docRef.id;
+                videoData.unshift(syncedItem);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderAdminVideoManager();
+                renderFeeds();
+                input.value = '';
+                alert('Channel synced & saved to Firebase successfully!');
+            } catch (e) {
+                alert('Error saving to Firebase: ' + e.message);
+            }
         }
 
         function renderAdminVideoManager() {
@@ -936,16 +972,21 @@
             `).join('');
         }
 
-        function deleteVideoItem(id) {
-            if (confirm('Delete this stream?')) {
+        window.deleteVideoItem = async function(id) {
+            if (confirm('Delete this stream from Firebase?')) {
+                try {
+                    await deleteDoc(doc(db, "nexrise_videos", id));
+                } catch(e) {
+                    console.log("Firebase delete note:", e);
+                }
                 videoData = videoData.filter(v => v.id !== id);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 renderAdminVideoManager();
                 renderFeeds();
             }
         }
 
-        function handleDirectAdminPublish(e) {
+        window.handleDirectAdminPublish = async function(e) {
             e.preventDefault();
             const title = document.getElementById('adminPubTitle').value;
             const creator = document.getElementById('adminPubCreator').value;
@@ -953,21 +994,26 @@
             const type = document.getElementById('adminPubType').value;
 
             const newItem = {
-                id: Date.now().toString(),
                 type, category: "Moral & Islamic",
                 url, title, creator,
                 likes: 0, comments: [], status: "approved"
             };
 
-            videoData.unshift(newItem);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-            renderAdminVideoManager();
-            renderFeeds();
-            e.target.reset();
-            alert('Stream Published!');
+            try {
+                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
+                newItem.id = docRef.id;
+                videoData.unshift(newItem);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderAdminVideoManager();
+                renderFeeds();
+                e.target.reset();
+                alert('Stream Published & Saved to Firebase!');
+            } catch(err) {
+                alert('Error publishing to Firebase: ' + err.message);
+            }
         }
 
-        function handleFormSubmit(e) {
+        window.handleFormSubmit = async function(e) {
             e.preventDefault();
             const type = document.getElementById('videoType').value;
             const category = document.getElementById('videoCategory').value;
@@ -976,32 +1022,37 @@
             const creator = document.getElementById('creatorName').value;
 
             const newItem = {
-                id: Date.now().toString(),
                 type, category, url, title, creator,
                 likes: 0, comments: [], status: "approved"
             };
 
-            videoData.unshift(newItem);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
-            renderFeeds();
-            alert('Submitted Successfully!');
-            e.target.reset();
+            try {
+                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
+                newItem.id = docRef.id;
+                videoData.unshift(newItem);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderFeeds();
+                alert('Submitted & Saved to Firebase Successfully!');
+                e.target.reset();
+            } catch(err) {
+                alert('Error submitting to Firebase: ' + err.message);
+            }
         }
 
-        function openCommentsModal(id) {
+        window.openCommentsModal = function(id) {
             activeCommentVideoId = id;
             document.getElementById('commentsModal').classList.remove('hidden');
             renderComments();
         }
 
-        function closeCommentsModal() {
+        window.closeCommentsModal = function() {
             document.getElementById('commentsModal').classList.add('hidden');
         }
 
         function renderComments() {
             const container = document.getElementById('commentsList');
             const item = videoData.find(v => v.id === activeCommentVideoId);
-            if (!item || item.comments.length === 0) {
+            if (!item || !item.comments || item.comments.length === 0) {
                 container.innerHTML = `<p class="text-gray-500 text-center py-4">No comments yet.</p>`;
                 return;
             }
@@ -1012,13 +1063,14 @@
             `).join('');
         }
 
-        function handleAddComment(e) {
+        window.handleAddComment = async function(e) {
             e.preventDefault();
             const input = document.getElementById('commentInput');
             const item = videoData.find(v => v.id === activeCommentVideoId);
             if (item && input.value.trim()) {
+                if(!item.comments) item.comments = [];
                 item.comments.push(input.value.trim());
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(videoData));
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 input.value = '';
                 renderComments();
                 renderFeeds();

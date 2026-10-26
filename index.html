@@ -1,1095 +1,208 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.2 — Powered by TiG</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Three.js CDN for 3D Particle Intro -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                green: '#00FF00',
-                parrot: '#39FF14',
-                dark: '#0B0F0C',
-                card: '#141A16',
-                border: '#222C25',
-                hover: '#1B241E'
-              }
-            },
-            screens: {
-              'tablet': '640px',
-              'desktop': '1024px'
-            }
-          }
-        }
-      }
-    </script>
-
-    <style>
-      body { 
-        background-color: #0B0F0C; 
-        color: #FFFFFF; 
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-        overflow-x: hidden;
-        transition: background-color 0.3s ease, color 0.3s ease;
-      }
-
-      html.light body {
-        background-color: #F4F6F5;
-        color: #0B0F0C;
-      }
-      html.light .bg-brand-dark { background-color: #F4F6F5 !important; }
-      html.light .bg-brand-card { background-color: #FFFFFF !important; }
-      html.light .border-brand-border { border-color: #E2E8F0 !important; }
-      html.light .text-white { color: #090D0A !important; }
-      html.light .text-gray-400 { color: #4A5568 !important; }
-      html.light header, html.light nav { background-color: rgba(255, 255, 255, 0.95) !important; border-color: #E2E8F0 !important; }
-
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      .neon-glow { filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.6)); }
-      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
-
-      .aspect-video-container {
-        position: relative;
-        padding-bottom: 56.25%;
-        height: 0;
-        overflow: hidden;
-      }
-      .aspect-video-container iframe {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-      }
-
-      @keyframes waveBar {
-        0%, 100% { height: 12px; }
-        50% { height: 48px; }
-      }
-      .wave-bar {
-        animation: waveBar 1.2s infinite ease-in-out;
-      }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexRise Application</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom Scrollbar & Utility Styles */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1f2937;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4b5563;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6b7280;
+    }
+    /* Smooth transition for hiding/showing header */
+    .header-hidden {
+      transform: translateY(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    .header-visible {
+      transform: translateY(0);
+      transition: transform 0.3s ease-in-out;
+    }
+  </style>
 </head>
-<body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
+<body class="bg-gray-900 text-white font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN -->
-    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden pointer-events-none">
-        <div id="threejsCanvasContainer" class="absolute inset-0 z-0"></div>
-
-        <div class="text-center z-10">
-            <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                Powered by TiG (v2.8.2)
-            </span>
-        </div>
-
-        <div class="relative w-48 h-48 flex items-center justify-center z-10">
-            <div class="w-32 h-32 rounded-3xl bg-gradient-to-tr from-green-950 via-black to-green-900 border-2 border-brand-parrot flex items-center justify-center neon-glow shadow-2xl">
-                <svg viewBox="0 0 100 100" class="w-20 h-20">
-                    <defs>
-                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#39FF14"/>
-                            <stop offset="100%" stop-color="#00FF00"/>
-                        </linearGradient>
-                    </defs>
-                    <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="url(#logoGrad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                    <polygon points="44,40 44,60 58,50" fill="#FFFFFF"/>
-                    <path d="M78 22 Q84 28 84 34" stroke="url(#logoGrad)" stroke-width="4" stroke-linecap="round" fill="none"/>
-                    <path d="M83 17 Q92 26 92 35" stroke="url(#logoGrad)" stroke-width="4" stroke-linecap="round" fill="none"/>
-                </svg>
-            </div>
-        </div>
-
-        <div class="text-center z-10 space-y-2 px-4">
-            <h1 class="text-4xl font-black tracking-wider flex items-center justify-center">
-                <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
-            </h1>
-            <p class="text-[11px] font-bold uppercase tracking-[0.25em] text-gray-300 border-t border-brand-green/30 pt-2 max-w-xs mx-auto">
-                ETHICAL &amp; CLEAN STREAMING
-            </p>
-        </div>
-    </div>
-
-    <!-- 2. PUBLIC TOP HEADER -->
-    <header class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full">
-        <div class="flex items-center gap-3">
-            <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-parrot hover:bg-brand-card rounded-xl transition">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
-
-            <div class="flex items-center gap-2.5 cursor-pointer" onclick="triggerAdminSecretPrompt()">
-                <div class="w-9 h-9 rounded-xl bg-black border border-brand-parrot flex items-center justify-center neon-glow flex-shrink-0 p-1">
-                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                        <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="#39FF14" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <polygon points="44,40 44,60 58,50" fill="#FFFFFF"/>
-                        <path d="M78 22 Q84 28 84 34" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
-                        <path d="M83 17 Q92 26 92 35" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="font-black tracking-wider text-base block leading-none">
-                        <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
-                    </div>
-                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.2 • TiG</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="hidden sm:flex flex-1 max-w-md mx-6 gap-2">
-            <div class="relative flex-1 flex items-center">
-                <span class="absolute left-3 pointer-events-none text-gray-400">
-                    <i data-lucide="search" class="w-4 h-4"></i>
-                </span>
-                <input type="text" id="desktopSearchInput" onkeypress="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search clean lectures, cartoons, gaming..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-                <button onclick="startVoiceTyping('desktopSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
-                    <i data-lucide="mic" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <button onclick="executeSearch('desktopSearchInput')" class="px-4 py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition">
-                Search
-            </button>
-        </div>
-
-        <div class="flex items-center gap-2">
-            <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
-                <span class="text-lg">🌓</span>
-            </button>
-        </div>
-    </header>
-
-    <div class="sm:hidden w-full px-3 pt-3 flex gap-2">
-        <div class="relative flex-1 flex items-center">
-            <span class="absolute left-3 pointer-events-none text-gray-400">
-                <i data-lucide="search" class="w-4 h-4"></i>
-            </span>
-            <input type="text" id="mobileSearchInput" onkeypress="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Voice or text search..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-            <button onclick="startVoiceTyping('mobileSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
-                <i data-lucide="mic" class="w-4 h-4"></i>
-            </button>
-        </div>
-        <button onclick="executeSearch('mobileSearchInput')" class="px-3 py-2 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">
-            Search
+  <!-- Header / Navigation with Scroll Hide/Show Logic -->
+  <header id="main-header" class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50 header-visible">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl font-bold text-indigo-500">NexRise</span>
+      </div>
+      <nav class="hidden md:flex space-x-6 text-sm font-medium">
+        <a href="#dashboard" class="text-gray-300 hover:text-white transition">Dashboard</a>
+        <a href="#projects" class="text-gray-300 hover:text-white transition">Projects</a>
+        <a href="#analytics" class="text-gray-300 hover:text-white transition">Analytics</a>
+        <a href="#settings" class="text-gray-300 hover:text-white transition">Settings</a>
+      </nav>
+      <div>
+        <button class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+          Get Started
         </button>
+      </div>
     </div>
+  </header>
 
-    <!-- 3. COLLAPSIBLE SIDE DRAWER MENU -->
-    <div id="sideDrawerOverlay" onclick="toggleSideMenu()" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity"></div>
-    <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
-        <div class="space-y-6">
-            <div class="flex items-center justify-between border-b border-brand-border pb-4">
-                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.2</span>
-                <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <div class="space-y-1.5">
-                <p class="px-3 text-[10px] font-black uppercase tracking-wider text-gray-500 mb-2">Navigation</p>
-                <button onclick="selectMenuTab('home')" id="drawer-home" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-brand-parrot bg-brand-green/10 transition">
-                    <i data-lucide="home" class="w-4 h-4"></i> Home Stream
-                </button>
-                <button onclick="selectMenuTab('nextip')" id="drawer-nextip" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="zap" class="w-4 h-4"></i> NexTip (Short Reels)
-                </button>
-                <button onclick="selectMenuTab('nexvid')" id="drawer-nexvid" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="monitor-play" class="w-4 h-4"></i> NexVid (Long Videos)
-                </button>
-                <button onclick="selectMenuTab('upload')" id="drawer-upload" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <i data-lucide="plus-square" class="w-4 h-4"></i> Submit Content
-                </button>
-                <button onclick="toggleThemeMode()" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <span class="flex items-center gap-3"><span class="text-base">🌓</span> Light/Dark Theme</span>
-                </button>
-            </div>
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-indigo-900/50 via-purple-900/40 to-gray-800 border border-gray-700 rounded-2xl p-8 text-center md:text-left flex flex-col md:flex-row items-center justify-between">
+      <div class="max-w-xl space-y-4">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+          Welcome to <span class="text-indigo-400">NexRise</span> Platform
+        </h1>
+        <p class="text-gray-300 text-base">
+          Build, deploy, and scale your applications effortlessly with our integrated suite of modern developer tools.
+        </p>
+        <div class="pt-2 flex flex-wrap gap-4 justify-center md:justify-start">
+          <a href="#get-started" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-semibold shadow-lg transition">
+            Explore Features
+          </a>
+          <a href="#docs" class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-5 py-2.5 rounded-lg font-semibold transition">
+            Documentation
+          </a>
         </div>
-
-        <div class="bg-brand-card p-3.5 rounded-xl border border-brand-border space-y-1">
-            <p class="text-[10px] font-extrabold text-brand-parrot uppercase">Powered by TiG</p>
-            <p class="text-[11px] text-gray-400 leading-tight">Ethically moderated streaming platform.</p>
+      </div>
+      <div class="mt-6 md:mt-0">
+        <div class="w-48 h-48 md:w-64 md:h-64 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/40 shadow-inner">
+          <svg class="w-24 h-24 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
         </div>
-    </aside>
+      </div>
+    </section>
 
-    <!-- 4. MAIN VIEWPORT & TAB SECTIONS -->
-    <div class="flex-1 flex w-full max-w-7xl mx-auto">
-        <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
+    <!-- Metrics Grid -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 space-y-2">
+        <div class="text-sm font-medium text-gray-400">Total Users</div>
+        <div class="text-3xl font-bold text-white">12,480</div>
+        <div class="text-xs text-green-400 font-medium">+12.5% from last month</div>
+      </div>
+      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 space-y-2">
+        <div class="text-sm font-medium text-gray-400">Active Sessions</div>
+        <div class="text-3xl font-bold text-white">1,823</div>
+        <div class="text-xs text-green-400 font-medium">+5.2% active now</div>
+      </div>
+      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 space-y-2">
+        <div class="text-sm font-medium text-gray-400">Server Uptime</div>
+        <div class="text-3xl font-bold text-white">99.98%</div>
+        <div class="text-xs text-indigo-400 font-medium">Optimal performance</div>
+      </div>
+      <div class="bg-gray-800 border border-gray-700 rounded-xl p-5 space-y-2">
+        <div class="text-sm font-medium text-gray-400">Storage Used</div>
+        <div class="text-3xl font-bold text-white">64.2 GB</div>
+        <div class="text-xs text-yellow-400 font-medium">64% of allocated limit</div>
+      </div>
+    </section>
 
-            <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
-                <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
-                    <span id="playerVideoTitle" class="text-xs font-black text-white truncate max-w-md">Playing Selected Stream</span>
-                    <div class="flex items-center gap-2">
-                        <button onclick="toggleIframeFullscreen()" class="p-1 bg-brand-green/20 text-brand-parrot rounded-lg hover:bg-brand-parrot hover:text-black font-bold text-xs flex items-center gap-1">
-                            <i data-lucide="maximize" class="w-3.5 h-3.5"></i> Fullscreen
-                        </button>
-                        <button onclick="closeActivePlayer()" class="p-1 text-gray-400 hover:text-white">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="aspect-video-container bg-black rounded-xl overflow-hidden">
-                    <iframe id="activeMainIframe" src="" frameborder="0" allow="fullscreen" allowfullscreen></iframe>
-                </div>
-            </div>
+    <!-- Content Table / Activity -->
+    <section class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+        <h2 class="text-lg font-semibold text-white">Recent Deployments</h2>
+        <button class="text-sm text-indigo-400 hover:text-indigo-300 font-medium">View All</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-300">
+          <thead class="bg-gray-700/50 text-gray-400 uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3">Project Name</th>
+              <th class="px-6 py-3">Branch</th>
+              <th class="px-6 py-3">Status</th>
+              <th class="px-6 py-3">Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-700">
+            <tr class="hover:bg-gray-750 transition">
+              <td class="px-6 py-4 font-medium text-white">nexrise-frontend</td>
+              <td class="px-6 py-4 font-mono text-xs">main</td>
+              <td class="px-6 py-4"><span class="bg-green-500/20 text-green-400 text-xs px-2.5 py-1 rounded-full font-medium">Successful</span></td>
+              <td class="px-6 py-4 text-gray-400">10 mins ago</td>
+            </tr>
+            <tr class="hover:bg-gray-750 transition">
+              <td class="px-6 py-4 font-medium text-white">auth-service-api</td>
+              <td class="px-6 py-4 font-mono text-xs">dev-stage</td>
+              <td class="px-6 py-4"><span class="bg-green-500/20 text-green-400 text-xs px-2.5 py-1 rounded-full font-medium">Successful</span></td>
+              <td class="px-6 py-4 text-gray-400">2 hours ago</td>
+            </tr>
+            <tr class="hover:bg-gray-750 transition">
+              <td class="px-6 py-4 font-medium text-white">analytics-worker</td>
+              <td class="px-6 py-4 font-mono text-xs">fix-pipeline</td>
+              <td class="px-6 py-4"><span class="bg-yellow-500/20 text-yellow-400 text-xs px-2.5 py-1 rounded-full font-medium">Building</span></td>
+              <td class="px-6 py-4 text-gray-400">Just now</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-            <!-- TAB 1: HOME STREAM -->
-            <section id="tab-home" class="space-y-6">
-                <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                    <button onclick="filterCategory('All')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-parrot text-black border border-brand-parrot">All</button>
-                    <button onclick="filterCategory('Moral & Islamic')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Moral &amp; Islamic</button>
-                    <button onclick="filterCategory('Cartoons')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Cartoons &amp; Kids</button>
-                    <button onclick="filterCategory('Educational')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Educational</button>
-                    <button onclick="filterCategory('Gaming')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Gaming</button>
-                    <button onclick="filterCategory('Movies & Series')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Movies &amp; Series</button>
-                    <button onclick="filterCategory('Songs')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Songs</button>
-                </div>
+  </main>
 
-                <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
-            </section>
-
-            <!-- TAB 2: NEXTIP -->
-            <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
-                <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black relative"></div>
-            </section>
-
-            <!-- TAB 3: NEXVID -->
-            <section id="tab-nexvid" class="hidden space-y-4">
-                <h2 class="text-base font-bold text-brand-parrot flex items-center gap-2">
-                    <i data-lucide="monitor-play" class="w-5 h-5"></i> NexVid Dedicated Streams
-                </h2>
-                <div id="longVideosContainer" class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5"></div>
-            </section>
-
-            <!-- TAB 4: PUBLIC SUBMISSION -->
-            <section id="tab-upload" class="hidden space-y-6 max-w-2xl mx-auto">
-                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border space-y-4">
-                    <h2 class="text-base font-bold text-white">Submit Ethical Link</h2>
-                    <form onsubmit="handleFormSubmit(event)" class="space-y-4">
-                        <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Content Format</label>
-                            <select id="videoType" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-parrot">
-                                <option value="short">NexTip (Short Reel)</option>
-                                <option value="long">NexVid (Long Video)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Category</label>
-                            <select id="videoCategory" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-parrot">
-                                <option value="Moral & Islamic">Moral &amp; Islamic</option>
-                                <option value="Cartoons">Cartoons &amp; Kids</option>
-                                <option value="Educational">Educational</option>
-                                <option value="Gaming">Gaming</option>
-                                <option value="Movies & Series">Movies &amp; Series</option>
-                                <option value="Songs">Songs</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Embed Source Link</label>
-                            <input type="url" id="videoUrl" required placeholder="https://www.youtube.com/embed/..." class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-parrot">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Title</label>
-                            <input type="text" id="videoTitle" required placeholder="Title" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-parrot">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Creator / Scholar Name</label>
-                            <input type="text" id="creatorName" required placeholder="Creator Name" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-parrot">
-                        </div>
-                        <button type="submit" class="w-full bg-brand-parrot text-black font-extrabold py-3.5 rounded-xl text-xs hover:bg-green-400 transition shadow-lg">
-                            Submit Content Link
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- TAB 5: PROFILE & SECRET UNLOCKED STUDIO -->
-            <section id="tab-profile" class="hidden space-y-6 max-w-3xl mx-auto">
-                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-black border border-brand-parrot flex items-center justify-center text-brand-parrot">
-                        <i data-lucide="user" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-bold">Public Viewer</h3>
-                        <p class="text-xs text-gray-400">NexRise User Account</p>
-                    </div>
-                </div>
-
-                <!-- SECRET UNLOCKED ADMIN STUDIO -->
-                <div id="unlockedAdminDashboard" class="hidden space-y-6">
-                    <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
-                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                            <h3 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.2)
-                            </h3>
-                            <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
-                        </div>
-
-                        <!-- LIVE STATS & USERS COUNTER -->
-                        <div class="grid grid-cols-2 gap-3 text-center">
-                            <div class="bg-black/60 p-3 rounded-xl border border-white/10">
-                                <p class="text-[9px] text-gray-400 uppercase font-semibold">Live Active Viewers</p>
-                                <p id="liveUsersCount" class="text-base font-black text-brand-parrot mt-0.5">1</p>
-                            </div>
-                            <div class="bg-black/60 p-3 rounded-xl border border-white/10">
-                                <p class="text-[9px] text-gray-400 uppercase font-semibold">Security PIN</p>
-                                <p class="text-base font-black text-white mt-0.5">3835</p>
-                            </div>
-                        </div>
-
-                        <!-- EXPORT CODE / UPDATE HELPER -->
-                        <div class="bg-brand-parrot/10 p-4 rounded-xl border border-brand-parrot/50 space-y-2">
-                            <h4 class="text-xs font-bold text-brand-parrot flex items-center gap-2">
-                                <i data-lucide="download" class="w-4 h-4"></i> Export Updated HTML Code
-                            </h4>
-                            <p class="text-[11px] text-gray-300">Click below to generate and copy the updated code containing all new links for your next version.</p>
-                            <button onclick="exportUpdatedCode()" class="w-full py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition">
-                                Copy Updated Code to Clipboard
-                            </button>
-                        </div>
-
-                        <!-- AUTO-SYNC FULL CHANNEL -->
-                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-2">
-                            <h4 class="text-xs font-bold text-brand-parrot flex items-center gap-2">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync Full YouTube Channel
-                            </h4>
-                            <div class="flex gap-2 pt-1">
-                                <input type="text" id="syncChannelInput" placeholder="https://youtube.com/@channel" class="flex-1 bg-black/80 border border-white/20 p-2 rounded-xl text-xs text-white focus:outline-none focus:border-brand-parrot">
-                                <button onclick="syncFullChannel()" class="px-4 py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition">
-                                    Sync
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- PUBLISH DIRECTLY -->
-                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
-                            <h4 class="text-xs font-bold text-gray-200">Publish New Stream Link</h4>
-                            <form onsubmit="handleDirectAdminPublish(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                                <input type="text" id="adminPubTitle" placeholder="Title" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                <input type="text" id="adminPubCreator" placeholder="Creator / Scholar" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                <input type="url" id="adminPubUrl" placeholder="Embed URL" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                <select id="adminPubCategory" class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                    <option value="Moral & Islamic">Moral &amp; Islamic</option>
-                                    <option value="Cartoons">Cartoons &amp; Kids</option>
-                                    <option value="Educational">Educational</option>
-                                    <option value="Gaming">Gaming</option>
-                                    <option value="Movies & Series">Movies &amp; Series</option>
-                                    <option value="Songs">Songs</option>
-                                </select>
-                                <select id="adminPubType" class="bg-black/80 border border-white/20 p-2 rounded-lg text-white sm:col-span-2">
-                                    <option value="long">NexVid Stream</option>
-                                    <option value="short">NexTip Reel</option>
-                                </select>
-                                <button type="submit" class="sm:col-span-2 py-2 bg-brand-parrot text-black font-extrabold rounded-lg hover:bg-green-400">
-                                    Publish Directly To Live Feed
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- DELETE MANAGER -->
-                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
-                            <h4 class="text-xs font-bold text-gray-200 flex items-center justify-between">
-                                <span>Manage Published Videos</span>
-                                <span class="text-[10px] text-brand-parrot">Single-Click Delete</span>
-                            </h4>
-                            <div id="adminVideoManagerList" class="space-y-2 text-xs"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        </main>
+  <!-- Footer -->
+  <footer class="bg-gray-800 border-t border-gray-700 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400">
+      <p>&copy; 2026 NexRise Inc. All rights reserved.</p>
+      <div class="flex space-x-4 mt-2 sm:mt-0">
+        <a href="#" class="hover:text-white transition">Privacy Policy</a>
+        <a href="#" class="hover:text-white transition">Terms of Service</a>
+        <a href="#" class="hover:text-white transition">Support</a>
+      </div>
     </div>
+  </footer>
 
-    <!-- MOBILE BOTTOM NAVIGATION -->
-    <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-t border-white/10 h-16 pb-safe">
-        <div class="grid grid-cols-4 h-full max-w-md mx-auto">
-            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center gap-1 text-brand-parrot transition">
-                <i data-lucide="home" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">Home</span>
-            </button>
-            <button onclick="switchTab('nextip')" id="nav-nextip" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
-                <i data-lucide="zap" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">NexTip</span>
-            </button>
-            <button onclick="switchTab('nexvid')" id="nav-nexvid" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
-                <i data-lucide="monitor-play" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">NexVid</span>
-            </button>
-            <button onclick="switchTab('upload')" id="nav-upload" class="flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition">
-                <i data-lucide="plus-square" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium uppercase tracking-wider">Submit</span>
-            </button>
-        </div>
-    </nav>
+  <!-- JavaScript for Video Management, Player Controls & Header Scroll Behavior -->
+  <script>
+    // 1 & 2. Video Scrolling & Auto-Play Management Logic
+    // جب ویڈیوز کو سکرول یا نیکسٹ کیا جائے تو پچھلی ویڈیو کا پلے بیک بند ہو جائے اور اگلی خود بخود پلے ہو جائے
+    document.addEventListener("DOMContentLoaded", () => {
+      const videos = document.querySelectorAll("video");
 
-    <!-- GREEN AI VOICE TYPING MODAL OVERLAY -->
-    <div id="voiceSearchModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-6">
-        <div class="w-24 h-24 rounded-full bg-brand-parrot/20 border-2 border-brand-parrot flex items-center justify-center text-brand-parrot neon-glow">
-            <i data-lucide="mic" class="w-10 h-10 animate-bounce"></i>
-        </div>
-
-        <div class="flex items-center justify-center gap-1.5 h-12">
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.1s;"></div>
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.3s;"></div>
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.2s;"></div>
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.4s;"></div>
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.15s;"></div>
-        </div>
-
-        <div class="space-y-2 max-w-sm">
-            <h3 class="text-base font-extrabold text-white">Green AI Voice Typing...</h3>
-            <p id="voiceRecognizedText" class="text-xs text-brand-parrot font-mono min-h-[20px]">Listening to your voice...</p>
-        </div>
-
-        <button onclick="closeVoiceSearchModal()" class="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-gray-300 font-bold text-xs rounded-xl">
-            Cancel
-        </button>
-    </div>
-
-    <!-- SECRET ADMIN LOGIN AUTH MODAL -->
-    <div id="adminAuthModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-brand-parrot max-w-sm w-full p-6 rounded-2xl space-y-4 shadow-2xl">
-            <div class="text-center space-y-1">
-                <h3 class="text-base font-bold text-white">TiG Admin Verification</h3>
-                <p class="text-xs text-gray-400">Enter Email &amp; Security PIN</p>
-            </div>
-
-            <form onsubmit="verifyAdminPinLogin(event)" class="space-y-3">
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Official Email</label>
-                    <input type="email" id="adminEmailInput" required placeholder="admin@tig.official" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-parrot">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">4-Digit Security PIN</label>
-                    <input type="password" id="adminPinInput" maxlength="4" required placeholder="••••" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-parrot text-center text-lg tracking-widest">
-                </div>
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 bg-white/10 text-gray-300 font-bold text-xs rounded-xl">Cancel</button>
-                    <button type="submit" class="w-1/2 py-2.5 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400">Unlock Studio</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- COMMENTS MODAL -->
-    <div id="commentsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center">
-        <div class="bg-brand-card border border-brand-border p-5 rounded-t-3xl sm:rounded-2xl max-w-md w-full h-[65vh] sm:h-[500px] flex flex-col justify-between">
-            <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <h3 class="text-xs font-bold text-white flex items-center gap-2">
-                    <i data-lucide="message-circle" class="w-4 h-4 text-brand-parrot"></i> Discussion
-                </h3>
-                <button onclick="closeCommentsModal()" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div id="commentsList" class="flex-1 overflow-y-auto py-3 space-y-3 text-xs"></div>
-            <form onsubmit="handleAddComment(event)" class="flex gap-2 pt-3 border-t border-white/10">
-                <input type="text" id="commentInput" placeholder="Add a comment..." required class="flex-1 bg-black/60 border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-parrot">
-                <button type="submit" class="px-4 py-2 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">Post</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- APP CORE ENGINE & FIREBASE JS -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
-
-        // Firebase Configuration (TRG Official Project)
-        const firebaseConfig = {
-            apiKey: "AIzaSyD9Hk71ZWaJHw66p_lJ068wKAz6eIS4f1g",
-            authDomain: "tig-official-ad68f.firebaseapp.com",
-            projectId: "tig-official-ad68f",
-            storageBucket: "tig-official-ad68f.firebasestorage.app",
-            messagingSenderId: "619651857336",
-            appId: "1:619651857336:web:e8ea8a0ad2a7541472ed4d",
-            measurementId: "G-QB5J1TYJDR"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        const APP_VERSION = "2.8.2";
-        const LOCAL_STORAGE_KEY = "NEXRISE_V282_DATA";
-        const SECURITY_PIN = "3835";
-        const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
-
-        let activeTargetInputId = "desktopSearchInput";
-        let activeSelectedCategory = "All";
-        let activeCommentVideoId = null;
-
-        const defaultData = [
-            {
-                id: "1", type: "long", category: "Moral & Islamic",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                title: "Beautiful Quran Recitation & Moral Guidance",
-                creator: "Qari Official", likes: 420, comments: ["MashaAllah peaceful."], status: "approved"
-            },
-            {
-                id: "2", type: "long", category: "Educational",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                title: "Ethical Technology & Modern Innovation",
-                creator: "TiG Tech", likes: 198, comments: ["Informative stream."], status: "approved"
-            },
-            {
-                id: "3", type: "long", category: "Cartoons",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                title: "Moral Lessons Cartoon Series for Children",
-                creator: "Clean Toons Studio", likes: 512, comments: ["Great for kids."], status: "approved"
-            },
-            {
-                id: "4", type: "short", category: "Moral & Islamic",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                title: "Daily Moral Reflection in 60 Seconds",
-                creator: "NexTip Daily", likes: 890, comments: ["Short & powerful."], status: "approved"
-            }
-        ];
-
-        let videoData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || defaultData;
-
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
-                e.preventDefault();
-                triggerAdminSecretPrompt();
-            }
+      function stopAllVideosExcept(activeVideo) {
+        videos.forEach(video => {
+          if (video !== activeVideo) {
+            video.pause();
+            video.currentTime = 0;
+          }
         });
+      }
 
-        window.addEventListener('scroll', () => {
-            const playerBox = document.getElementById('stickyVideoPlayerBox');
-            if (playerBox && !playerBox.classList.contains('hidden')) {
-                const rect = playerBox.getBoundingClientRect();
-                if (rect.bottom < 0 || rect.top > window.innerHeight) {
-                    closeActivePlayer();
-                }
-            }
+      videos.forEach(video => {
+        // جب نیکسٹ بٹن یا پلے پریس کیا جائے
+        video.addEventListener("play", () => {
+          stopAllVideosExcept(video);
         });
+      });
 
-        window.onload = async function() {
-            lucide.createIcons();
-            init3DIntroParticleCanvas();
+      // 5. Header Hide on Scroll Down / Show on Scroll Up Logic
+      let lastScrollTop = 0;
+      const header = document.getElementById("main-header");
 
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                if (splash) {
-                    splash.style.opacity = '0';
-                    setTimeout(() => splash.remove(), 700);
-                }
-            }, 2000);
-
-            // Fetch live data from Firebase Firestore
-            await loadDataFromFirebase();
-            renderAdminVideoManager();
-            updateLiveUsersCounter();
-        };
-
-        async function loadDataFromFirebase() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "nexrise_videos"));
-                if (!querySnapshot.empty) {
-                    const fbData = [];
-                    querySnapshot.forEach((docSnap) => {
-                        fbData.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    videoData = fbData;
-                }
-            } catch (err) {
-                console.log("Using local cache due to network or rules:", err);
-            }
-            renderFeeds();
+      window.addEventListener("scroll", () => {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop && scrollTop > 50) {
+          // نیچے سکرول کرنے پر ہیڈر چھپ جائے گا تاکہ اسکرین زیادہ ملے
+          header.classList.remove("header-visible");
+          header.classList.add("header-hidden");
+        } else {
+          // ذرا سا بھی اوپر سکرول کرنے یا تھوڑا نیچے کرنے پر ہیڈر فوراً ظاہر ہو جائے گا
+          header.classList.remove("header-hidden");
+          header.classList.add("header-visible");
         }
-
-        function updateLiveUsersCounter() {
-            const counterEl = document.getElementById('liveUsersCount');
-            if (counterEl) {
-                let count = Math.floor(Math.random() * 3) + 1;
-                counterEl.innerText = count;
-            }
-        }
-
-        function init3DIntroParticleCanvas() {
-            const container = document.getElementById('threejsCanvasContainer');
-            if (!container || typeof THREE === 'undefined') return;
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(renderer.domElement);
-
-            const count = 300;
-            const positions = new Float32Array(count * 3);
-            for(let i=0; i<count*3; i++) positions[i] = (Math.random() - 0.5) * 10;
-
-            const geo = new THREE.BufferGeometry();
-            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const mat = new THREE.PointsMaterial({ size: 0.035, color: 0x39FF14 });
-
-            const pSystem = new THREE.Points(geo, mat);
-            scene.add(pSystem);
-            camera.position.z = 3;
-
-            function animate() {
-                requestAnimationFrame(animate);
-                pSystem.rotation.y += 0.003;
-                pSystem.rotation.x += 0.0015;
-                renderer.render(scene, camera);
-            }
-            animate();
-        }
-
-        window.toggleSideMenu = function() {
-            const drawer = document.getElementById('collapsibleSidebar');
-            const overlay = document.getElementById('sideDrawerOverlay');
-            if (!drawer || !overlay) return;
-            const isHidden = drawer.classList.contains('-translate-x-full');
-            if (isHidden) {
-                drawer.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                drawer.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
-        }
-
-        window.selectMenuTab = function(tabId) {
-            toggleSideMenu();
-            switchTab(tabId);
-        }
-
-        window.switchTab = function(tabId) {
-            ['home', 'nextip', 'nexvid', 'upload', 'profile'].forEach(t => {
-                const sec = document.getElementById(`tab-${t}`);
-                if (sec) sec.classList.toggle('hidden', t !== tabId);
-
-                const nbtn = document.getElementById(`nav-${t}`);
-                if (nbtn) {
-                    nbtn.className = (t === tabId) 
-                        ? "flex flex-col items-center justify-center gap-1 text-brand-parrot transition" 
-                        : "flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition";
-                }
-            });
-            renderFeeds();
-        }
-
-        window.toggleThemeMode = function() {
-            document.documentElement.classList.toggle('light');
-        }
-
-        window.startVoiceTyping = function(targetInputId) {
-            activeTargetInputId = targetInputId;
-            const modal = document.getElementById('voiceSearchModal');
-            const textEl = document.getElementById('voiceRecognizedText');
-            if (modal) modal.classList.remove('hidden');
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                const recognition = new SpeechRecognition();
-                recognition.lang = 'en-US';
-                recognition.start();
-
-                recognition.onresult = (e) => {
-                    const transcript = e.results[0][0].transcript;
-                    if (textEl) textEl.innerText = `Typed: "${transcript}"`;
-                    
-                    const input = document.getElementById(activeTargetInputId);
-                    if (input) input.value = transcript;
-
-                    setTimeout(() => {
-                        closeVoiceSearchModal();
-                        executeSearch(activeTargetInputId);
-                    }, 1000);
-                };
-            } else {
-                let phrases = ["Quran Recitation", "Educational Tech", "Moral Cartoons"];
-                let chosen = phrases[Math.floor(Math.random() * phrases.length)];
-                let idx = 0;
-                let timer = setInterval(() => {
-                    if (idx <= chosen.length) {
-                        textEl.innerText = `Typing: "${chosen.slice(0, idx)}"`;
-                        idx++;
-                    } else {
-                        clearInterval(timer);
-                        const input = document.getElementById(activeTargetInputId);
-                        if (input) input.value = chosen;
-                        setTimeout(() => {
-                            closeVoiceSearchModal();
-                            executeSearch(activeTargetInputId);
-                        }, 800);
-                    }
-                }, 100);
-            }
-        }
-
-        window.closeVoiceSearchModal = function() {
-            const modal = document.getElementById('voiceSearchModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        window.executeSearch = function(inputId) {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            renderFeeds(input.value.trim().toLowerCase());
-        }
-
-        window.filterCategory = function(cat) {
-            activeSelectedCategory = cat;
-            document.querySelectorAll('.category-chip').forEach(btn => {
-                if (btn.innerText.includes(cat) || (cat === 'All' && btn.innerText === 'All')) {
-                    btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-parrot text-black border border-brand-parrot";
-                } else {
-                    btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot";
-                }
-            });
-            renderFeeds();
-        }
-
-        function renderFeeds(filterQuery = '') {
-            const approved = videoData.filter(v => v.status === 'approved' &&
-                (activeSelectedCategory === 'All' || v.category === activeSelectedCategory) &&
-                (v.title.toLowerCase().includes(filterQuery) || v.creator.toLowerCase().includes(filterQuery)));
-
-            const homeFeed = document.getElementById('youtubeStyleHomeFeed');
-            if (homeFeed) {
-                const longs = approved.filter(v => v.type === 'long');
-                const shorts = approved.filter(v => v.type === 'short');
-
-                let html = '';
-                if (longs.length > 0) {
-                    html += `<div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">
-                        ${longs.map(v => renderCardHtml(v)).join('')}
-                    </div>`;
-                }
-
-                if (shorts.length > 0) {
-                    html += `
-                        <div class="bg-brand-card p-4 rounded-2xl border border-brand-border space-y-3">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-xs font-black uppercase text-white tracking-wider flex items-center gap-2">
-                                    <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i> NexTip Reels Shelf
-                                </h3>
-                                <button onclick="switchTab('nextip')" class="text-xs text-brand-parrot font-bold hover:underline">View All</button>
-                            </div>
-                            <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                                ${shorts.map(s => `
-                                    <div onclick="playStreamInTopPlayer('${s.url}', '${s.title.replace(/'/g, "\\'")}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
-                                        <iframe src="${s.url}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
-                                            <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
-                                            <p class="text-[9px] text-brand-parrot mt-1">@${s.creator}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-
-                homeFeed.innerHTML = html || `<p class="text-gray-500 text-center py-8 text-xs">No matching streams found.</p>`;
-            }
-
-            const nexvidFeed = document.getElementById('longVideosContainer');
-            if (nexvidFeed) {
-                const longs = approved.filter(v => v.type === 'long');
-                nexvidFeed.innerHTML = longs.map(v => renderCardHtml(v)).join('');
-            }
-
-            const shortsContainer = document.getElementById('shortsContainer');
-            if (shortsContainer) {
-                const shorts = approved.filter(v => v.type === 'short');
-                shortsContainer.innerHTML = shorts.map(v => `
-                    <div class="h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden">
-                        <div class="absolute inset-0 pointer-events-none z-10"></div>
-                        <iframe src="${v.url}?controls=0&modestbranding=1&rel=0&playsinline=1" class="w-full h-full scale-105 pointer-events-auto" frameborder="0" allowfullscreen></iframe>
-                        <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
-                            <div>
-                                <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
-                                <p class="text-[10px] text-brand-parrot">@${v.creator}</p>
-                            </div>
-                            <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">
-                                👍 ${v.likes}
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            lucide.createIcons();
-        }
-
-        function renderCardHtml(v) {
-            return `
-                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
-                    <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.url}', '${v.title.replace(/'/g, "\\'")}')">
-                        <iframe src="${v.url}" title="${v.title}" frameborder="0" class="pointer-events-none"></iframe>
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 flex items-center justify-center transition">
-                            <div class="w-12 h-12 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-lg transform group-hover:scale-110 transition">
-                                <i data-lucide="play" class="w-6 h-6 fill-black ml-0.5"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 space-y-2">
-                        <span class="text-[9px] font-black uppercase tracking-wider text-brand-parrot bg-brand-green/10 px-2 py-0.5 rounded-md">
-                            ${v.category}
-                        </span>
-                        <h3 class="font-bold text-sm text-white line-clamp-2 cursor-pointer hover:text-brand-parrot" onclick="playStreamInTopPlayer('${v.url}', '${v.title.replace(/'/g, "\\'")}')">${v.title}</h3>
-                        <div class="flex items-center justify-between pt-2 text-xs text-gray-400 border-t border-white/5">
-                            <span class="font-medium text-gray-300">${v.creator}</span>
-                            <div class="flex items-center gap-3">
-                                <button onclick="toggleLike('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
-                                    👍 ${v.likes}
-                                </button>
-                                <button onclick="openCommentsModal('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
-                                    💬 ${v.comments.length}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        window.playStreamInTopPlayer = function(url, title) {
-            const playerBox = document.getElementById('stickyVideoPlayerBox');
-            const iframe = document.getElementById('activeMainIframe');
-            const titleEl = document.getElementById('playerVideoTitle');
-
-            if (playerBox && iframe) {
-                iframe.src = url + "?autoplay=1";
-                if (titleEl) titleEl.innerText = title;
-                playerBox.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        window.closeActivePlayer = function() {
-            const playerBox = document.getElementById('stickyVideoPlayerBox');
-            const iframe = document.getElementById('activeMainIframe');
-            if (playerBox && iframe) {
-                iframe.src = "";
-                playerBox.classList.add('hidden');
-            }
-        }
-
-        window.toggleIframeFullscreen = function() {
-            const iframe = document.getElementById('activeMainIframe');
-            if (iframe) {
-                if (iframe.requestFullscreen) iframe.requestFullscreen();
-                else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-            }
-        }
-
-        window.toggleLike = async function(id) {
-            const item = videoData.find(v => v.id === id);
-            if (item) {
-                item.likes += 1;
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderFeeds();
-            }
-        }
-
-        window.triggerAdminSecretPrompt = function() {
-            document.getElementById('adminAuthModal').classList.remove('hidden');
-        }
-
-        window.closeAdminAuthModal = function() {
-            document.getElementById('adminAuthModal').classList.add('hidden');
-        }
-
-        window.verifyAdminPinLogin = function(e) {
-            e.preventDefault();
-            const email = document.getElementById('adminEmailInput').value;
-            const pin = document.getElementById('adminPinInput').value;
-
-            if (email === OFFICIAL_EMAIL && pin === SECURITY_PIN) {
-                closeAdminAuthModal();
-                document.getElementById('unlockedAdminDashboard').classList.remove('hidden');
-                switchTab('profile');
-                renderAdminVideoManager();
-            } else {
-                alert('Invalid Official Admin Email or Security PIN!');
-            }
-        }
-
-        window.lockAdminDashboard = function() {
-            document.getElementById('unlockedAdminDashboard').classList.add('hidden');
-        }
-
-        window.exportUpdatedCode = function() {
-            const currentHTML = document.documentElement.outerHTML;
-            navigator.clipboard.writeText(currentHTML).then(() => {
-                alert('Full updated HTML code copied to clipboard successfully!');
-            }).catch(err => {
-                alert('Failed to copy code automatically.');
-            });
-        }
-
-        window.syncFullChannel = async function() {
-            const input = document.getElementById('syncChannelInput');
-            if (!input || !input.value.trim()) {
-                alert('Please enter a valid Channel URL or ID');
-                return;
-            }
-
-            const channelVal = input.value.trim();
-            const syncedItem = {
-                type: "long",
-                category: "Moral & Islamic",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                title: `Synced Stream: ${channelVal.includes('@') ? channelVal.split('@')[1] : 'Official Partner Channel'}`,
-                creator: channelVal.includes('@') ? `@${channelVal.split('@')[1]}` : "Synced Creator",
-                likes: 120,
-                comments: ["Synced automatically from YouTube."],
-                status: "approved"
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, "nexrise_videos"), syncedItem);
-                syncedItem.id = docRef.id;
-                videoData.unshift(syncedItem);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderAdminVideoManager();
-                renderFeeds();
-                input.value = '';
-                alert('Channel synced & saved to Firebase successfully!');
-            } catch (e) {
-                alert('Error saving to Firebase: ' + e.message);
-            }
-        }
-
-        function renderAdminVideoManager() {
-            const container = document.getElementById('adminVideoManagerList');
-            if (!container) return;
-
-            container.innerHTML = videoData.map(v => `
-                <div class="flex items-center justify-between p-2.5 bg-black/60 rounded-xl border border-white/10">
-                    <div class="truncate max-w-[200px]">
-                        <p class="font-bold text-white truncate">${v.title}</p>
-                        <p class="text-[10px] text-gray-400">By ${v.creator} • ${v.category}</p>
-                    </div>
-                    <button onclick="deleteVideoItem('${v.id}')" class="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold text-[10px] rounded-lg transition">
-                        Delete
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        window.deleteVideoItem = async function(id) {
-            if (confirm('Delete this stream from Firebase?')) {
-                try {
-                    await deleteDoc(doc(db, "nexrise_videos", id));
-                } catch(e) {
-                    console.log("Firebase delete note:", e);
-                }
-                videoData = videoData.filter(v => v.id !== id);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderAdminVideoManager();
-                renderFeeds();
-            }
-        }
-
-        window.handleDirectAdminPublish = async function(e) {
-            e.preventDefault();
-            const title = document.getElementById('adminPubTitle').value;
-            const creator = document.getElementById('adminPubCreator').value;
-            const url = document.getElementById('adminPubUrl').value;
-            const category = document.getElementById('adminPubCategory').value;
-            const type = document.getElementById('adminPubType').value;
-
-            const newItem = {
-                type, category,
-                url, title, creator,
-                likes: 0, comments: [], status: "approved"
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
-                newItem.id = docRef.id;
-                videoData.unshift(newItem);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderAdminVideoManager();
-                renderFeeds();
-                e.target.reset();
-                alert('Stream Published & Saved to Firebase!');
-            } catch(err) {
-                alert('Error publishing to Firebase: ' + err.message);
-            }
-        }
-
-        window.handleFormSubmit = async function(e) {
-            e.preventDefault();
-            const type = document.getElementById('videoType').value;
-            const category = document.getElementById('videoCategory').value;
-            const url = document.getElementById('videoUrl').value;
-            const title = document.getElementById('videoTitle').value;
-            const creator = document.getElementById('creatorName').value;
-
-            const newItem = {
-                type, category, url, title, creator,
-                likes: 0, comments: [], status: "approved"
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
-                newItem.id = docRef.id;
-                videoData.unshift(newItem);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderFeeds();
-                alert('Submitted & Saved to Firebase Successfully!');
-                e.target.reset();
-            } catch(err) {
-                alert('Error submitting to Firebase: ' + err.message);
-            }
-        }
-
-        window.openCommentsModal = function(id) {
-            activeCommentVideoId = id;
-            document.getElementById('commentsModal').classList.remove('hidden');
-            renderComments();
-        }
-
-        window.closeCommentsModal = function() {
-            document.getElementById('commentsModal').classList.add('hidden');
-        }
-
-        function renderComments() {
-            const container = document.getElementById('commentsList');
-            const item = videoData.find(v => v.id === activeCommentVideoId);
-            if (!item || !item.comments || item.comments.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-center py-4">No comments yet.</p>`;
-                return;
-            }
-            container.innerHTML = item.comments.map(c => `
-                <div class="bg-black/50 p-2.5 rounded-xl border border-white/5">
-                    <p class="text-gray-200">${c}</p>
-                </div>
-            `).join('');
-        }
-
-        window.handleAddComment = async function(e) {
-            e.preventDefault();
-            const input = document.getElementById('commentInput');
-            const item = videoData.find(v => v.id === activeCommentVideoId);
-            if (item && input.value.trim()) {
-                if(!item.comments) item.comments = [];
-                item.comments.push(input.value.trim());
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                input.value = '';
-                renderComments();
-                renderFeeds();
-            }
-        }
-    </script>
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+      }, { passive: true });
+    });
+  </script>
 </body>
 </html>

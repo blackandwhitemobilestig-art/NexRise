@@ -88,6 +88,14 @@
         transform: rotate(90deg) scale(0.85);
         transform-origin: center center;
       }
+
+      /* Vertical Brightness Range Slider Over Video */
+      .vertical-slider {
+        writing-mode: bt-lr;
+        -webkit-appearance: slider-vertical;
+        width: 8px;
+        height: 80px;
+      }
     </style>
 </head>
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
@@ -129,7 +137,7 @@
         </div>
     </div>
 
-    <!-- ONE-TIME PERMISSIONS MODAL (Microphone, Notifications, Storage) -->
+    <!-- ONE-TIME PERMISSIONS MODAL -->
     <div id="permissionModal" class="hidden fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-brand-card border border-brand-parrot max-w-sm w-full p-6 rounded-2xl space-y-4 shadow-2xl text-center">
             <div class="w-12 h-12 rounded-full bg-brand-green/20 border border-brand-parrot flex items-center justify-center mx-auto text-brand-parrot neon-glow">
@@ -253,33 +261,54 @@
     <div class="flex-1 flex w-full max-w-7xl mx-auto">
         <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
 
-            <!-- STICKY VIDEO PLAYER BOX WITH ROTATE & BRIGHTNESS CONTROLS -->
-            <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative space-y-3">
-                <div class="flex items-center justify-between pb-2 border-b border-white/10">
-                    <span id="playerVideoTitle" class="text-xs font-black text-white truncate max-w-md">Playing Selected Stream</span>
-                    <div class="flex items-center gap-2">
-                        <button onclick="toggleIframeFullscreen()" class="p-1 px-2 bg-brand-green/20 text-brand-parrot rounded-lg hover:bg-brand-parrot hover:text-black font-bold text-xs flex items-center gap-1">
-                            <i data-lucide="maximize" class="w-3.5 h-3.5"></i> Fullscreen
-                        </button>
-                        <button onclick="closeActivePlayer()" class="p-1 text-gray-400 hover:text-white">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
+            <!-- STICKY SIDE-BY-SIDE VIDEO PLAYER & RECOMMENDATION SECTION (YOUTUBE / PC STYLE) -->
+            <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
+                <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
+                    
+                    <!-- LEFT COLUMN: VIDEO PLAYER (PROPORTIONAL HOME SIZE) & TITLE -->
+                    <div class="desktop:col-span-2 space-y-3">
+                        <div class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10">
+                            
+                            <iframe id="activeMainIframe" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                            
+                            <!-- OVERLAY CONTROLS ON VIDEO (No extra space taken) -->
+                            <!-- Circular Rotate Button Top Left -->
+                            <button onclick="rotateActiveVideo()" title="Rotate Screen" class="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
+                                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                            </button>
 
-                <!-- Player Controls Bar (Rotate & Brightness) -->
-                <div class="flex flex-wrap items-center justify-between gap-3 bg-black/60 p-2.5 rounded-xl border border-white/10 text-xs">
-                    <button onclick="rotateActiveVideo()" class="px-3 py-1.5 bg-brand-card border border-brand-border hover:border-brand-parrot text-white rounded-lg flex items-center gap-1.5 font-bold transition">
-                        <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-brand-parrot"></i> Rotate Screen
-                    </button>
-                    <div class="flex items-center gap-2">
-                        <span class="text-gray-400 font-bold">☀️ Brightness:</span>
-                        <input type="range" id="brightnessSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="w-24 accent-brand-parrot cursor-pointer">
-                    </div>
-                </div>
+                            <!-- Vertical Brightness Slider Right Side -->
+                            <div class="absolute top-10 right-2 z-20 bg-black/70 border border-white/20 p-1.5 rounded-full flex flex-col items-center gap-1 shadow-lg">
+                                <span class="text-[9px]">☀️</span>
+                                <input type="range" id="brightnessSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="vertical-slider accent-brand-parrot cursor-pointer">
+                            </div>
 
-                <div class="aspect-video-container bg-black rounded-xl overflow-hidden">
-                    <iframe id="activeMainIframe" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                            <!-- Fullscreen Overlay Button Bottom Right -->
+                            <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="absolute bottom-2 right-2 z-20 p-1.5 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition shadow-lg">
+                                <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- VIDEO TITLE & CLOSE BUTTON -->
+                        <div class="flex items-start justify-between gap-3 pt-1 border-t border-white/10">
+                            <div>
+                                <h3 id="playerVideoTitle" class="text-sm font-black text-white line-clamp-2">Playing Selected Stream</h3>
+                                <p id="playerVideoCreator" class="text-xs text-brand-parrot font-bold mt-0.5">@NexRise Stream</p>
+                            </div>
+                            <button onclick="closeActivePlayer()" class="p-1 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: RECOMMENDATION FEED LIST (YouTube PC Style) -->
+                    <div class="space-y-3 border-t desktop:border-t-0 desktop:border-l border-white/10 pt-3 desktop:pt-0 desktop:pl-4">
+                        <h4 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
+                            <i data-lucide="list-video" class="w-4 h-4"></i> Recommended Streams
+                        </h4>
+                        <div id="playerRecommendationList" class="space-y-2 max-h-[350px] overflow-y-auto no-scrollbar"></div>
+                    </div>
+
                 </div>
             </div>
 
@@ -609,7 +638,6 @@
             lucide.createIcons();
             init3DIntroParticleCanvas();
 
-            // Check One-Time Permissions on First Load
             if (!localStorage.getItem("nexrise_permissions_asked")) {
                 const pModal = document.getElementById('permissionModal');
                 if (pModal) pModal.classList.remove('hidden');
@@ -629,15 +657,12 @@
         };
 
         window.grantAllAppPermissions = function() {
-            // Request Mic permission
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => console.log("Mic permission denied:", err));
             }
-            // Request Notification permission
             if ("Notification" in window) {
                 Notification.requestPermission().catch(err => console.log("Notification permission error:", err));
             }
-            // Save state to localStorage so it asks only once
             localStorage.setItem("nexrise_permissions_asked", "true");
             localStorage.setItem("nexrise_storage_allowed", "true");
 
@@ -835,7 +860,7 @@
                             </div>
                             <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
                                 ${shorts.map(s => `
-                                    <div onclick="playStreamInTopPlayer('${s.url}', '${s.title.replace(/'/g, "\\'")}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
+                                    <div onclick="playStreamInTopPlayer('${s.id}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
                                         <iframe src="${s.url}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
                                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
                                             <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
@@ -882,7 +907,7 @@
         function renderCardHtml(v) {
             return `
                 <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
-                    <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.url}', '${v.title.replace(/'/g, "\\'")}')">
+                    <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.id}')">
                         <iframe src="${v.url}" title="${v.title}" frameborder="0" class="pointer-events-none"></iframe>
                         <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 flex items-center justify-center transition">
                             <div class="w-12 h-12 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-lg transform group-hover:scale-110 transition">
@@ -894,7 +919,7 @@
                         <span class="text-[9px] font-black uppercase tracking-wider text-brand-parrot bg-brand-green/10 px-2 py-0.5 rounded-md">
                             ${v.category}
                         </span>
-                        <h3 class="font-bold text-sm text-white line-clamp-2 cursor-pointer hover:text-brand-parrot" onclick="playStreamInTopPlayer('${v.url}', '${v.title.replace(/'/g, "\\'")}')">${v.title}</h3>
+                        <h3 class="font-bold text-sm text-white line-clamp-2 cursor-pointer hover:text-brand-parrot" onclick="playStreamInTopPlayer('${v.id}')">${v.title}</h3>
                         <div class="flex items-center justify-between pt-2 text-xs text-gray-400 border-t border-white/5">
                             <span class="font-medium text-gray-300">${v.creator}</span>
                             <div class="flex items-center gap-3">
@@ -911,17 +936,39 @@
             `;
         }
 
-        // Single Click Instant Play with Autoplay Enabled
-        window.playStreamInTopPlayer = function(url, title) {
+        // Single Click Play & Render Side Recommendation Feed
+        window.playStreamInTopPlayer = function(id) {
+            const target = videoData.find(v => v.id === id);
+            if(!target) return;
+
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             const iframe = document.getElementById('activeMainIframe');
             const titleEl = document.getElementById('playerVideoTitle');
+            const creatorEl = document.getElementById('playerVideoCreator');
+            const recContainer = document.getElementById('playerRecommendationList');
 
             if (playerBox && iframe) {
-                // Ensure single click triggers immediate play via autoplay parameter
-                let formattedUrl = url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+                let formattedUrl = target.url.includes('?') ? `${target.url}&autoplay=1` : `${target.url}?autoplay=1`;
                 iframe.src = formattedUrl;
-                if (titleEl) titleEl.innerText = title;
+                if (titleEl) titleEl.innerText = target.title;
+                if (creatorEl) creatorEl.innerText = `@${target.creator}`;
+
+                // Populate Right Side Recommendation List
+                if(recContainer) {
+                    const recs = videoData.filter(v => v.id !== id && v.status === 'approved');
+                    recContainer.innerHTML = recs.map(v => `
+                        <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2 p-2 bg-black/50 hover:bg-black/90 rounded-xl border border-white/5 hover:border-brand-parrot/50 transition cursor-pointer">
+                            <div class="w-24 h-14 bg-black rounded-lg overflow-hidden shrink-0 relative">
+                                <iframe src="${v.url}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
+                                <p class="text-[10px] text-brand-parrot mt-0.5">@${v.creator}</p>
+                            </div>
+                        </div>
+                    `).join('') || `<p class="text-xs text-gray-500">No other recommendations.</p>`;
+                }
+
                 playerBox.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -944,7 +991,6 @@
             }
         }
 
-        // Rotate & Brightness Features
         window.rotateActiveVideo = function() {
             const iframe = document.getElementById('activeMainIframe');
             if (iframe) {
@@ -1057,7 +1103,7 @@
         window.deleteVideoItem = async function(id) {
             if (confirm('Delete this stream from Firebase?')) {
                 try {
-                    await deleteDoc(doc(db, "nexrise_videos", id));
+                    await deleteDoc(doc(doc(db, "nexrise_videos", id)));
                 } catch(e) {
                     console.log("Firebase delete note:", e);
                 }

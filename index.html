@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.2 — Powered by TiG</title>
+    <title>NexRise v2.8.3 — Powered by TiG</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -105,7 +105,7 @@
 
         <div class="text-center z-10">
             <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                Powered by TiG (v2.8.2)
+                Powered by TiG (v2.8.3)
             </span>
         </div>
 
@@ -177,7 +177,7 @@
                     <div class="font-black tracking-wider text-base block leading-none">
                         <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
                     </div>
-                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.2 • TiG</span>
+                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.3 • TiG</span>
                 </div>
             </div>
         </div>
@@ -224,7 +224,7 @@
     <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
-                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.2</span>
+                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.3</span>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -264,30 +264,25 @@
             <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     
-                    <!-- LEFT COLUMN: VIDEO PLAYER (CLEAN ETHICAL STREAM - NO EXTERNAL AD/LINK DISTRACTION) -->
+                    <!-- LEFT COLUMN: VIDEO PLAYER -->
                     <div class="desktop:col-span-2 space-y-3">
                         <div class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10">
-                            
                             <iframe id="activeMainIframe" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                             
-                            <!-- Circular Rotate Button Top Left -->
                             <button onclick="rotateActiveVideo()" title="Rotate Screen" class="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                 <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                             </button>
 
-                            <!-- Vertical Brightness Slider Right Side -->
                             <div class="absolute top-10 right-2 z-20 bg-black/70 border border-white/20 p-1.5 rounded-full flex flex-col items-center gap-1 shadow-lg">
                                 <span class="text-[9px]">☀️</span>
                                 <input type="range" id="brightnessSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="vertical-slider accent-brand-parrot cursor-pointer">
                             </div>
 
-                            <!-- Fullscreen Overlay Button Bottom Right -->
                             <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="absolute bottom-2 right-2 z-20 p-1.5 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition shadow-lg">
                                 <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
 
-                        <!-- VIDEO TITLE & CLOSE BUTTON -->
                         <div class="flex items-start justify-between gap-3 pt-1 border-t border-white/10">
                             <div>
                                 <h3 id="playerVideoTitle" class="text-sm font-black text-white line-clamp-2">Playing Selected Stream</h3>
@@ -299,7 +294,7 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: INTERNAL PLATFORM RECOMMENDATION FEED LIST -->
+                    <!-- RIGHT COLUMN: RECOMMENDATION FEED LIST -->
                     <div class="space-y-3 border-t desktop:border-t-0 desktop:border-l border-white/10 pt-3 desktop:pt-0 desktop:pl-4">
                         <h4 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
                             <i data-lucide="list-video" class="w-4 h-4"></i> Recommended Streams
@@ -397,7 +392,7 @@
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
                             <h3 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.2)
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.3)
                             </h3>
                             <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                         </div>
@@ -587,8 +582,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const APP_VERSION = "2.8.2";
-        const LOCAL_STORAGE_KEY = "NEXRISE_V282_DATA";
+        const APP_VERSION = "2.8.3";
+        const LOCAL_STORAGE_KEY = "NEXRISE_V283_DATA";
         const SECURITY_PIN = "3835";
         const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
 
@@ -652,6 +647,7 @@
             await loadDataFromFirebase();
             renderAdminVideoManager();
             updateLiveUsersCounter();
+            setupReelsAutoPauseScrollObserver();
         };
 
         window.grantAllAppPermissions = function() {
@@ -756,6 +752,9 @@
                 }
             });
             renderFeeds();
+            if(tabId === 'nextip') {
+                setTimeout(setupReelsAutoPauseScrollObserver, 300);
+            }
         }
 
         window.toggleThemeMode = function() {
@@ -830,10 +829,8 @@
             renderFeeds();
         }
 
-        // Helper to clean embed URLs and block external distractions/external app jumps
         function cleanEmbedUrl(rawUrl, extraParams = '') {
             let clean = rawUrl.trim();
-            // Ensure parameters block external related links and branding
             let sep = clean.includes('?') ? '&' : '?';
             return `${clean}${sep}rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`;
         }
@@ -892,8 +889,8 @@
             if (shortsContainer) {
                 const shorts = approved.filter(v => v.type === 'short');
                 shortsContainer.innerHTML = shorts.map(v => `
-                    <div class="h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden">
-                        <iframe src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" class="w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                    <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden" data-raw-url="${v.url}">
+                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                         <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
                             <div>
                                 <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
@@ -908,6 +905,37 @@
             }
 
             lucide.createIcons();
+            setupReelsAutoPauseScrollObserver();
+        }
+
+        // NEXTIP SINGLE ACTIVE PLAYBACK LOGIC ON SCROLL
+        function setupReelsAutoPauseScrollObserver() {
+            const reelItems = document.querySelectorAll('.reel-item');
+            if (!reelItems.length) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const iframe = entry.target.querySelector('.reel-iframe');
+                    if (!iframe) return;
+
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                        // Play only active visible reel
+                        if (!iframe.src || iframe.src === 'about:blank') {
+                            iframe.src = iframe.getAttribute('data-src');
+                        }
+                    } else {
+                        // Pause / stop background playback immediately on scroll away
+                        if (iframe.src && iframe.src !== 'about:blank') {
+                            iframe.src = 'about:blank';
+                        }
+                    }
+                });
+            }, {
+                root: document.getElementById('shortsContainer'),
+                threshold: 0.6
+            });
+
+            reelItems.forEach(item => observer.observe(item));
         }
 
         function renderCardHtml(v) {
@@ -942,7 +970,6 @@
             `;
         }
 
-        // Single Click Play & Clean Recommendation Feed (No External Distractions)
         window.playStreamInTopPlayer = function(id) {
             const target = videoData.find(v => v.id === id);
             if(!target) return;
@@ -954,13 +981,11 @@
             const recContainer = document.getElementById('playerRecommendationList');
 
             if (playerBox && iframe) {
-                // Apply strict clean parameters to block external app jumps and suggested distractions
                 let finalEmbedUrl = cleanEmbedUrl(target.url, '&autoplay=1');
                 iframe.src = finalEmbedUrl;
                 if (titleEl) titleEl.innerText = target.title;
                 if (creatorEl) creatorEl.innerText = `@${target.creator}`;
 
-                // Populate Right Side Recommendation List strictly from internal platform data
                 if(recContainer) {
                     const recs = videoData.filter(v => v.id !== id && v.status === 'approved');
                     recContainer.innerHTML = recs.map(v => `

@@ -89,7 +89,6 @@
         transform-origin: center center;
       }
 
-      /* Vertical Brightness Range Slider Over Video */
       .vertical-slider {
         writing-mode: bt-lr;
         -webkit-appearance: slider-vertical;
@@ -261,17 +260,16 @@
     <div class="flex-1 flex w-full max-w-7xl mx-auto">
         <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
 
-            <!-- STICKY SIDE-BY-SIDE VIDEO PLAYER & RECOMMENDATION SECTION (YOUTUBE / PC STYLE) -->
+            <!-- STICKY SIDE-BY-SIDE VIDEO PLAYER & RECOMMENDATION SECTION -->
             <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     
-                    <!-- LEFT COLUMN: VIDEO PLAYER (PROPORTIONAL HOME SIZE) & TITLE -->
+                    <!-- LEFT COLUMN: VIDEO PLAYER (CLEAN ETHICAL STREAM - NO EXTERNAL AD/LINK DISTRACTION) -->
                     <div class="desktop:col-span-2 space-y-3">
                         <div class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10">
                             
                             <iframe id="activeMainIframe" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                             
-                            <!-- OVERLAY CONTROLS ON VIDEO (No extra space taken) -->
                             <!-- Circular Rotate Button Top Left -->
                             <button onclick="rotateActiveVideo()" title="Rotate Screen" class="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                 <i data-lucide="rotate-cw" class="w-4 h-4"></i>
@@ -301,7 +299,7 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: RECOMMENDATION FEED LIST (YouTube PC Style) -->
+                    <!-- RIGHT COLUMN: INTERNAL PLATFORM RECOMMENDATION FEED LIST -->
                     <div class="space-y-3 border-t desktop:border-t-0 desktop:border-l border-white/10 pt-3 desktop:pt-0 desktop:pl-4">
                         <h4 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
                             <i data-lucide="list-video" class="w-4 h-4"></i> Recommended Streams
@@ -832,6 +830,14 @@
             renderFeeds();
         }
 
+        // Helper to clean embed URLs and block external distractions/external app jumps
+        function cleanEmbedUrl(rawUrl, extraParams = '') {
+            let clean = rawUrl.trim();
+            // Ensure parameters block external related links and branding
+            let sep = clean.includes('?') ? '&' : '?';
+            return `${clean}${sep}rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`;
+        }
+
         function renderFeeds(filterQuery = '') {
             const approved = videoData.filter(v => v.status === 'approved' &&
                 (activeSelectedCategory === 'All' || v.category === activeSelectedCategory) &&
@@ -861,7 +867,7 @@
                             <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
                                 ${shorts.map(s => `
                                     <div onclick="playStreamInTopPlayer('${s.id}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
-                                        <iframe src="${s.url}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
+                                        <iframe src="${cleanEmbedUrl(s.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
                                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
                                             <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
                                             <p class="text-[9px] text-brand-parrot mt-1">@${s.creator}</p>
@@ -887,7 +893,7 @@
                 const shorts = approved.filter(v => v.type === 'short');
                 shortsContainer.innerHTML = shorts.map(v => `
                     <div class="h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden">
-                        <iframe src="${v.url}?controls=1&autoplay=1&mute=0&modestbranding=1&rel=0&playsinline=1" class="w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                        <iframe src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" class="w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                         <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
                             <div>
                                 <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
@@ -908,7 +914,7 @@
             return `
                 <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
                     <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.id}')">
-                        <iframe src="${v.url}" title="${v.title}" frameborder="0" class="pointer-events-none"></iframe>
+                        <iframe src="${cleanEmbedUrl(v.url)}" title="${v.title}" frameborder="0" class="pointer-events-none"></iframe>
                         <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 flex items-center justify-center transition">
                             <div class="w-12 h-12 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-lg transform group-hover:scale-110 transition">
                                 <i data-lucide="play" class="w-6 h-6 fill-black ml-0.5"></i>
@@ -936,7 +942,7 @@
             `;
         }
 
-        // Single Click Play & Render Side Recommendation Feed
+        // Single Click Play & Clean Recommendation Feed (No External Distractions)
         window.playStreamInTopPlayer = function(id) {
             const target = videoData.find(v => v.id === id);
             if(!target) return;
@@ -948,18 +954,19 @@
             const recContainer = document.getElementById('playerRecommendationList');
 
             if (playerBox && iframe) {
-                let formattedUrl = target.url.includes('?') ? `${target.url}&autoplay=1` : `${target.url}?autoplay=1`;
-                iframe.src = formattedUrl;
+                // Apply strict clean parameters to block external app jumps and suggested distractions
+                let finalEmbedUrl = cleanEmbedUrl(target.url, '&autoplay=1');
+                iframe.src = finalEmbedUrl;
                 if (titleEl) titleEl.innerText = target.title;
                 if (creatorEl) creatorEl.innerText = `@${target.creator}`;
 
-                // Populate Right Side Recommendation List
+                // Populate Right Side Recommendation List strictly from internal platform data
                 if(recContainer) {
                     const recs = videoData.filter(v => v.id !== id && v.status === 'approved');
                     recContainer.innerHTML = recs.map(v => `
                         <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2 p-2 bg-black/50 hover:bg-black/90 rounded-xl border border-white/5 hover:border-brand-parrot/50 transition cursor-pointer">
                             <div class="w-24 h-14 bg-black rounded-lg overflow-hidden shrink-0 relative">
-                                <iframe src="${v.url}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
+                                <iframe src="${cleanEmbedUrl(v.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
@@ -1103,7 +1110,7 @@
         window.deleteVideoItem = async function(id) {
             if (confirm('Delete this stream from Firebase?')) {
                 try {
-                    await deleteDoc(doc(doc(db, "nexrise_videos", id)));
+                    await deleteDoc(doc(db, "nexrise_videos", id));
                 } catch(e) {
                     console.log("Firebase delete note:", e);
                 }

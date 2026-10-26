@@ -256,9 +256,9 @@
                 <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
             </section>
 
-            <!-- TAB 2: NEXTIP -->
+           <!-- TAB 2: NEXTIP -->
             <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
-                <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black"></div>
+                <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black relative"></div>
             </section>
 
             <!-- TAB 3: NEXVID -->
@@ -792,16 +792,16 @@
                 const longs = approved.filter(v => v.type === 'long');
                 nexvidFeed.innerHTML = longs.map(v => renderCardHtml(v)).join('');
             }
-
-            const shortsContainer = document.getElementById('shortsContainer');
+const shortsContainer = document.getElementById('shortsContainer');
             if (shortsContainer) {
                 const shorts = approved.filter(v => v.type === 'short');
                 shortsContainer.innerHTML = shorts.map(v => `
-                    <div class="h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border">
-                        <iframe src="${v.url}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
-                        <div class="absolute bottom-4 left-4 right-4 bg-black/70 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between">
+                    <div class="h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden">
+                        <div class="absolute inset-0 pointer-events-none z-10"></div>
+                        <iframe src="${v.url}?controls=0&modestbranding=1&rel=0&playsinline=1" class="w-full h-full scale-105 pointer-events-auto" frameborder="0" allowfullscreen></iframe>
+                        <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
                             <div>
-                                <p class="text-xs font-bold text-white">${v.title}</p>
+                                <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
                                 <p class="text-[10px] text-brand-parrot">@${v.creator}</p>
                             </div>
                             <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">

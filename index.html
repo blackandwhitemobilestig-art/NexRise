@@ -63,11 +63,11 @@
       .neon-glow { filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.6)); }
       .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
 
-      /* Auto-Hiding Top Header Animation */
-      .top-header-container {
-        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      /* AUTO HIDE HEADER ANIMATION */
+      .header-transform {
+        transition: transform 0.3s ease-in-out;
       }
-      .top-header-hidden {
+      .header-hidden {
         transform: translateY(-100%);
       }
 
@@ -102,12 +102,6 @@
         -webkit-appearance: slider-vertical;
         width: 8px;
         height: 80px;
-      }
-
-      /* Custom Scrubber Track Light */
-      input[type="range"]::-webkit-slider-thumb {
-        background-color: #39FF14;
-        box-shadow: 0 0 10px #39FF14;
       }
     </style>
 </head>
@@ -162,8 +156,8 @@
             </div>
             <div class="space-y-2 text-left text-xs text-gray-300 bg-black/60 p-3 rounded-xl border border-white/10">
                 <div class="flex items-center gap-2"><span>🎙️</span> <span>Microphone (For Voice Search)</span></div>
-                <div class="flex items-center gap-2"><span>🔔</span> <span>Notifications &amp; Background Audio</span></div>
-                <div class="flex items-center gap-2"><span>📁</span> <span>Storage Access (For Cache &amp; Data)</span></div>
+                <div class="flex items-center gap-2"><span>🔔</span> <span>Notifications (For Updates)</span></div>
+                <div class="flex items-center gap-2"><span>📁</span> <span>Storage Access (For Cache & Data)</span></div>
             </div>
             <button onclick="grantAllAppPermissions()" class="w-full py-3 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition shadow-lg">
                 Allow &amp; Continue
@@ -171,88 +165,66 @@
         </div>
     </div>
 
-    <!-- BACKGROUND AUDIO PLAYBACK / NOTIFICATION CONTROLLER (STICKY BAR) -->
-    <div id="backgroundAudioWidget" class="hidden fixed bottom-16 sm:bottom-4 right-4 z-50 bg-brand-card/95 border-2 border-brand-parrot p-3 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-xs transition-all">
-        <div class="w-10 h-10 rounded-xl bg-black border border-brand-parrot flex items-center justify-center text-brand-parrot animate-pulse">
-            <i data-lucide="music" class="w-5 h-5"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-            <p id="bgAudioTitle" class="text-xs font-bold text-white truncate">Playing in Background</p>
-            <p id="bgAudioSubtitle" class="text-[9px] text-brand-parrot">Background Audio Stream Active</p>
-        </div>
-        <div class="flex items-center gap-1">
-            <button onclick="toggleBgAudioPlayPause()" id="bgPlayPauseBtn" class="p-2 text-brand-parrot hover:bg-white/10 rounded-lg">
-                <i data-lucide="pause" class="w-4 h-4"></i>
+    <!-- 2. PUBLIC TOP HEADER (AUTO HIDE ON SCROLL) -->
+    <header id="mainAppHeader" class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full header-transform">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-parrot hover:bg-brand-card rounded-xl transition">
+                <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
-            <button onclick="stopBackgroundAudio()" class="p-2 text-gray-400 hover:text-red-400 rounded-lg">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-        </div>
-    </div>
 
-    <!-- 2. AUTO-HIDING TOP HEADER & SEARCH BAR -->
-    <div id="topHeaderWrapper" class="sticky top-0 z-40 top-header-container w-full">
-        <header class="bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full">
-            <div class="flex items-center gap-3">
-                <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-parrot hover:bg-brand-card rounded-xl transition">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
-
-                <div class="flex items-center gap-2.5 cursor-pointer" onclick="triggerAdminSecretPrompt()">
-                    <div class="w-9 h-9 rounded-xl bg-black border border-brand-parrot flex items-center justify-center neon-glow flex-shrink-0 p-1">
-                        <svg viewBox="0 0 100 100" class="w-full h-full">
-                            <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="#39FF14" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                            <polygon points="44,40 44,60 58,50" fill="#FFFFFF"/>
-                            <path d="M78 22 Q84 28 84 34" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
-                            <path d="M83 17 Q92 26 92 35" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
-                        </svg>
+            <div class="flex items-center gap-2.5 cursor-pointer" onclick="triggerAdminSecretPrompt()">
+                <div class="w-9 h-9 rounded-xl bg-black border border-brand-parrot flex items-center justify-center neon-glow flex-shrink-0 p-1">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="#39FF14" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <polygon points="44,40 44,60 58,50" fill="#FFFFFF"/>
+                        <path d="M78 22 Q84 28 84 34" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
+                        <path d="M83 17 Q92 26 92 35" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="font-black tracking-wider text-base block leading-none">
+                        <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
                     </div>
-                    <div>
-                        <div class="font-black tracking-wider text-base block leading-none">
-                            <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
-                        </div>
-                        <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.3 • TiG</span>
-                    </div>
+                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.3 • TiG</span>
                 </div>
             </div>
+        </div>
 
-            <div class="hidden sm:flex flex-1 max-w-md mx-6 gap-2">
-                <div class="relative flex-1 flex items-center">
-                    <span class="absolute left-3 pointer-events-none text-gray-400">
-                        <i data-lucide="search" class="w-4 h-4"></i>
-                    </span>
-                    <input type="text" id="desktopSearchInput" onkeypress="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search clean lectures, cartoons, gaming..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-                    <button onclick="startVoiceTyping('desktopSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
-                        <i data-lucide="mic" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <button onclick="executeSearch('desktopSearchInput')" class="px-4 py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition">
-                    Search
-                </button>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
-                    <span class="text-lg">🌓</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- MOBILE SEARCH BAR IN HEADER WRAPPER -->
-        <div class="sm:hidden w-full px-3 py-2 bg-black/90 backdrop-blur-md border-b border-white/10 flex gap-2">
+        <div class="hidden sm:flex flex-1 max-w-md mx-6 gap-2">
             <div class="relative flex-1 flex items-center">
                 <span class="absolute left-3 pointer-events-none text-gray-400">
                     <i data-lucide="search" class="w-4 h-4"></i>
                 </span>
-                <input type="text" id="mobileSearchInput" onkeypress="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Voice or text search..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-                <button onclick="startVoiceTyping('mobileSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1 rounded-lg transition" title="Voice Typing Search">
+                <input type="text" id="desktopSearchInput" onkeypress="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search clean lectures, cartoons, gaming..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
+                <button onclick="startVoiceTyping('desktopSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
                     <i data-lucide="mic" class="w-4 h-4"></i>
                 </button>
             </div>
-            <button onclick="executeSearch('mobileSearchInput')" class="px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">
+            <button onclick="executeSearch('desktopSearchInput')" class="px-4 py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition">
                 Search
             </button>
         </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
+                <span class="text-lg">🌓</span>
+            </button>
+        </div>
+    </header>
+
+    <div id="mobileSearchContainer" class="sm:hidden w-full px-3 pt-3 flex gap-2 header-transform">
+        <div class="relative flex-1 flex items-center">
+            <span class="absolute left-3 pointer-events-none text-gray-400">
+                <i data-lucide="search" class="w-4 h-4"></i>
+            </span>
+            <input type="text" id="mobileSearchInput" onkeypress="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Voice or text search..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
+            <button onclick="startVoiceTyping('mobileSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
+                <i data-lucide="mic" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <button onclick="executeSearch('mobileSearchInput')" class="px-3 py-2 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">
+            Search
+        </button>
     </div>
 
     <!-- 3. COLLAPSIBLE SIDE DRAWER MENU -->
@@ -293,49 +265,46 @@
     </aside>
 
     <!-- 4. MAIN VIEWPORT & TAB SECTIONS -->
-    <div id="mainScrollableViewport" class="flex-1 flex w-full max-w-7xl mx-auto overflow-y-auto max-h-screen">
-        <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6">
+    <div class="flex-1 flex w-full max-w-7xl mx-auto">
+        <main id="mainScrollContainer" class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
 
-            <!-- STICKY TOP PLAYER & INDEPENDENT BOTTOM RECOMMENDATION FEED -->
+            <!-- STICKY SIDE-BY-SIDE VIDEO PLAYER & RECOMMENDATION SECTION -->
             <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     
-                    <!-- LEFT COLUMN: CUSTOM MEDIA PLAYER WITH SCRUBBER BAR -->
+                    <!-- LEFT COLUMN: VIDEO PLAYER -->
                     <div class="desktop:col-span-2 space-y-3">
                         <div class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10">
                             <iframe id="activeMainIframe" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                             
-                            <!-- DEDICATED BACKGROUND PLAYBACK BUTTON OVERLAY -->
-                            <button onclick="enableBackgroundAudioMode()" title="Background Playback" class="absolute top-2 right-2 z-20 px-3 py-1.5 rounded-xl bg-black/80 hover:bg-brand-parrot hover:text-black border border-brand-parrot flex items-center gap-1.5 text-xs font-bold text-brand-parrot transition shadow-2xl">
-                                <i data-lucide="headphones" class="w-4 h-4"></i>
-                                <span>Background Play</span>
+                            <!-- BACKGROUND PLAYBACK BUTTON OVERLAY -->
+                            <button onclick="toggleBackgroundAudioMode()" title="Background Playback" class="absolute top-2 right-12 z-20 px-3 py-1.5 rounded-lg bg-brand-parrot text-black font-extrabold text-xs shadow-lg flex items-center gap-1.5 hover:bg-green-400 transition">
+                                <i data-lucide="headphones" class="w-4 h-4"></i> Background Play
                             </button>
 
                             <button onclick="rotateActiveVideo()" title="Rotate Screen" class="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                 <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                             </button>
 
-                            <!-- BRIGHTNESS CONTROL SLIDER -->
-                            <div class="absolute top-12 left-2 z-20 bg-black/70 border border-white/20 p-1.5 rounded-full flex flex-col items-center gap-1 shadow-lg">
+                            <div class="absolute top-10 right-2 z-20 bg-black/70 border border-white/20 p-1.5 rounded-full flex flex-col items-center gap-1 shadow-lg">
                                 <span class="text-[9px]">☀️</span>
                                 <input type="range" id="brightnessSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="vertical-slider accent-brand-parrot cursor-pointer">
                             </div>
 
-                            <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="absolute bottom-10 right-2 z-20 p-1.5 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition shadow-lg">
+                            <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="absolute bottom-2 right-2 z-20 p-1.5 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition shadow-lg">
                                 <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
                             </button>
+                        </div>
 
-                            <!-- CUSTOM SCRUBBER & PROGRESS BAR OVERLAY -->
-                            <div class="absolute bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md px-3 py-1.5 flex items-center gap-2 border-t border-white/10 z-20">
-                                <button onclick="toggleCustomPlayPause()" class="text-brand-parrot p-1 hover:scale-110 transition">
-                                    <i data-lucide="play" id="customPlayIcon" class="w-4 h-4"></i>
-                                </button>
-                                <span id="playerCurrentTime" class="text-[10px] font-mono text-gray-300">00:00</span>
-                                <div class="flex-1 relative flex items-center">
-                                    <input type="range" id="customScrubber" min="0" max="100" value="0" oninput="seekVideoPosition(this.value)" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-brand-parrot">
-                                </div>
-                                <span id="playerTotalTime" class="text-[10px] font-mono text-gray-400">03:45</span>
+                        <!-- AUDIO BACKGROUND NOTIFICATION WIDGET -->
+                        <div id="backgroundPlaybackBar" class="hidden bg-black/80 border border-brand-parrot p-3 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-brand-parrot animate-ping"></div>
+                                <span class="text-xs font-bold text-white">Background Audio Playing...</span>
                             </div>
+                            <button onclick="stopBackgroundAudioMode()" class="px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition">
+                                Stop Playback
+                            </button>
                         </div>
 
                         <div class="flex items-start justify-between gap-3 pt-1 border-t border-white/10">
@@ -349,12 +318,12 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT/BOTTOM COLUMN: SEPARATE RECOMMENDATION FEED LIST -->
-                    <div class="space-y-3 border-t desktop:border-t-0 desktop:border-l border-white/10 pt-3 desktop:pt-0 desktop:pl-4 flex flex-col h-full">
+                    <!-- RIGHT COLUMN: SEPARATE RECOMMENDATION FEED LIST -->
+                    <div class="space-y-3 border-t desktop:border-t-0 desktop:border-l border-white/10 pt-3 desktop:pt-0 desktop:pl-4">
                         <h4 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                            <i data-lucide="list-video" class="w-4 h-4"></i> Recommended Feed
+                            <i data-lucide="list-video" class="w-4 h-4"></i> Recommended Streams
                         </h4>
-                        <div id="playerRecommendationList" class="space-y-2 max-h-[380px] overflow-y-auto no-scrollbar flex-1 pr-1"></div>
+                        <div id="playerRecommendationList" class="space-y-2 max-h-[350px] overflow-y-auto no-scrollbar"></div>
                     </div>
 
                 </div>
@@ -375,7 +344,7 @@
                 <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
             </section>
 
-            <!-- TAB 2: NEXTIP (REELS WITH AUTO PLAY/PAUSE ON SCROLL) -->
+            <!-- TAB 2: NEXTIP -->
             <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
                 <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black relative"></div>
             </section>
@@ -475,15 +444,16 @@
                             </button>
                         </div>
 
-                        <!-- AUTO-SYNC FULL CHANNEL -->
+                        <!-- AUTO-SYNC FULL CHANNEL IN ONE CLICK -->
                         <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-2">
                             <h4 class="text-xs font-bold text-brand-parrot flex items-center gap-2">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync Full YouTube Channel
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync Full YouTube Channel (1-Click)
                             </h4>
+                            <p class="text-[10px] text-gray-400">Enter Channel ID, @Handle, or RSS Feed Link to bulk import channel videos directly into Firebase.</p>
                             <div class="flex gap-2 pt-1">
-                                <input type="text" id="syncChannelInput" placeholder="https://youtube.com/@channel" class="flex-1 bg-black/80 border border-white/20 p-2 rounded-xl text-xs text-white focus:outline-none focus:border-brand-parrot">
-                                <button onclick="syncFullChannel()" class="px-4 py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition">
-                                    Sync
+                                <input type="text" id="syncChannelInput" placeholder="UCxxxx... or @channel or Feed Link" class="flex-1 bg-black/80 border border-white/20 p-2 rounded-xl text-xs text-white focus:outline-none focus:border-brand-parrot">
+                                <button id="syncChannelBtn" onclick="syncFullChannel()" class="px-4 py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition flex items-center gap-1">
+                                    <span>Sync All</span>
                                 </button>
                             </div>
                         </div>
@@ -623,7 +593,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
-        // Firebase Configuration (TRG Official Project)
         const firebaseConfig = {
             apiKey: "AIzaSyD9Hk71ZWaJHw66p_lJ068wKAz6eIS4f1g",
             authDomain: "tig-official-ad68f.firebaseapp.com",
@@ -645,13 +614,6 @@
         let activeTargetInputId = "desktopSearchInput";
         let activeSelectedCategory = "All";
         let activeCommentVideoId = null;
-
-        // Custom Media & Background Audio State
-        let isPlayingCustom = true;
-        let isBgAudioPlaying = false;
-        let activeBgAudioTitle = "";
-        let customTimerInterval = null;
-        let scrubberValue = 0;
 
         const defaultData = [
             {
@@ -692,7 +654,7 @@
         window.onload = async function() {
             lucide.createIcons();
             init3DIntroParticleCanvas();
-            setupScrollHeaderAutoHide();
+            setupAutoHidingHeaderOnScroll();
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
                 const pModal = document.getElementById('permissionModal');
@@ -711,26 +673,30 @@
             renderAdminVideoManager();
             updateLiveUsersCounter();
             setupReelsAutoPauseScrollObserver();
-            setupHomeFeedAutoPlayScrollObserver();
+            setupFeedAutoPlayOnScroll();
         };
 
-        // 1. AUTO-HIDE HEADER ON DOWN SCROLL, SHOW ON UP SCROLL
-        function setupScrollHeaderAutoHide() {
-            const viewport = document.getElementById('mainScrollableViewport');
-            const headerWrapper = document.getElementById('topHeaderWrapper');
-            if (!viewport || !headerWrapper) return;
+        // AUTO HIDE SEARCH AND HEADER ON SCROLL UP/DOWN
+        function setupAutoHidingHeaderOnScroll() {
+            const mainScroll = document.getElementById('mainScrollContainer');
+            const header = document.getElementById('mainAppHeader');
+            const mobileSearch = document.getElementById('mobileSearchContainer');
+            if (!mainScroll || !header) return;
 
-            let lastScrollY = viewport.scrollTop;
-
-            viewport.addEventListener('scroll', () => {
-                const currentScrollY = viewport.scrollTop;
-                if (currentScrollY > lastScrollY && currentScrollY > 60) {
-                    headerWrapper.classList.add('top-header-hidden');
-                } else if (currentScrollY < lastScrollY) {
-                    headerWrapper.classList.remove('top-header-hidden');
+            let lastScrollTop = 0;
+            mainScroll.addEventListener('scroll', () => {
+                let st = mainScroll.scrollTop;
+                if (st > lastScrollTop && st > 60) {
+                    // Scrolling down -> Hide top header & search
+                    header.classList.add('header-hidden');
+                    if(mobileSearch) mobileSearch.classList.add('header-hidden');
+                } else {
+                    // Scrolling up -> Show top header & search immediately
+                    header.classList.remove('header-hidden');
+                    if(mobileSearch) mobileSearch.classList.remove('header-hidden');
                 }
-                lastScrollY = currentScrollY;
-            }, { passive: true });
+                lastScrollTop = st <= 0 ? 0 : st;
+            });
         }
 
         window.grantAllAppPermissions = function() {
@@ -827,38 +793,7 @@
                 const sec = document.getElementById(`tab-${t}`);
                 if (sec) sec.classList.toggle('hidden', t !== tabId);
 
-                const nbtn = document.getElementById(`nav-${t}`);
-                if (nbtn) {
-                    nbtn.className = (t === tabId) 
-                        ? "flex flex-col items-center justify-center gap-1 text-brand-parrot transition" 
-                        : "flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition";
-                }
-            });
-            renderFeeds();
-            if(tabId === 'nextip') {
-                setTimeout(setupReelsAutoPauseScrollObserver, 300);
-            }
-        }
-
-        window.toggleThemeMode = function() {
-            document.documentElement.classList.toggle('light');
-        }
-
-        window.startVoiceTyping = function(targetInputId) {
-            activeTargetInputId = targetInputId;
-            const modal = document.getElementById('voiceSearchModal');
-            const textEl = document.getElementById('voiceRecognizedText');
-            if (modal) modal.classList.remove('hidden');
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                const recognition = new SpeechRecognition();
-                recognition.lang = 'en-US';
-                recognition.start();
-
-                recognition.onresult = (e) => {
-                    const transcript = e.results[0][0].transcript;
-                    if (textEl) textEl.innerText = `Typed: "${transcript}"`;
+                const nbtn = document.getElementById(`nav-${t}`); if (nbtn) { nbtn.className = (t === tabId) ? "flex flex-col items-center justify-center gap-1 text-brand-parrot transition" : "flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition"; } }); renderFeeds(); if(tabId === 'nextip') { setTimeout(setupReelsAutoPauseScrollObserver, 300); } }  window.toggleThemeMode = function() { document.documentElement.classList.toggle('light'); }  window.startVoiceTyping = function(targetInputId) { activeTargetInputId = targetInputId; const modal = document.getElementById('voiceSearchModal'); const textEl = document.getElementById('voiceRecognizedText'); if (modal) modal.classList.remove('hidden');  const SpeechRecognition = window.SpeechRecognition \vert{}\vert{} window.webkitSpeechRecognition; if (SpeechRecognition) { const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.start();  recognition.onresult = (e) => { const transcript = e.results[0][0].transcript; if (textEl) textEl.innerText = `Typed: "${transcript}"`;
                     
                     const input = document.getElementById(activeTargetInputId);
                     if (input) input.value = transcript;
@@ -874,48 +809,7 @@
                 let idx = 0;
                 let timer = setInterval(() => {
                     if (idx <= chosen.length) {
-                        textEl.innerText = `Typing: "${chosen.slice(0, idx)}"`;
-                        idx++;
-                    } else {
-                        clearInterval(timer);
-                        const input = document.getElementById(activeTargetInputId);
-                        if (input) input.value = chosen;
-                        setTimeout(() => {
-                            closeVoiceSearchModal();
-                            executeSearch(activeTargetInputId);
-                        }, 800);
-                    }
-                }, 100);
-            }
-        }
-
-        window.closeVoiceSearchModal = function() {
-            const modal = document.getElementById('voiceSearchModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        window.executeSearch = function(inputId) {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            renderFeeds(input.value.trim().toLowerCase());
-        }
-
-        window.filterCategory = function(cat) {
-            activeSelectedCategory = cat;
-            document.querySelectorAll('.category-chip').forEach(btn => {
-                if (btn.innerText.includes(cat) || (cat === 'All' && btn.innerText === 'All')) {
-                    btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-parrot text-black border border-brand-parrot";
-                } else {
-                    btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot";
-                }
-            });
-            renderFeeds();
-        }
-
-        function cleanEmbedUrl(rawUrl, extraParams = '') {
-            let clean = rawUrl.trim();
-            let sep = clean.includes('?') ? '&' : '?';
-            return `${clean}${sep}rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`;
+                        textEl.innerText = `Typing: "${chosen.slice(0, idx)}"`; idx++; } else { clearInterval(timer); const input = document.getElementById(activeTargetInputId); if (input) input.value = chosen; setTimeout(() => { closeVoiceSearchModal(); executeSearch(activeTargetInputId); }, 800); } }, 100); } }  window.closeVoiceSearchModal = function() { const modal = document.getElementById('voiceSearchModal'); if (modal) modal.classList.add('hidden'); }  window.executeSearch = function(inputId) { const input = document.getElementById(inputId); if (!input) return; renderFeeds(input.value.trim().toLowerCase()); }  window.filterCategory = function(cat) { activeSelectedCategory = cat; document.querySelectorAll('.category-chip').forEach(btn => { if (btn.innerText.includes(cat) \vert{}\vert{} (cat === 'All' && btn.innerText === 'All')) { btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-parrot text-black border border-brand-parrot"; } else { btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot"; } }); renderFeeds(); }  function cleanEmbedUrl(rawUrl, extraParams = '') { let clean = rawUrl.trim(); let sep = clean.includes('?') ? '&' : '?'; return `${clean}${sep}rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`;
         }
 
         function renderFeeds(filterQuery = '') {
@@ -939,509 +833,4 @@
                     html += `
                         <div class="bg-brand-card p-4 rounded-2xl border border-brand-border space-y-3">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-xs font-black uppercase text-white tracking-wider flex items-center gap-2">
-                                    <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i> NexTip Reels Shelf
-                                </h3>
-                                <button onclick="switchTab('nextip')" class="text-xs text-brand-parrot font-bold hover:underline">View All</button>
-                            </div>
-                            <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                                ${shorts.map(s => `
-                                    <div onclick="playStreamInTopPlayer('${s.id}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
-                                        <iframe src="${cleanEmbedUrl(s.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
-                                            <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
-                                            <p class="text-[9px] text-brand-parrot mt-1">@${s.creator}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-
-                homeFeed.innerHTML = html || `<p class="text-gray-500 text-center py-8 text-xs">No matching streams found.</p>`;
-            }
-
-            const nexvidFeed = document.getElementById('longVideosContainer');
-            if (nexvidFeed) {
-                const longs = approved.filter(v => v.type === 'long');
-                nexvidFeed.innerHTML = longs.map(v => renderCardHtml(v)).join('');
-            }
-
-            const shortsContainer = document.getElementById('shortsContainer');
-            if (shortsContainer) {
-                const shorts = approved.filter(v => v.type === 'short');
-                shortsContainer.innerHTML = shorts.map(v => `
-                    <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden" data-raw-url="${v.url}">
-                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
-                        <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
-                            <div>
-                                <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
-                                <p class="text-[10px] text-brand-parrot">@${v.creator}</p>
-                            </div>
-                            <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">
-                                👍 ${v.likes}
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            lucide.createIcons();
-            setupReelsAutoPauseScrollObserver();
-            setupHomeFeedAutoPlayScrollObserver();
-        }
-
-        // 2. REELS AUTO PLAY / PAUSE OBSERVER ON SCROLL
-        function setupReelsAutoPauseScrollObserver() {
-            const reelItems = document.querySelectorAll('.reel-item');
-            if (!reelItems.length) return;
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const iframe = entry.target.querySelector('.reel-iframe');
-                    if (!iframe) return;
-
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-                        if (!iframe.src || iframe.src === 'about:blank') {
-                            iframe.src = iframe.getAttribute('data-src');
-                        }
-                    } else {
-                        if (iframe.src && iframe.src !== 'about:blank') {
-                            iframe.src = 'about:blank';
-                        }
-                    }
-                });
-            }, {
-                root: document.getElementById('shortsContainer'),
-                threshold: 0.6
-            });
-
-            reelItems.forEach(item => observer.observe(item));
-        }
-
-        // 3. HOME FEED CARD AUTO PLAY / PAUSE ON SCROLL
-        function setupHomeFeedAutoPlayScrollObserver() {
-            const feedCards = document.querySelectorAll('.feed-video-card');
-            if (!feedCards.length) return;
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const iframe = entry.target.querySelector('iframe');
-                    if (!iframe) return;
-
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
-                        if (entry.target.getAttribute('data-user-paused') !== 'true') {
-                            iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                        }
-                    } else {
-                        iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                    }
-                });
-            }, {
-                root: document.getElementById('mainScrollableViewport'),
-                threshold: 0.75
-            });
-
-            feedCards.forEach(card => observer.observe(card));
-        }
-
-        function renderCardHtml(v) {
-            return `
-                <div class="feed-video-card bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
-                    <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.id}')">
-                        <iframe src="${cleanEmbedUrl(v.url)}" title="${v.title}" frameborder="0" class="pointer-events-none"></iframe>
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 flex items-center justify-center transition">
-                            <div class="w-12 h-12 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-lg transform group-hover:scale-110 transition">
-                                <i data-lucide="play" class="w-6 h-6 fill-black ml-0.5"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 space-y-2">
-                        <span class="text-[9px] font-black uppercase tracking-wider text-brand-parrot bg-brand-green/10 px-2 py-0.5 rounded-md">
-                            ${v.category}
-                        </span>
-                        <h3 class="font-bold text-sm text-white line-clamp-2 cursor-pointer hover:text-brand-parrot" onclick="playStreamInTopPlayer('${v.id}')">${v.title}</h3>
-                        <div class="flex items-center justify-between pt-2 text-xs text-gray-400 border-t border-white/5">
-                            <span class="font-medium text-gray-300">${v.creator}</span>
-                            <div class="flex items-center gap-3">
-                                <button onclick="toggleLike('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
-                                    👍 ${v.likes}
-                                </button>
-                                <button onclick="openCommentsModal('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
-                                    💬 ${v.comments.length}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // 4. MAIN VIDEO PLAYER WITH INDEPENDENT SEPARATE RECOMMENDATION FEED
-        window.playStreamInTopPlayer = function(id) {
-            const target = videoData.find(v => v.id === id);
-            if(!target) return;
-
-            activeBgAudioTitle = target.title;
-            const playerBox = document.getElementById('stickyVideoPlayerBox');
-            const iframe = document.getElementById('activeMainIframe');
-            const titleEl = document.getElementById('playerVideoTitle');
-            const creatorEl = document.getElementById('playerVideoCreator');
-            const recContainer = document.getElementById('playerRecommendationList');
-
-            if (playerBox && iframe) {
-                let finalEmbedUrl = cleanEmbedUrl(target.url, '&autoplay=1');
-                iframe.src = finalEmbedUrl;
-                if (titleEl) titleEl.innerText = target.title;
-                if (creatorEl) creatorEl.innerText = `@${target.creator}`;
-
-                startCustomScrubberTimer();
-
-                // Build separate independent bottom recommendation feed
-                if(recContainer) {
-                    const recs = videoData.filter(v => v.id !== id && v.status === 'approved');
-                    recContainer.innerHTML = recs.map(v => `
-                        <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2.5 p-2 bg-black/60 hover:bg-black/95 rounded-xl border border-white/10 hover:border-brand-parrot/50 transition cursor-pointer group">
-                            <div class="w-28 h-16 bg-black rounded-lg overflow-hidden shrink-0 relative">
-                                <iframe src="${cleanEmbedUrl(v.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
-                                <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent flex items-center justify-center">
-                                    <i data-lucide="play-circle" class="w-5 h-5 text-brand-parrot opacity-80 group-hover:opacity-100"></i>
-                                </div>
-                            </div>
-                            <div class="flex-1 min-w-0 flex flex-col justify-center">
-                                <p class="text-xs font-bold text-white line-clamp-2 leading-tight group-hover:text-brand-parrot">${v.title}</p>
-                                <p class="text-[10px] text-gray-400 mt-1">@${v.creator}</p>
-                            </div>
-                        </div>
-                    `).join('') || `<p class="text-xs text-gray-500">No other recommendations available.</p>`;
-                }
-
-                playerBox.classList.remove('hidden');
-                document.getElementById('mainScrollableViewport').scrollTo({ top: 0, behavior: 'smooth' });
-                lucide.createIcons();
-            }
-        }
-
-        // 5. BACKGROUND PLAYBACK & AUDIO CONTROLLER
-        window.enableBackgroundAudioMode = function() {
-            const widget = document.getElementById('backgroundAudioWidget');
-            const bgTitle = document.getElementById('bgAudioTitle');
-            if (widget) {
-                if (bgTitle) bgTitle.innerText = activeBgAudioTitle || "Active Background Audio";
-                widget.classList.remove('hidden');
-                isBgAudioPlaying = true;
-
-                if ('mediaSession' in navigator) {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: activeBgAudioTitle || "NexRise Background Audio",
-                        artist: "TiG Official Stream",
-                        album: "NexRise Media"
-                    });
-
-                    navigator.mediaSession.setActionHandler('play', () => toggleBgAudioPlayPause());
-                    navigator.mediaSession.setActionHandler('pause', () => toggleBgAudioPlayPause());
-                }
-            }
-        }
-
-        window.toggleBgAudioPlayPause = function() {
-            const btn = document.getElementById('bgPlayPauseBtn');
-            const iframe = document.getElementById('activeMainIframe');
-
-            if (isBgAudioPlaying) {
-                iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                if (btn) btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i>`;
-                isBgAudioPlaying = false;
-            } else {
-                iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                if (btn) btn.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i>`;
-                isBgAudioPlaying = true;
-            }
-            lucide.createIcons();
-        }
-
-        window.stopBackgroundAudio = function() {
-            const widget = document.getElementById('backgroundAudioWidget');
-            if (widget) widget.classList.add('hidden');
-            isBgAudioPlaying = false;
-        }
-
-        // SCRUBBER & CUSTOM PLAYER TIMERS
-        function startCustomScrubberTimer() {
-            clearInterval(customTimerInterval);
-            scrubberValue = 0;
-            const scrubber = document.getElementById('customScrubber');
-            const timeDisplay = document.getElementById('playerCurrentTime');
-
-            customTimerInterval = setInterval(() => {
-                if (isPlayingCustom && scrubberValue < 100) {
-                    scrubberValue += 0.5;
-                    if (scrubber) scrubber.value = scrubberValue;
-                    
-                    let seconds = Math.floor((scrubberValue / 100) * 225);
-                    let mins = Math.floor(seconds / 60);
-                    let secs = seconds % 60;
-                    if (timeDisplay) timeDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                }
-            }, 1000);
-        }
-
-        window.toggleCustomPlayPause = function() {
-            const iframe = document.getElementById('activeMainIframe');
-            const icon = document.getElementById('customPlayIcon');
-
-            if (isPlayingCustom) {
-                iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-                isPlayingCustom = false;
-                if(icon) icon.setAttribute('data-lucide', 'play');
-            } else {
-                iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                isPlayingCustom = true;
-                if(icon) icon.setAttribute('data-lucide', 'pause');
-            }
-            lucide.createIcons();
-        }
-
-        window.seekVideoPosition = function(val) {
-            scrubberValue = parseFloat(val);
-            const iframe = document.getElementById('activeMainIframe');
-            let targetSeconds = Math.floor((scrubberValue / 100) * 225);
-            iframe.contentWindow?.postMessage(`{"event":"command","func":"seekTo","args":[${targetSeconds}, true]}`, '*');
-        }
-
-        window.closeActivePlayer = function() {
-            const playerBox = document.getElementById('stickyVideoPlayerBox');
-            const iframe = document.getElementById('activeMainIframe');
-            if (playerBox && iframe) {
-                iframe.src = "";
-                playerBox.classList.add('hidden');
-                clearInterval(customTimerInterval);
-            }
-        }
-
-        window.toggleIframeFullscreen = function() {
-            const iframe = document.getElementById('activeMainIframe');
-            if (iframe) {
-                if (iframe.requestFullscreen) iframe.requestFullscreen();
-                else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-            }
-        }
-
-        window.rotateActiveVideo = function() {
-            const iframe = document.getElementById('activeMainIframe');
-            if (iframe) {
-                iframe.classList.toggle('video-rotate-90');
-            }
-        }
-
-        window.adjustVideoBrightness = function(val) {
-            const iframe = document.getElementById('activeMainIframe');
-            if (iframe) {
-                iframe.style.filter = `brightness(${val}%)`;
-            }
-        }
-
-        window.toggleLike = async function(id) {
-            const item = videoData.find(v => v.id === id);
-            if (item) {
-                item.likes += 1;
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderFeeds();
-            }
-        }
-
-        window.triggerAdminSecretPrompt = function() {
-            document.getElementById('adminAuthModal').classList.remove('hidden');
-        }
-
-        window.closeAdminAuthModal = function() {
-            document.getElementById('adminAuthModal').classList.add('hidden');
-        }
-
-        window.verifyAdminPinLogin = function(e) {
-            e.preventDefault();
-            const email = document.getElementById('adminEmailInput').value;
-            const pin = document.getElementById('adminPinInput').value;
-
-            if (email === OFFICIAL_EMAIL && pin === SECURITY_PIN) {
-                closeAdminAuthModal();
-                document.getElementById('unlockedAdminDashboard').classList.remove('hidden');
-                switchTab('profile');
-                renderAdminVideoManager();
-            } else {
-                alert('Invalid Official Admin Email or Security PIN!');
-            }
-        }
-
-        window.lockAdminDashboard = function() {
-            document.getElementById('unlockedAdminDashboard').classList.add('hidden');
-        }
-
-        window.exportUpdatedCode = function() {
-            const currentHTML = document.documentElement.outerHTML;
-            navigator.clipboard.writeText(currentHTML).then(() => {
-                alert('Full updated HTML code copied to clipboard successfully!');
-            }).catch(err => {
-                alert('Failed to copy code automatically.');
-            });
-        }
-
-        window.syncFullChannel = async function() {
-            const input = document.getElementById('syncChannelInput');
-            if (!input || !input.value.trim()) {
-                alert('Please enter a valid Channel URL or ID');
-                return;
-            }
-
-            const channelVal = input.value.trim();
-            const syncedItem = {
-                type: "long",
-                category: "Moral & Islamic",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                title: `Synced Stream: ${channelVal.includes('@') ? channelVal.split('@')[1] : 'Official Partner Channel'}`,
-                creator: channelVal.includes('@') ? `@${channelVal.split('@')[1]}` : "Synced Creator",
-                likes: 120,
-                comments: ["Synced automatically from YouTube."],
-                status: "approved"
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, "nexrise_videos"), syncedItem);
-                syncedItem.id = docRef.id;
-                videoData.unshift(syncedItem);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderAdminVideoManager();
-                renderFeeds();
-                input.value = '';
-                alert('Channel synced & saved to Firebase successfully!');
-            } catch (e) {
-                alert('Error saving to Firebase: ' + e.message);
-            }
-        }
-
-        function renderAdminVideoManager() {
-            const container = document.getElementById('adminVideoManagerList');
-            if (!container) return;
-
-            container.innerHTML = videoData.map(v => `
-                <div class="flex items-center justify-between p-2.5 bg-black/60 rounded-xl border border-white/10">
-                    <div class="truncate max-w-[200px]">
-                        <p class="font-bold text-white truncate">${v.title}</p>
-                        <p class="text-[10px] text-gray-400">By ${v.creator} • ${v.category}</p>
-                    </div>
-                    <button onclick="deleteVideoItem('${v.id}')" class="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold text-[10px] rounded-lg transition">
-                        Delete
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        window.deleteVideoItem = async function(id) {
-            if (confirm('Delete this stream from Firebase?')) {
-                try {
-                    await deleteDoc(doc(db, "nexrise_videos", id));
-                } catch(e) {
-                    console.log("Firebase delete note:", e);
-                }
-                videoData = videoData.filter(v => v.id !== id);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderAdminVideoManager();
-                renderFeeds();
-            }
-        }
-
-        window.handleDirectAdminPublish = async function(e) {
-            e.preventDefault();
-            const title = document.getElementById('adminPubTitle').value;
-            const creator = document.getElementById('adminPubCreator').value;
-            const url = document.getElementById('adminPubUrl').value;
-            const category = document.getElementById('adminPubCategory').value;
-            const type = document.getElementById('adminPubType').value;
-
-            const newItem = {
-                type, category,
-                url, title, creator,
-                likes: 0, comments: [], status: "approved"
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
-                newItem.id = docRef.id;
-                videoData.unshift(newItem);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderAdminVideoManager();
-                renderFeeds();
-                e.target.reset();
-                alert('Stream Published & Saved to Firebase!');
-            } catch(err) {
-                alert('Error publishing to Firebase: ' + err.message);
-            }
-        }
-
-        window.handleFormSubmit = async function(e) {
-            e.preventDefault();
-            const type = document.getElementById('videoType').value;
-            const category = document.getElementById('videoCategory').value;
-            const url = document.getElementById('videoUrl').value;
-            const title = document.getElementById('videoTitle').value;
-            const creator = document.getElementById('creatorName').value;
-
-            const newItem = {
-                type, category, url, title, creator,
-                likes: 0, comments: [], status: "approved"
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
-                newItem.id = docRef.id;
-                videoData.unshift(newItem);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                renderFeeds();
-                alert('Submitted & Saved to Firebase Successfully!');
-                e.target.reset();
-            } catch(err) {
-                alert('Error submitting to Firebase: ' + err.message);
-            }
-        }
-
-        window.openCommentsModal = function(id) {
-            activeCommentVideoId = id;
-            document.getElementById('commentsModal').classList.remove('hidden');
-            renderComments();
-        }
-
-        window.closeCommentsModal = function() {
-            document.getElementById('commentsModal').classList.add('hidden');
-        }
-
-        function renderComments() {
-            const container = document.getElementById('commentsList');
-            const item = videoData.find(v => v.id === activeCommentVideoId);
-            if (!item || !item.comments || item.comments.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-center py-4">No comments yet.</p>`;
-                return;
-            }
-            container.innerHTML = item.comments.map(c => `
-                <div class="bg-black/50 p-2.5 rounded-xl border border-white/5">
-                    <p class="text-gray-200">${c}</p>
-                </div>
-            `).join('');
-        }
-
-        window.handleAddComment = async function(e) {
-            e.preventDefault();
-            const input = document.getElementById('commentInput');
-            const item = videoData.find(v => v.id === activeCommentVideoId);
-            if (item && input.value.trim()) {
-                if(!item.comments) item.comments = [];
-                item.comments.push(input.value.trim());
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                input.value = '';
-                renderComments();
-                renderFeeds();
-            }
-        }
-    </script>
-</body>
-</html>
+                                <h3 class="text-xs font-black uppercase text-white tracking

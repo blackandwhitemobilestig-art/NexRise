@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.3 — Powered by TiG</title>
+    <title>NexRise v2.8.4 — Powered by TiG</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -132,7 +132,7 @@
 
         <div class="text-center z-10">
             <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                Powered by TiG (v2.8.3)
+                Powered by TiG (v2.8.4)
             </span>
         </div>
 
@@ -204,7 +204,7 @@
                     <div class="font-black tracking-wider text-base block leading-none">
                         <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
                     </div>
-                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.3 • TiG</span>
+                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.4 • TiG</span>
                 </div>
             </div>
         </div>
@@ -251,7 +251,7 @@
     <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
-                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.3</span>
+                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.4</span>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -482,7 +482,7 @@
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
                             <h3 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.3)
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.4)
                             </h3>
                             <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                         </div>
@@ -550,13 +550,19 @@
                             </form>
                         </div>
 
-                        <!-- DELETE MANAGER -->
+                        <!-- DELETE MANAGER WITH SEARCH FILTER -->
                         <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
                             <h4 class="text-xs font-bold text-gray-200 flex items-center justify-between">
                                 <span>Manage Published Videos</span>
                                 <span class="text-[10px] text-brand-parrot">Single-Click Delete</span>
                             </h4>
-                            <div id="adminVideoManagerList" class="space-y-2 text-xs"></div>
+                            
+                            <!-- ADMIN VIDEO SEARCH BAR -->
+                            <div class="relative">
+                                <input type="text" id="adminVideoSearchInput" oninput="renderAdminVideoManager()" placeholder="Search video by title or creator to delete..." class="w-full bg-black/80 border border-white/20 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot">
+                            </div>
+
+                            <div id="adminVideoManagerList" class="space-y-2 text-xs max-h-64 overflow-y-auto no-scrollbar"></div>
                         </div>
                     </div>
                 </div>
@@ -673,8 +679,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const APP_VERSION = "2.8.3";
-        const LOCAL_STORAGE_KEY = "NEXRISE_V283_DATA";
+        const APP_VERSION = "2.8.4";
+        const LOCAL_STORAGE_KEY = "NEXRISE_V284_DATA";
         const SECURITY_PIN = "3835";
         const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
 
@@ -1117,7 +1123,7 @@
                                     👍 ${v.likes}
                                 </button>
                                 <button onclick="openCommentsModal('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
-                                    💬 ${v.comments.length}
+                                    💬 ${v.comments ? v.comments.length : 0}
                                 </button>
                             </div>
                         </div>
@@ -1394,48 +1400,62 @@
             });
         }
 
-        // BULK CHANNEL / RSS FEED SYNC FUNCTION
+        // BULK CHANNEL & PLAYLIST AUTO-SYNC FUNCTION (CORS Error Bypass)
         window.syncFullChannel = async function() {
             const input = document.getElementById('syncChannelInput');
             const btn = document.getElementById('syncChannelBtn');
             if (!input || !input.value.trim()) {
-                alert('Please enter a valid YouTube Channel ID, @Handle, or RSS Feed link');
+                alert('Please enter a YouTube Channel ID, @Handle, or Feed Link');
                 return;
             }
 
-            const rawVal = input.value.trim();
+            let rawVal = input.value.trim();
             btn.innerHTML = `<span>Syncing...</span>`;
 
             let channelId = '';
-            let creatorName = 'Official Channel';
-
             if (rawVal.includes('channel_id=')) {
                 channelId = rawVal.split('channel_id=')[1].split('&')[0];
             } else if (rawVal.startsWith('UC')) {
                 channelId = rawVal;
-            } else if (rawVal.includes('@')) {
-                creatorName = rawVal.includes('youtube.com/') ? `@${rawVal.split('@')[1]}` : rawVal;
             } else {
-                creatorName = rawVal;
+                channelId = rawVal.replace('@', '');
             }
 
-            let rssUrl = channelId 
+            let targetRss = channelId.startsWith('UC') 
                 ? `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`
-                : `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.youtube.com/feeds/videos.xml?user=${rawVal}`)}`;
+                : `https://www.youtube.com/feeds/videos.xml?user=${channelId}`;
 
-            try {
-                const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`);
-                const xmlText = await res.text();
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-                const entries = xmlDoc.querySelectorAll("entry");
+            // Multi-proxy endpoints to bypass CORS & Permission Policy errors
+            const proxies = [
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(targetRss)}`,
+                `https://corsproxy.io/?${encodeURIComponent(targetRss)}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetRss)}`
+            ];
 
-                if (entries && entries.length > 0) {
-                    let count = 0;
+            let xmlText = null;
+            for (let proxyUrl of proxies) {
+                try {
+                    const res = await fetch(proxyUrl);
+                    if (res.ok) {
+                        xmlText = await res.text();
+                        if (xmlText && xmlText.includes('<entry>')) break;
+                    }
+                } catch (e) {
+                    console.log("Proxy fallback attempt...");
+                }
+            }
+
+            if (xmlText && xmlText.includes('<entry>')) {
+                try {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+                    const entries = xmlDoc.querySelectorAll("entry");
+                    const channelTitle = xmlDoc.querySelector("author > name")?.textContent || "YouTube Creator";
+
+                    let addedCount = 0;
                     for (let entry of entries) {
                         const title = entry.querySelector("title")?.textContent || "Channel Video";
                         const videoId = entry.querySelector("videoId")?.textContent || entry.querySelector("yt\\:videoId")?.textContent;
-                        const author = entry.querySelector("author > name")?.textContent || creatorName;
 
                         if (videoId) {
                             const syncedItem = {
@@ -1443,16 +1463,19 @@
                                 category: "Moral & Islamic",
                                 url: `https://www.youtube.com/embed/${videoId}`,
                                 title: title,
-                                creator: author,
-                                likes: Math.floor(Math.random() * 100) + 50,
-                                comments: ["Bulk synced from YouTube Channel."],
+                                creator: channelTitle,
+                                likes: Math.floor(Math.random() * 200) + 50,
+                                comments: ["Auto synced playlist video."],
                                 status: "approved"
                             };
 
-                            const docRef = await addDoc(collection(db, "nexrise_videos"), syncedItem);
-                            syncedItem.id = docRef.id;
-                            videoData.unshift(syncedItem);
-                            count++;
+                            // Check duplicate before adding
+                            if (!videoData.some(v => v.url.includes(videoId))) {
+                                const docRef = await addDoc(collection(db, "nexrise_videos"), syncedItem);
+                                syncedItem.id = docRef.id;
+                                videoData.unshift(syncedItem);
+                                addedCount++;
+                            }
                         }
                     }
 
@@ -1460,45 +1483,42 @@
                     renderAdminVideoManager();
                     renderFeeds();
                     input.value = '';
-                    alert(`Success! Bulk imported ${count} videos from channel to Firebase & App!`);
-                } else {
-                    const syncedItem = {
-                        type: "long",
-                        category: "Moral & Islamic",
-                        url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                        title: `Synced Stream Feed: ${creatorName}`,
-                        creator: creatorName,
-                        likes: 120,
-                        comments: ["Synced automatically."],
-                        status: "approved"
-                    };
-                    const docRef = await addDoc(collection(db, "nexrise_videos"), syncedItem);
-                    syncedItem.id = docRef.id;
-                    videoData.unshift(syncedItem);
-                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
-                    renderAdminVideoManager();
-                    renderFeeds();
-                    input.value = '';
-                    alert('Channel Stream synced to Firebase!');
+                    alert(`Success! Auto-synced ${addedCount} videos from channel to Firebase!`);
+                } catch (err) {
+                    alert('Parsing error: ' + err.message);
                 }
-            } catch (e) {
-                alert('Sync complete or using fallback integration.');
-            } finally {
-                btn.innerHTML = `<span>Sync All</span>`;
+            } else {
+                alert('Could not auto-fetch RSS feed. Please check Channel ID or network connection.');
             }
+
+            btn.innerHTML = `<span>Sync All</span>`;
         }
 
-        function renderAdminVideoManager() {
+        // RENDER ADMIN VIDEO MANAGER WITH SEARCH FILTER
+        window.renderAdminVideoManager = function() {
             const container = document.getElementById('adminVideoManagerList');
             if (!container) return;
 
-            container.innerHTML = videoData.map(v => `
-                <div class="flex items-center justify-between p-2.5 bg-black/60 rounded-xl border border-white/10">
-                    <div class="truncate max-w-[200px]">
-                        <p class="font-bold text-white truncate">${v.title}</p>
+            const searchInput = document.getElementById('adminVideoSearchInput');
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+            const filtered = videoData.filter(v => 
+                v.title.toLowerCase().includes(query) || 
+                v.creator.toLowerCase().includes(query)
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center py-3 text-xs">No matching videos found.</p>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(v => `
+                <div class="flex items-center justify-between p-2.5 bg-black/60 rounded-xl border border-white/10 hover:border-brand-parrot/40 transition">
+                    <div class="truncate max-w-[200px] sm:max-w-[320px]">
+                        <p class="font-bold text-white truncate text-xs">${v.title}</p>
                         <p class="text-[10px] text-gray-400">By ${v.creator} • ${v.category}</p>
                     </div>
-                    <button onclick="deleteVideoItem('${v.id}')" class="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold text-[10px] rounded-lg transition">
+                    <button onclick="deleteVideoItem('${v.id}')" class="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold text-[10px] rounded-lg transition shrink-0">
                         Delete
                     </button>
                 </div>

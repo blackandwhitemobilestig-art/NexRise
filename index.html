@@ -63,6 +63,14 @@
       .neon-glow { filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.6)); }
       .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
 
+      /* Auto-Hiding Top Header Animation */
+      .top-header-container {
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .top-header-hidden {
+        transform: translateY(-100%);
+      }
+
       .aspect-video-container {
         position: relative;
         padding-bottom: 56.25%;
@@ -94,6 +102,12 @@
         -webkit-appearance: slider-vertical;
         width: 8px;
         height: 80px;
+      }
+
+      /* Custom Scrubber Track Light */
+      input[type="range"]::-webkit-slider-thumb {
+        background-color: #39FF14;
+        box-shadow: 0 0 10px #39FF14;
       }
     </style>
 </head>
@@ -148,8 +162,8 @@
             </div>
             <div class="space-y-2 text-left text-xs text-gray-300 bg-black/60 p-3 rounded-xl border border-white/10">
                 <div class="flex items-center gap-2"><span>🎙️</span> <span>Microphone (For Voice Search)</span></div>
-                <div class="flex items-center gap-2"><span>🔔</span> <span>Notifications (For Updates)</span></div>
-                <div class="flex items-center gap-2"><span>📁</span> <span>Storage Access (For Cache & Data)</span></div>
+                <div class="flex items-center gap-2"><span>🔔</span> <span>Notifications &amp; Background Audio</span></div>
+                <div class="flex items-center gap-2"><span>📁</span> <span>Storage Access (For Cache &amp; Data)</span></div>
             </div>
             <button onclick="grantAllAppPermissions()" class="w-full py-3 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition shadow-lg">
                 Allow &amp; Continue
@@ -157,66 +171,88 @@
         </div>
     </div>
 
-    <!-- 2. PUBLIC TOP HEADER -->
-    <header class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full">
-        <div class="flex items-center gap-3">
-            <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-parrot hover:bg-brand-card rounded-xl transition">
-                <i data-lucide="menu" class="w-6 h-6"></i>
+    <!-- BACKGROUND AUDIO PLAYBACK / NOTIFICATION CONTROLLER (STICKY BAR) -->
+    <div id="backgroundAudioWidget" class="hidden fixed bottom-16 sm:bottom-4 right-4 z-50 bg-brand-card/95 border-2 border-brand-parrot p-3 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-xs transition-all">
+        <div class="w-10 h-10 rounded-xl bg-black border border-brand-parrot flex items-center justify-center text-brand-parrot animate-pulse">
+            <i data-lucide="music" class="w-5 h-5"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p id="bgAudioTitle" class="text-xs font-bold text-white truncate">Playing in Background</p>
+            <p id="bgAudioSubtitle" class="text-[9px] text-brand-parrot">Background Audio Stream Active</p>
+        </div>
+        <div class="flex items-center gap-1">
+            <button onclick="toggleBgAudioPlayPause()" id="bgPlayPauseBtn" class="p-2 text-brand-parrot hover:bg-white/10 rounded-lg">
+                <i data-lucide="pause" class="w-4 h-4"></i>
             </button>
+            <button onclick="stopBackgroundAudio()" class="p-2 text-gray-400 hover:text-red-400 rounded-lg">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
 
-            <div class="flex items-center gap-2.5 cursor-pointer" onclick="triggerAdminSecretPrompt()">
-                <div class="w-9 h-9 rounded-xl bg-black border border-brand-parrot flex items-center justify-center neon-glow flex-shrink-0 p-1">
-                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                        <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="#39FF14" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                        <polygon points="44,40 44,60 58,50" fill="#FFFFFF"/>
-                        <path d="M78 22 Q84 28 84 34" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
-                        <path d="M83 17 Q92 26 92 35" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="font-black tracking-wider text-base block leading-none">
-                        <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
+    <!-- 2. AUTO-HIDING TOP HEADER & SEARCH BAR -->
+    <div id="topHeaderWrapper" class="sticky top-0 z-40 top-header-container w-full">
+        <header class="bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-parrot hover:bg-brand-card rounded-xl transition">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+
+                <div class="flex items-center gap-2.5 cursor-pointer" onclick="triggerAdminSecretPrompt()">
+                    <div class="w-9 h-9 rounded-xl bg-black border border-brand-parrot flex items-center justify-center neon-glow flex-shrink-0 p-1">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="#39FF14" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <polygon points="44,40 44,60 58,50" fill="#FFFFFF"/>
+                            <path d="M78 22 Q84 28 84 34" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
+                            <path d="M83 17 Q92 26 92 35" stroke="#39FF14" stroke-width="4" stroke-linecap="round" fill="none"/>
+                        </svg>
                     </div>
-                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.3 • TiG</span>
+                    <div>
+                        <div class="font-black tracking-wider text-base block leading-none">
+                            <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
+                        </div>
+                        <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.3 • TiG</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="hidden sm:flex flex-1 max-w-md mx-6 gap-2">
+            <div class="hidden sm:flex flex-1 max-w-md mx-6 gap-2">
+                <div class="relative flex-1 flex items-center">
+                    <span class="absolute left-3 pointer-events-none text-gray-400">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" id="desktopSearchInput" onkeypress="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search clean lectures, cartoons, gaming..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
+                    <button onclick="startVoiceTyping('desktopSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
+                        <i data-lucide="mic" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <button onclick="executeSearch('desktopSearchInput')" class="px-4 py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition">
+                    Search
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
+                    <span class="text-lg">🌓</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- MOBILE SEARCH BAR IN HEADER WRAPPER -->
+        <div class="sm:hidden w-full px-3 py-2 bg-black/90 backdrop-blur-md border-b border-white/10 flex gap-2">
             <div class="relative flex-1 flex items-center">
                 <span class="absolute left-3 pointer-events-none text-gray-400">
                     <i data-lucide="search" class="w-4 h-4"></i>
                 </span>
-                <input type="text" id="desktopSearchInput" onkeypress="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search clean lectures, cartoons, gaming..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-                <button onclick="startVoiceTyping('desktopSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
+                <input type="text" id="mobileSearchInput" onkeypress="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Voice or text search..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
+                <button onclick="startVoiceTyping('mobileSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1 rounded-lg transition" title="Voice Typing Search">
                     <i data-lucide="mic" class="w-4 h-4"></i>
                 </button>
             </div>
-            <button onclick="executeSearch('desktopSearchInput')" class="px-4 py-2 bg-brand-parrot text-black font-black text-xs rounded-xl hover:bg-green-400 transition">
+            <button onclick="executeSearch('mobileSearchInput')" class="px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">
                 Search
             </button>
         </div>
-
-        <div class="flex items-center gap-2">
-            <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
-                <span class="text-lg">🌓</span>
-            </button>
-        </div>
-    </header>
-
-    <div class="sm:hidden w-full px-3 pt-3 flex gap-2">
-        <div class="relative flex-1 flex items-center">
-            <span class="absolute left-3 pointer-events-none text-gray-400">
-                <i data-lucide="search" class="w-4 h-4"></i>
-            </span>
-            <input type="text" id="mobileSearchInput" onkeypress="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Voice or text search..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-            <button onclick="startVoiceTyping('mobileSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
-                <i data-lucide="mic" class="w-4 h-4"></i>
-            </button>
-        </div>
-        <button onclick="executeSearch('mobileSearchInput')" class="px-3 py-2 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">
-            Search
-        </button>
     </div>
 
     <!-- 3. COLLAPSIBLE SIDE DRAWER MENU -->
@@ -257,30 +293,49 @@
     </aside>
 
     <!-- 4. MAIN VIEWPORT & TAB SECTIONS -->
-    <div class="flex-1 flex w-full max-w-7xl mx-auto">
-        <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
+    <div id="mainScrollableViewport" class="flex-1 flex w-full max-w-7xl mx-auto overflow-y-auto max-h-screen">
+        <main class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6">
 
-            <!-- STICKY SIDE-BY-SIDE VIDEO PLAYER & RECOMMENDATION SECTION -->
+            <!-- STICKY TOP PLAYER & INDEPENDENT BOTTOM RECOMMENDATION FEED -->
             <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     
-                    <!-- LEFT COLUMN: VIDEO PLAYER -->
+                    <!-- LEFT COLUMN: CUSTOM MEDIA PLAYER WITH SCRUBBER BAR -->
                     <div class="desktop:col-span-2 space-y-3">
                         <div class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10">
                             <iframe id="activeMainIframe" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                             
+                            <!-- DEDICATED BACKGROUND PLAYBACK BUTTON OVERLAY -->
+                            <button onclick="enableBackgroundAudioMode()" title="Background Playback" class="absolute top-2 right-2 z-20 px-3 py-1.5 rounded-xl bg-black/80 hover:bg-brand-parrot hover:text-black border border-brand-parrot flex items-center gap-1.5 text-xs font-bold text-brand-parrot transition shadow-2xl">
+                                <i data-lucide="headphones" class="w-4 h-4"></i>
+                                <span>Background Play</span>
+                            </button>
+
                             <button onclick="rotateActiveVideo()" title="Rotate Screen" class="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                 <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                             </button>
 
-                            <div class="absolute top-10 right-2 z-20 bg-black/70 border border-white/20 p-1.5 rounded-full flex flex-col items-center gap-1 shadow-lg">
+                            <!-- BRIGHTNESS CONTROL SLIDER -->
+                            <div class="absolute top-12 left-2 z-20 bg-black/70 border border-white/20 p-1.5 rounded-full flex flex-col items-center gap-1 shadow-lg">
                                 <span class="text-[9px]">☀️</span>
                                 <input type="range" id="brightnessSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="vertical-slider accent-brand-parrot cursor-pointer">
                             </div>
 
-                            <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="absolute bottom-2 right-2 z-20 p-1.5 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition shadow-lg">
+                            <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="absolute bottom-10 right-2 z-20 p-1.5 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition shadow-lg">
                                 <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
                             </button>
+
+                            <!-- CUSTOM SCRUBBER & PROGRESS BAR OVERLAY -->
+                            <div class="absolute bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md px-3 py-1.5 flex items-center gap-2 border-t border-white/10 z-20">
+                                <button onclick="toggleCustomPlayPause()" class="text-brand-parrot p-1 hover:scale-110 transition">
+                                    <i data-lucide="play" id="customPlayIcon" class="w-4 h-4"></i>
+                                </button>
+                                <span id="playerCurrentTime" class="text-[10px] font-mono text-gray-300">00:00</span>
+                                <div class="flex-1 relative flex items-center">
+                                    <input type="range" id="customScrubber" min="0" max="100" value="0" oninput="seekVideoPosition(this.value)" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-brand-parrot">
+                                </div>
+                                <span id="playerTotalTime" class="text-[10px] font-mono text-gray-400">03:45</span>
+                            </div>
                         </div>
 
                         <div class="flex items-start justify-between gap-3 pt-1 border-t border-white/10">
@@ -294,12 +349,12 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: RECOMMENDATION FEED LIST -->
-                    <div class="space-y-3 border-t desktop:border-t-0 desktop:border-l border-white/10 pt-3 desktop:pt-0 desktop:pl-4">
+                    <!-- RIGHT/BOTTOM COLUMN: SEPARATE RECOMMENDATION FEED LIST -->
+                    <div class="space-y-3 border-t desktop:border-t-0 desktop:border-l border-white/10 pt-3 desktop:pt-0 desktop:pl-4 flex flex-col h-full">
                         <h4 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                            <i data-lucide="list-video" class="w-4 h-4"></i> Recommended Streams
+                            <i data-lucide="list-video" class="w-4 h-4"></i> Recommended Feed
                         </h4>
-                        <div id="playerRecommendationList" class="space-y-2 max-h-[350px] overflow-y-auto no-scrollbar"></div>
+                        <div id="playerRecommendationList" class="space-y-2 max-h-[380px] overflow-y-auto no-scrollbar flex-1 pr-1"></div>
                     </div>
 
                 </div>
@@ -320,7 +375,7 @@
                 <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
             </section>
 
-            <!-- TAB 2: NEXTIP -->
+            <!-- TAB 2: NEXTIP (REELS WITH AUTO PLAY/PAUSE ON SCROLL) -->
             <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
                 <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black relative"></div>
             </section>
@@ -591,6 +646,13 @@
         let activeSelectedCategory = "All";
         let activeCommentVideoId = null;
 
+        // Custom Media & Background Audio State
+        let isPlayingCustom = true;
+        let isBgAudioPlaying = false;
+        let activeBgAudioTitle = "";
+        let customTimerInterval = null;
+        let scrubberValue = 0;
+
         const defaultData = [
             {
                 id: "1", type: "long", category: "Moral & Islamic",
@@ -630,6 +692,7 @@
         window.onload = async function() {
             lucide.createIcons();
             init3DIntroParticleCanvas();
+            setupScrollHeaderAutoHide();
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
                 const pModal = document.getElementById('permissionModal');
@@ -648,7 +711,27 @@
             renderAdminVideoManager();
             updateLiveUsersCounter();
             setupReelsAutoPauseScrollObserver();
+            setupHomeFeedAutoPlayScrollObserver();
         };
+
+        // 1. AUTO-HIDE HEADER ON DOWN SCROLL, SHOW ON UP SCROLL
+        function setupScrollHeaderAutoHide() {
+            const viewport = document.getElementById('mainScrollableViewport');
+            const headerWrapper = document.getElementById('topHeaderWrapper');
+            if (!viewport || !headerWrapper) return;
+
+            let lastScrollY = viewport.scrollTop;
+
+            viewport.addEventListener('scroll', () => {
+                const currentScrollY = viewport.scrollTop;
+                if (currentScrollY > lastScrollY && currentScrollY > 60) {
+                    headerWrapper.classList.add('top-header-hidden');
+                } else if (currentScrollY < lastScrollY) {
+                    headerWrapper.classList.remove('top-header-hidden');
+                }
+                lastScrollY = currentScrollY;
+            }, { passive: true });
+        }
 
         window.grantAllAppPermissions = function() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -906,9 +989,10 @@
 
             lucide.createIcons();
             setupReelsAutoPauseScrollObserver();
+            setupHomeFeedAutoPlayScrollObserver();
         }
 
-        // NEXTIP SINGLE ACTIVE PLAYBACK LOGIC ON SCROLL
+        // 2. REELS AUTO PLAY / PAUSE OBSERVER ON SCROLL
         function setupReelsAutoPauseScrollObserver() {
             const reelItems = document.querySelectorAll('.reel-item');
             if (!reelItems.length) return;
@@ -919,12 +1003,10 @@
                     if (!iframe) return;
 
                     if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-                        // Play only active visible reel
                         if (!iframe.src || iframe.src === 'about:blank') {
                             iframe.src = iframe.getAttribute('data-src');
                         }
                     } else {
-                        // Pause / stop background playback immediately on scroll away
                         if (iframe.src && iframe.src !== 'about:blank') {
                             iframe.src = 'about:blank';
                         }
@@ -938,9 +1020,35 @@
             reelItems.forEach(item => observer.observe(item));
         }
 
+        // 3. HOME FEED CARD AUTO PLAY / PAUSE ON SCROLL
+        function setupHomeFeedAutoPlayScrollObserver() {
+            const feedCards = document.querySelectorAll('.feed-video-card');
+            if (!feedCards.length) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const iframe = entry.target.querySelector('iframe');
+                    if (!iframe) return;
+
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
+                        if (entry.target.getAttribute('data-user-paused') !== 'true') {
+                            iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                        }
+                    } else {
+                        iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                    }
+                });
+            }, {
+                root: document.getElementById('mainScrollableViewport'),
+                threshold: 0.75
+            });
+
+            feedCards.forEach(card => observer.observe(card));
+        }
+
         function renderCardHtml(v) {
             return `
-                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
+                <div class="feed-video-card bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
                     <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.id}')">
                         <iframe src="${cleanEmbedUrl(v.url)}" title="${v.title}" frameborder="0" class="pointer-events-none"></iframe>
                         <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 flex items-center justify-center transition">
@@ -970,10 +1078,12 @@
             `;
         }
 
+        // 4. MAIN VIDEO PLAYER WITH INDEPENDENT SEPARATE RECOMMENDATION FEED
         window.playStreamInTopPlayer = function(id) {
             const target = videoData.find(v => v.id === id);
             if(!target) return;
 
+            activeBgAudioTitle = target.title;
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             const iframe = document.getElementById('activeMainIframe');
             const titleEl = document.getElementById('playerVideoTitle');
@@ -986,24 +1096,118 @@
                 if (titleEl) titleEl.innerText = target.title;
                 if (creatorEl) creatorEl.innerText = `@${target.creator}`;
 
+                startCustomScrubberTimer();
+
+                // Build separate independent bottom recommendation feed
                 if(recContainer) {
                     const recs = videoData.filter(v => v.id !== id && v.status === 'approved');
                     recContainer.innerHTML = recs.map(v => `
-                        <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2 p-2 bg-black/50 hover:bg-black/90 rounded-xl border border-white/5 hover:border-brand-parrot/50 transition cursor-pointer">
-                            <div class="w-24 h-14 bg-black rounded-lg overflow-hidden shrink-0 relative">
+                        <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2.5 p-2 bg-black/60 hover:bg-black/95 rounded-xl border border-white/10 hover:border-brand-parrot/50 transition cursor-pointer group">
+                            <div class="w-28 h-16 bg-black rounded-lg overflow-hidden shrink-0 relative">
                                 <iframe src="${cleanEmbedUrl(v.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
+                                <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent flex items-center justify-center">
+                                    <i data-lucide="play-circle" class="w-5 h-5 text-brand-parrot opacity-80 group-hover:opacity-100"></i>
+                                </div>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
-                                <p class="text-[10px] text-brand-parrot mt-0.5">@${v.creator}</p>
+                            <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                <p class="text-xs font-bold text-white line-clamp-2 leading-tight group-hover:text-brand-parrot">${v.title}</p>
+                                <p class="text-[10px] text-gray-400 mt-1">@${v.creator}</p>
                             </div>
                         </div>
-                    `).join('') || `<p class="text-xs text-gray-500">No other recommendations.</p>`;
+                    `).join('') || `<p class="text-xs text-gray-500">No other recommendations available.</p>`;
                 }
 
                 playerBox.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.getElementById('mainScrollableViewport').scrollTo({ top: 0, behavior: 'smooth' });
+                lucide.createIcons();
             }
+        }
+
+        // 5. BACKGROUND PLAYBACK & AUDIO CONTROLLER
+        window.enableBackgroundAudioMode = function() {
+            const widget = document.getElementById('backgroundAudioWidget');
+            const bgTitle = document.getElementById('bgAudioTitle');
+            if (widget) {
+                if (bgTitle) bgTitle.innerText = activeBgAudioTitle || "Active Background Audio";
+                widget.classList.remove('hidden');
+                isBgAudioPlaying = true;
+
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: activeBgAudioTitle || "NexRise Background Audio",
+                        artist: "TiG Official Stream",
+                        album: "NexRise Media"
+                    });
+
+                    navigator.mediaSession.setActionHandler('play', () => toggleBgAudioPlayPause());
+                    navigator.mediaSession.setActionHandler('pause', () => toggleBgAudioPlayPause());
+                }
+            }
+        }
+
+        window.toggleBgAudioPlayPause = function() {
+            const btn = document.getElementById('bgPlayPauseBtn');
+            const iframe = document.getElementById('activeMainIframe');
+
+            if (isBgAudioPlaying) {
+                iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                if (btn) btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i>`;
+                isBgAudioPlaying = false;
+            } else {
+                iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                if (btn) btn.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i>`;
+                isBgAudioPlaying = true;
+            }
+            lucide.createIcons();
+        }
+
+        window.stopBackgroundAudio = function() {
+            const widget = document.getElementById('backgroundAudioWidget');
+            if (widget) widget.classList.add('hidden');
+            isBgAudioPlaying = false;
+        }
+
+        // SCRUBBER & CUSTOM PLAYER TIMERS
+        function startCustomScrubberTimer() {
+            clearInterval(customTimerInterval);
+            scrubberValue = 0;
+            const scrubber = document.getElementById('customScrubber');
+            const timeDisplay = document.getElementById('playerCurrentTime');
+
+            customTimerInterval = setInterval(() => {
+                if (isPlayingCustom && scrubberValue < 100) {
+                    scrubberValue += 0.5;
+                    if (scrubber) scrubber.value = scrubberValue;
+                    
+                    let seconds = Math.floor((scrubberValue / 100) * 225);
+                    let mins = Math.floor(seconds / 60);
+                    let secs = seconds % 60;
+                    if (timeDisplay) timeDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        window.toggleCustomPlayPause = function() {
+            const iframe = document.getElementById('activeMainIframe');
+            const icon = document.getElementById('customPlayIcon');
+
+            if (isPlayingCustom) {
+                iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                isPlayingCustom = false;
+                if(icon) icon.setAttribute('data-lucide', 'play');
+            } else {
+                iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                isPlayingCustom = true;
+                if(icon) icon.setAttribute('data-lucide', 'pause');
+            }
+            lucide.createIcons();
+        }
+
+        window.seekVideoPosition = function(val) {
+            scrubberValue = parseFloat(val);
+            const iframe = document.getElementById('activeMainIframe');
+            let targetSeconds = Math.floor((scrubberValue / 100) * 225);
+            iframe.contentWindow?.postMessage(`{"event":"command","func":"seekTo","args":[${targetSeconds}, true]}`, '*');
         }
 
         window.closeActivePlayer = function() {
@@ -1012,6 +1216,7 @@
             if (playerBox && iframe) {
                 iframe.src = "";
                 playerBox.classList.add('hidden');
+                clearInterval(customTimerInterval);
             }
         }
 

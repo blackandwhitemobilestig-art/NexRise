@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.3 — Powered by TiG</title>
+    <title>NexRise v2.8.3 — Powered by TiG (Custom Player)</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -77,7 +77,7 @@
         height: 0;
         overflow: hidden;
       }
-      .aspect-video-container iframe, .aspect-video-container video {
+      .aspect-video-container video, .aspect-video-container iframe {
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 100%;
@@ -103,17 +103,27 @@
         width: 8px;
         height: 80px;
       }
+
+      /* CUSTOM VIDEO OVERLAY HOVER LOGIC */
+      .player-controls-overlay {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .player-container:hover .player-controls-overlay,
+      .player-container.show-controls .player-controls-overlay {
+        opacity: 1;
+      }
     </style>
 </head>
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
 
-    <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN (SECURED TIMEOUT) -->
+    <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN -->
     <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden">
         <div id="threejsCanvasContainer" class="absolute inset-0 z-0"></div>
 
         <div class="text-center z-10">
             <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                Powered by TiG (v2.8.3)
+                Powered by TiG (v2.8.3 Custom Player)
             </span>
         </div>
 
@@ -152,7 +162,7 @@
             </div>
             <div class="space-y-1">
                 <h3 class="text-base font-bold text-white">App Permissions Required</h3>
-                <p class="text-xs text-gray-400">Please allow core features for seamless experience (Asked only once).</p>
+                <p class="text-xs text-gray-400">Please allow core features for seamless experience.</p>
             </div>
             <div class="space-y-2 text-left text-xs text-gray-300 bg-black/60 p-3 rounded-xl border border-white/10">
                 <div class="flex items-center gap-2"><span>🎙️</span> <span>Microphone (For Voice Search)</span></div>
@@ -268,32 +278,81 @@
     <div class="flex-1 flex w-full max-w-7xl mx-auto">
         <main id="mainScrollContainer" class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
 
-            <!-- STICKY SIDE-BY-SIDE VIDEO PLAYER & RECOMMENDATION SECTION -->
+            <!-- STICKY SIDE-BY-SIDE VIDEO PLAYER & RECOMMENDATION SECTION WITH CUSTOM MEDIA PLAYER -->
             <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     
-                    <!-- LEFT COLUMN: VIDEO PLAYER -->
+                    <!-- LEFT COLUMN: CUSTOM VIDEO PLAYER WITH AUTO-HIDE CONTROLS ON TOUCH/HOVER -->
                     <div class="desktop:col-span-2 space-y-3">
-                        <div class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10">
-                            <iframe id="activeMainIframe" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                        <div id="customPlayerContainer" class="player-container aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10 select-none">
                             
-                            <!-- BACKGROUND PLAYBACK BUTTON OVERLAY -->
-                            <button onclick="toggleBackgroundAudioMode()" title="Background Playback" class="absolute top-2 right-12 z-20 px-3 py-1.5 rounded-lg bg-brand-parrot text-black font-extrabold text-xs shadow-lg flex items-center gap-1.5 hover:bg-green-400 transition">
-                                <i data-lucide="headphones" class="w-4 h-4"></i> Background Play
-                            </button>
+                            <!-- HTML5 Custom Video Engine -->
+                            <video id="customMainVideo" class="w-full h-full object-contain" crossorigin="anonymous" playsinline></video>
+                            
+                            <!-- Fallback Iframe Player for Embedded Links -->
+                            <iframe id="activeMainIframe" class="hidden w-full h-full" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
 
-                            <button onclick="rotateActiveVideo()" title="Rotate Screen" class="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
-                                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-                            </button>
+                            <!-- AUTO-HIDE CONTROLS OVERLAY (Pops up on Hover / Touch) -->
+                            <div class="player-controls-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60 flex flex-col justify-between p-3 pointer-events-auto">
+                                
+                                <!-- TOP BAR CONTROLS -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="rotateActiveVideo()" title="Rotate Video" class="p-1.5 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition shadow">
+                                            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="toggleBackgroundAudioMode()" title="Background Playback" class="px-2.5 py-1 rounded-lg bg-brand-parrot text-black font-extrabold text-[11px] shadow flex items-center gap-1 hover:bg-green-400 transition">
+                                            <i data-lucide="headphones" class="w-3.5 h-3.5"></i> Bg Play
+                                        </button>
+                                    </div>
 
-                            <div class="absolute top-10 right-2 z-20 bg-black/70 border border-white/20 p-1.5 rounded-full flex flex-col items-center gap-1 shadow-lg">
-                                <span class="text-[9px]">☀️</span>
-                                <input type="range" id="brightnessSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="vertical-slider accent-brand-parrot cursor-pointer">
+                                    <!-- Brightness Slider -->
+                                    <div class="flex items-center gap-1.5 bg-black/70 border border-white/20 px-2 py-1 rounded-lg">
+                                        <span class="text-[10px]">☀️</span>
+                                        <input type="range" id="brightnessSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="w-16 accent-brand-parrot cursor-pointer h-1">
+                                    </div>
+                                </div>
+
+                                <!-- CENTER PLAY / PAUSE LARGE BUTTON -->
+                                <div class="flex items-center justify-center pointer-events-none">
+                                    <button id="centerPlayBtn" onclick="toggleCustomVideoPlay()" class="pointer-events-auto w-14 h-14 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-2xl hover:scale-110 transition">
+                                        <i data-lucide="play" id="centerPlayIcon" class="w-7 h-7 fill-black ml-1"></i>
+                                    </button>
+                                </div>
+
+                                <!-- BOTTOM BAR CONTROLS (SEEK BAR & VOLUME & FULLSCREEN) -->
+                                <div class="space-y-1.5 bg-black/80 p-2.5 rounded-xl border border-white/10">
+                                    <!-- PROGRESS / SEEK BAR WITH DURATION -->
+                                    <div class="flex items-center gap-2">
+                                        <span id="currentTimeDisplay" class="text-[10px] font-mono text-gray-300">00:00</span>
+                                        <input type="range" id="customSeekBar" min="0" max="100" value="0" step="0.1" oninput="seekCustomVideo(this.value)" class="flex-1 accent-brand-parrot cursor-pointer h-1.5 bg-gray-700 rounded-lg">
+                                        <span id="durationDisplay" class="text-[10px] font-mono text-gray-300">00:00</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-1">
+                                        <div class="flex items-center gap-3">
+                                            <button onclick="toggleCustomVideoPlay()" class="text-white hover:text-brand-parrot transition">
+                                                <i data-lucide="play" id="bottomPlayIcon" class="w-4 h-4"></i>
+                                            </button>
+
+                                            <!-- VOLUME UP / DOWN SLIDER -->
+                                            <div class="flex items-center gap-1.5">
+                                                <button onclick="toggleMuteVideo()" class="text-white hover:text-brand-parrot transition">
+                                                    <i data-lucide="volume-2" id="volumeIcon" class="w-4 h-4"></i>
+                                                </button>
+                                                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" oninput="setCustomVideoVolume(this.value)" class="w-16 accent-brand-parrot cursor-pointer h-1 bg-gray-700 rounded-lg">
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="p-1 rounded bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition">
+                                                <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
-
-                            <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="absolute bottom-2 right-2 z-20 p-1.5 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 text-white transition shadow-lg">
-                                <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
-                            </button>
                         </div>
 
                         <!-- AUDIO BACKGROUND NOTIFICATION WIDGET -->
@@ -329,7 +388,7 @@
                 </div>
             </div>
 
-            <!-- TAB 1: HOME STREAM -->
+            <!-- TAB 1: HOME STREAM (WITH OTHERS CATEGORY ADDED) -->
             <section id="tab-home" class="space-y-6">
                 <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
                     <button onclick="filterCategory('All')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-parrot text-black border border-brand-parrot">All</button>
@@ -339,6 +398,7 @@
                     <button onclick="filterCategory('Gaming')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Gaming</button>
                     <button onclick="filterCategory('Movies & Series')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Movies &amp; Series</button>
                     <button onclick="filterCategory('Songs')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Songs</button>
+                    <button onclick="filterCategory('Others')" class="category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot">Others</button>
                 </div>
 
                 <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
@@ -357,7 +417,7 @@
                 <div id="longVideosContainer" class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5"></div>
             </section>
 
-            <!-- TAB 4: PUBLIC SUBMISSION -->
+            <!-- TAB 4: PUBLIC SUBMISSION (WITH OTHERS CATEGORY ADDED) -->
             <section id="tab-upload" class="hidden space-y-6 max-w-2xl mx-auto">
                 <div class="bg-brand-card p-5 rounded-2xl border border-brand-border space-y-4">
                     <h2 class="text-base font-bold text-white">Submit Ethical Link</h2>
@@ -378,11 +438,12 @@
                                 <option value="Gaming">Gaming</option>
                                 <option value="Movies & Series">Movies &amp; Series</option>
                                 <option value="Songs">Songs</option>
+                                <option value="Others">Others</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Embed Source Link</label>
-                            <input type="url" id="videoUrl" required placeholder="https://www.youtube.com/embed/..." class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-parrot">
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Direct MP4 or Embed Video Link</label>
+                            <input type="url" id="videoUrl" required placeholder="https://domain.com/video.mp4 or embed link" class="w-full bg-black/70 border border-white/20 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-parrot">
                         </div>
                         <div>
                             <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Title</label>
@@ -416,7 +477,7 @@
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
                             <h3 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.3)
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.3 Custom Player)
                             </h3>
                             <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                         </div>
@@ -458,13 +519,13 @@
                             </div>
                         </div>
 
-                        <!-- PUBLISH DIRECTLY -->
+                        <!-- PUBLISH DIRECTLY (WITH OTHERS CATEGORY ADDED) -->
                         <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
                             <h4 class="text-xs font-bold text-gray-200">Publish New Stream Link</h4>
                             <form onsubmit="handleDirectAdminPublish(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                                 <input type="text" id="adminPubTitle" placeholder="Title" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
                                 <input type="text" id="adminPubCreator" placeholder="Creator / Scholar" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                <input type="url" id="adminPubUrl" placeholder="Embed URL" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
+                                <input type="url" id="adminPubUrl" placeholder="Direct MP4 or Embed URL" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
                                 <select id="adminPubCategory" class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
                                     <option value="Moral & Islamic">Moral &amp; Islamic</option>
                                     <option value="Cartoons">Cartoons &amp; Kids</option>
@@ -472,6 +533,7 @@
                                     <option value="Gaming">Gaming</option>
                                     <option value="Movies & Series">Movies &amp; Series</option>
                                     <option value="Songs">Songs</option>
+                                    <option value="Others">Others</option>
                                 </select>
                                 <select id="adminPubType" class="bg-black/80 border border-white/20 p-2 rounded-lg text-white sm:col-span-2">
                                     <option value="long">NexVid Stream</option>
@@ -614,18 +676,19 @@
         let activeTargetInputId = "desktopSearchInput";
         let activeSelectedCategory = "All";
         let activeCommentVideoId = null;
+        let autoHideControlsTimer = null;
 
         const defaultData = [
             {
                 id: "1", type: "long", category: "Moral & Islamic",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                title: "Beautiful Quran Recitation & Moral Guidance",
-                creator: "Qari Official", likes: 420, comments: ["MashaAllah peaceful."], status: "approved"
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                title: "Beautiful Moral & Peaceful Stream",
+                creator: "TiG Official", likes: 420, comments: ["MashaAllah peaceful."], status: "approved"
             },
             {
                 id: "2", type: "long", category: "Educational",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                title: "Ethical Technology & Modern Innovation",
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                title: "Ethical Technology & Innovation Lecture",
                 creator: "TiG Tech", likes: 198, comments: ["Informative stream."], status: "approved"
             },
             {
@@ -636,9 +699,15 @@
             },
             {
                 id: "4", type: "short", category: "Moral & Islamic",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
                 title: "Daily Moral Reflection in 60 Seconds",
                 creator: "NexTip Daily", likes: 890, comments: ["Short & powerful."], status: "approved"
+            },
+            {
+                id: "5", type: "long", category: "Others",
+                url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                title: "General & Miscellaneous Ethical Video",
+                creator: "Community Streamer", likes: 95, comments: ["Interesting content."], status: "approved"
             }
         ];
 
@@ -656,6 +725,7 @@
             try { lucide.createIcons(); } catch(e){}
             init3DIntroParticleCanvas();
             setupAutoHidingHeaderOnScroll();
+            setupCustomMediaPlayerListeners();
 
             // SAFE TIMEOUT FOR INTRO SPLASH SCREEN SO APP NEVER HANGS
             setTimeout(() => {
@@ -678,7 +748,102 @@
             setupFeedAutoPlayOnScroll();
         };
 
-        // AUTO HIDE SEARCH AND HEADER ON SCROLL UP/DOWN
+        // CUSTOM MEDIA PLAYER ENGINE LOGIC & EVENTS
+        function setupCustomMediaPlayerListeners() {
+            const video = document.getElementById('customMainVideo');
+            const seekBar = document.getElementById('customSeekBar');
+            const currTimeEl = document.getElementById('currentTimeDisplay');
+            const durTimeEl = document.getElementById('durationDisplay');
+            const container = document.getElementById('customPlayerContainer');
+
+            if (!video) return;
+
+            // Video Time Update Listener (Seekbar sync)
+            video.addEventListener('timeupdate', () => {
+                if (video.duration) {
+                    const progress = (video.currentTime / video.duration) * 100;
+                    if (seekBar) seekBar.value = progress;
+                    if (currTimeEl) currTimeEl.innerText = formatTime(video.currentTime);
+                    if (durTimeEl) durTimeEl.innerText = formatTime(video.duration);
+                }
+            });
+
+            // Video Duration Loaded
+            video.addEventListener('loadedmetadata', () => {
+                if (durTimeEl) durTimeEl.innerText = formatTime(video.duration);
+            });
+
+            // Touch / Hover Auto-Hide Controls Logic
+            if (container) {
+                const triggerControls = () => {
+                    container.classList.add('show-controls');
+                    clearTimeout(autoHideControlsTimer);
+                    autoHideControlsTimer = setTimeout(() => {
+                        if (!video.paused) {
+                            container.classList.remove('show-controls');
+                        }
+                    }, 3000);
+                };
+
+                container.addEventListener('mousemove', triggerControls);
+                container.addEventListener('touchstart', triggerControls);
+                container.addEventListener('mouseleave', () => {
+                    if (!video.paused) container.classList.remove('show-controls');
+                });
+            }
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        window.toggleCustomVideoPlay = function() {
+            const video = document.getElementById('customMainVideo');
+            const centerIcon = document.getElementById('centerPlayIcon');
+            const bottomIcon = document.getElementById('bottomPlayIcon');
+
+            if (!video) return;
+
+            if (video.paused) {
+                video.play();
+                if (centerIcon) centerIcon.setAttribute('data-lucide', 'pause');
+                if (bottomIcon) bottomIcon.setAttribute('data-lucide', 'pause');
+            } else {
+                video.pause();
+                if (centerIcon) centerIcon.setAttribute('data-lucide', 'play');
+                if (bottomIcon) bottomIcon.setAttribute('data-lucide', 'play');
+            }
+            try { lucide.createIcons(); } catch(e){}
+        }
+
+        window.seekCustomVideo = function(val) {
+            const video = document.getElementById('customMainVideo');
+            if (video && video.duration) {
+                video.currentTime = (val / 100) * video.duration;
+            }
+        }
+
+        window.setCustomVideoVolume = function(val) {
+            const video = document.getElementById('customMainVideo');
+            if (video) {
+                video.volume = parseFloat(val);
+                video.muted = (parseFloat(val) === 0);
+            }
+        }
+
+        window.toggleMuteVideo = function() {
+            const video = document.getElementById('customMainVideo');
+            const volumeSlider = document.getElementById('volumeSlider');
+            if (video) {
+                video.muted = !video.muted;
+                if (volumeSlider) volumeSlider.value = video.muted ? 0 : video.volume;
+            }
+        }
+
+        // AUTO HIDE SEARCH AND HEADER ON SCROLL
         function setupAutoHidingHeaderOnScroll() {
             const mainScroll = document.getElementById('mainScrollContainer');
             const header = document.getElementById('mainAppHeader');
@@ -839,7 +1004,7 @@
                     }, 1000);
                 };
             } else {
-                let phrases = ["Quran Recitation", "Educational Tech", "Moral Cartoons"];
+                let phrases = ["Quran Recitation", "Educational Tech", "Others Category"];
                 let chosen = phrases[Math.floor(Math.random() * phrases.length)];
                 let idx = 0;
                 let timer = setInterval(() => {
@@ -917,7 +1082,10 @@
                             <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
                                 ${shorts.map(s => `
                                     <div onclick="playStreamInTopPlayer('${s.id}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
-                                        <iframe src="${cleanEmbedUrl(s.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
+                                        ${s.url.endsWith('.mp4') 
+                                            ? `<video src="${s.url}" class="w-full h-full object-cover pointer-events-none"></video>`
+                                            : `<iframe src="${cleanEmbedUrl(s.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>`
+                                        }
                                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
                                             <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
                                             <p class="text-[9px] text-brand-parrot mt-1">@${s.creator}</p>
@@ -929,7 +1097,7 @@
                     `;
                 }
 
-                homeFeed.innerHTML = html || `<p class="text-gray-500 text-center py-8 text-xs">No matching streams found.</p>`;
+                homeFeed.innerHTML = html || `<p class="text-gray-500 text-center py-8 text-xs">No matching streams found in this category.</p>`;
             }
 
             const nexvidFeed = document.getElementById('longVideosContainer');
@@ -943,7 +1111,10 @@
                 const shorts = approved.filter(v => v.type === 'short');
                 shortsContainer.innerHTML = shorts.map(v => `
                     <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden" data-raw-url="${v.url}">
-                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                        ${v.url.endsWith('.mp4')
+                            ? `<video data-src="${v.url}" class="reel-iframe w-full h-full object-cover" controls playsinline></video>`
+                            : `<iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`
+                        }
                         <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
                             <div>
                                 <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
@@ -969,16 +1140,25 @@
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    const iframe = entry.target.querySelector('.reel-iframe');
-                    if (!iframe) return;
+                    const media = entry.target.querySelector('.reel-iframe');
+                    if (!media) return;
 
                     if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-                        if (!iframe.src || iframe.src === 'about:blank') {
-                            iframe.src = iframe.getAttribute('data-src');
+                        if (media.tagName === 'VIDEO') {
+                            if (!media.src) media.src = media.getAttribute('data-src');
+                            media.play().catch(e=>{});
+                        } else {
+                            if (!media.src || media.src === 'about:blank') {
+                                media.src = media.getAttribute('data-src');
+                            }
                         }
                     } else {
-                        if (iframe.src && iframe.src !== 'about:blank') {
-                            iframe.src = 'about:blank';
+                        if (media.tagName === 'VIDEO') {
+                            media.pause();
+                        } else {
+                            if (media.src && media.src !== 'about:blank') {
+                                media.src = 'about:blank';
+                            }
                         }
                     }
                 });
@@ -990,7 +1170,6 @@
             reelItems.forEach(item => observer.observe(item));
         }
 
-        // AUTO PLAY VIDEO STOPPED IN VIEWPORT
         function setupFeedAutoPlayOnScroll() {
             const videoCards = document.querySelectorAll('.feed-video-card');
             if(!videoCards.length) return;
@@ -1002,12 +1181,12 @@
 
                     if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
                         const rawSrc = iframe.getAttribute('data-raw-src');
-                        if (rawSrc && !iframe.src.includes('autoplay=1')) {
+                        if (rawSrc && !rawSrc.endsWith('.mp4') && !iframe.src.includes('autoplay=1')) {
                             iframe.src = cleanEmbedUrl(rawSrc, '&autoplay=1&mute=1');
                         }
                     } else {
                         const rawSrc = iframe.getAttribute('data-raw-src');
-                        if (rawSrc && iframe.src.includes('autoplay=1')) {
+                        if (rawSrc && !rawSrc.endsWith('.mp4') && iframe.src.includes('autoplay=1')) {
                             iframe.src = cleanEmbedUrl(rawSrc);
                         }
                     }
@@ -1018,10 +1197,14 @@
         }
 
         function renderCardHtml(v) {
+            const isDirectMp4 = v.url.endsWith('.mp4');
             return `
                 <div class="feed-video-card bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
                     <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.id}')">
-                        <iframe data-raw-src="${v.url}" src="${cleanEmbedUrl(v.url)}" title="${v.title}" frameborder="0" class="feed-card-iframe pointer-events-none"></iframe>
+                        ${isDirectMp4
+                            ? `<video src="${v.url}" class="w-full h-full object-cover pointer-events-none"></video>`
+                            : `<iframe data-raw-src="${v.url}" src="${cleanEmbedUrl(v.url)}" title="${v.title}" frameborder="0" class="feed-card-iframe pointer-events-none"></iframe>`
+                        }
                         <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 flex items-center justify-center transition">
                             <div class="w-12 h-12 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-lg transform group-hover:scale-110 transition">
                                 <i data-lucide="play" class="w-6 h-6 fill-black ml-0.5"></i>
@@ -1054,14 +1237,32 @@
             if(!target) return;
 
             const playerBox = document.getElementById('stickyVideoPlayerBox');
+            const customVid = document.getElementById('customMainVideo');
             const iframe = document.getElementById('activeMainIframe');
             const titleEl = document.getElementById('playerVideoTitle');
             const creatorEl = document.getElementById('playerVideoCreator');
             const recContainer = document.getElementById('playerRecommendationList');
 
-            if (playerBox && iframe) {
-                let finalEmbedUrl = cleanEmbedUrl(target.url, '&autoplay=1');
-                iframe.src = finalEmbedUrl;
+            if (playerBox) {
+                const isMp4 = target.url.endsWith('.mp4');
+                if (isMp4) {
+                    if (iframe) iframe.classList.add('hidden');
+                    if (customVid) {
+                        customVid.classList.remove('hidden');
+                        customVid.src = target.url;
+                        customVid.play();
+                    }
+                } else {
+                    if (customVid) {
+                        customVid.pause();
+                        customVid.classList.add('hidden');
+                    }
+                    if (iframe) {
+                        iframe.classList.remove('hidden');
+                        iframe.src = cleanEmbedUrl(target.url, '&autoplay=1');
+                    }
+                }
+
                 if (titleEl) titleEl.innerText = target.title;
                 if (creatorEl) creatorEl.innerText = `@${target.creator}`;
 
@@ -1070,7 +1271,10 @@
                     recContainer.innerHTML = recs.map(v => `
                         <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2 p-2 bg-black/50 hover:bg-black/90 rounded-xl border border-white/5 hover:border-brand-parrot/50 transition cursor-pointer">
                             <div class="w-24 h-14 bg-black rounded-lg overflow-hidden shrink-0 relative">
-                                <iframe src="${cleanEmbedUrl(v.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
+                                ${v.url.endsWith('.mp4') 
+                                    ? `<video src="${v.url}" class="w-full h-full object-cover pointer-events-none"></video>`
+                                    : `<iframe src="${cleanEmbedUrl(v.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>`
+                                }
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
@@ -1100,33 +1304,35 @@
 
         window.closeActivePlayer = function() {
             const playerBox = document.getElementById('stickyVideoPlayerBox');
+            const customVid = document.getElementById('customMainVideo');
             const iframe = document.getElementById('activeMainIframe');
-            if (playerBox && iframe) {
-                iframe.src = "";
+            if (playerBox) {
+                if(customVid) { customVid.pause(); customVid.src = ""; }
+                if(iframe) iframe.src = "";
                 playerBox.classList.add('hidden');
                 stopBackgroundAudioMode();
             }
         }
 
         window.toggleIframeFullscreen = function() {
-            const iframe = document.getElementById('activeMainIframe');
-            if (iframe) {
-                if (iframe.requestFullscreen) iframe.requestFullscreen();
-                else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+            const container = document.getElementById('customPlayerContainer');
+            if (container) {
+                if (container.requestFullscreen) container.requestFullscreen();
+                else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
             }
         }
 
         window.rotateActiveVideo = function() {
-            const iframe = document.getElementById('activeMainIframe');
-            if (iframe) {
-                iframe.classList.toggle('video-rotate-90');
+            const container = document.getElementById('customPlayerContainer');
+            if (container) {
+                container.classList.toggle('video-rotate-90');
             }
         }
 
         window.adjustVideoBrightness = function(val) {
-            const iframe = document.getElementById('activeMainIframe');
-            if (iframe) {
-                iframe.style.filter = `brightness(${val}%)`;
+            const container = document.getElementById('customPlayerContainer');
+            if (container) {
+                container.style.filter = `brightness(${val}%)`;
             }
         }
 
@@ -1168,14 +1374,13 @@
 
         window.exportUpdatedCode = function() {
             const currentHTML = document.documentElement.outerHTML;
-            navigator.clipboard.writeText(currentHTML).then(() => {
+                navigator.clipboard.writeText(currentHTML).then(() => {
                 alert('Full updated HTML code copied to clipboard successfully!');
             }).catch(err => {
                 alert('Failed to copy code automatically.');
             });
         }
 
-        // BULK CHANNEL / RSS FEED SYNC FUNCTION
         window.syncFullChannel = async function() {
             const input = document.getElementById('syncChannelInput');
             const btn = document.getElementById('syncChannelBtn');
@@ -1221,7 +1426,7 @@
                         if (videoId) {
                             const syncedItem = {
                                 type: "long",
-                                category: "Moral & Islamic",
+                                category: "Others",
                                 url: `https://www.youtube.com/embed/${videoId}`,
                                 title: title,
                                 creator: author,
@@ -1245,7 +1450,7 @@
                 } else {
                     const syncedItem = {
                         type: "long",
-                        category: "Moral & Islamic",
+                        category: "Others",
                         url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
                         title: `Synced Stream Feed: ${creatorName}`,
                         creator: creatorName,

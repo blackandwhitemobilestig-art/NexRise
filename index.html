@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.5 — Powered by TiG</title>
+    <title>NexRise v2.8.6 — Powered by TiG</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -99,13 +99,6 @@
         transform-origin: center center;
       }
 
-      .vertical-slider {
-        writing-mode: bt-lr;
-        -webkit-appearance: slider-vertical;
-        width: 8px;
-        height: 80px;
-      }
-
       /* CUSTOM SCRUBBER RANGE SLIDER */
       input[type=range].custom-scrubber {
         -webkit-appearance: none;
@@ -127,12 +120,12 @@
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
 
     <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN -->
-    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden">
+    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden pointer-events-none">
         <div id="threejsCanvasContainer" class="absolute inset-0 z-0"></div>
 
         <div class="text-center z-10">
             <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                Powered by TiG (v2.8.5)
+                Powered by TiG (v2.8.6)
             </span>
         </div>
 
@@ -184,7 +177,7 @@
         </div>
     </div>
 
-    <!-- 2. PUBLIC TOP HEADER WITH WINDOW ARROW NAVIGATION -->
+    <!-- 2. PUBLIC TOP HEADER WITH WINDOW ARROWS -->
     <header id="mainAppHeader" class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-brand-border px-4 py-3 flex items-center justify-between w-full header-transform">
         <div class="flex items-center gap-3">
             <!-- WINDOW PAGE NAVIGATION ARROWS -->
@@ -214,7 +207,7 @@
                     <div class="font-black tracking-wider text-base block leading-none">
                         <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
                     </div>
-                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.5 • TiG</span>
+                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.6 • TiG</span>
                 </div>
             </div>
         </div>
@@ -261,7 +254,7 @@
     <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
-                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.5</span>
+                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.6</span>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -312,7 +305,7 @@
                                         <button onclick="rotateActiveVideo()" title="Rotate Screen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                             <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                                         </button>
-                                        <!-- DUAL FUNCTION FULLSCREEN / NORMAL TOGGLE BUTTON -->
+                                        <!-- DUAL FUNCTION FULLSCREEN TOGGLE BUTTON -->
                                         <button id="fullscreenToggleBtn" onclick="toggleIframeFullscreen()" title="Toggle Fullscreen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                             <i id="fullscreenIcon" data-lucide="maximize" class="w-4 h-4"></i>
                                         </button>
@@ -338,7 +331,7 @@
                                                 <button onclick="toggleMuteAudio()" class="text-gray-300 hover:text-brand-parrot transition">
                                                     <i id="volumeMuteIcon" data-lucide="volume-2" class="w-4 h-4"></i>
                                                 </button>
-                                                <!-- UPDATED SOUND SECTION (0 TO 200 MAX VOLUME) -->
+                                                <!-- UPDATED SOUND SECTION (0 TO 200 MAX VOLUME BOOSTER) -->
                                                 <input type="range" id="volumeControlSlider" min="0" max="200" value="100" oninput="setCustomVolume(this.value)" class="w-20 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer" title="Volume Control (Up to 200%)">
                                                 <span id="volumeValueLabel" class="text-[9px] font-mono text-brand-parrot font-bold">100%</span>
                                             </div>
@@ -471,7 +464,7 @@
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
                             <h3 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.5)
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.6)
                             </h3>
                             <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                         </div>
@@ -672,7 +665,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const APP_VERSION = "2.8.5";
+        const APP_VERSION = "2.8.6";
         const LOCAL_STORAGE_KEY = "NEXRISE_V285_DATA";
         const SECURITY_PIN = "3835";
         const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
@@ -687,10 +680,6 @@
         let hoverHideTimeout = null;
         let previewTouchTimer = null;
 
-        // AUDIO BOOSTER NODE (WEB AUDIO API)
-        let audioCtx = null;
-        let gainNode = null;
-
         const defaultData = [
             {
                 id: "1", type: "long", category: "Moral & Islamic",
@@ -701,6 +690,15 @@
         ];
 
         let videoData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || defaultData;
+
+        // SAFE SPLASH SCREEN REMOVER (Prevents Logo Freeze)
+        function hideSplashScreenSafely() {
+            const splash = document.getElementById('splashScreen');
+            if (splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => { if (splash) splash.style.display = 'none'; }, 700);
+            }
+        }
 
         // SECRET KEYBOARD SHORTCUT (Ctrl + Shift + J)
         document.addEventListener('keydown', (e) => {
@@ -729,15 +727,10 @@
             setupAutoHidingHeaderOnScroll();
 
             // Push initial state for page history navigation
-            window.history.replaceState({ tab: 'home' }, '', window.location.href);
+            try { window.history.replaceState({ tab: 'home' }, '', window.location.href); } catch(e){}
 
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                if (splash) {
-                    splash.style.opacity = '0';
-                    setTimeout(() => splash.remove(), 700);
-                }
-            }, 800);
+            // Automatic removal to prevent freezing
+            setTimeout(hideSplashScreenSafely, 800);
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
                 const pModal = document.getElementById('permissionModal');
@@ -757,160 +750,4 @@
         });
 
         function setupAutoHidingHeaderOnScroll() {
-            const mainScroll = document.getElementById('mainScrollContainer');
-            const header = document.getElementById('mainAppHeader');
-            const mobileSearch = document.getElementById('mobileSearchContainer');
-            if (!mainScroll || !header) return;
-
-            let lastScrollTop = 0;
-            mainScroll.addEventListener('scroll', () => {
-                let st = mainScroll.scrollTop;
-                if (st > lastScrollTop && st > 60) {
-                    header.classList.add('header-hidden');
-                    if(mobileSearch) mobileSearch.classList.add('header-hidden');
-                } else {
-                    header.classList.remove('header-hidden');
-                    if(mobileSearch) mobileSearch.classList.remove('header-hidden');
-                }
-                lastScrollTop = st <= 0 ? 0 : st;
-            });
-        }
-
-        window.grantAllAppPermissions = function() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => console.log("Mic permission denied:", err));
-            }
-            if ("Notification" in window) {
-                Notification.requestPermission().catch(err => console.log("Notification permission error:", err));
-            }
-            localStorage.setItem("nexrise_permissions_asked", "true");
-            localStorage.setItem("nexrise_storage_allowed", "true");
-
-            const pModal = document.getElementById('permissionModal');
-            if (pModal) pModal.classList.add('hidden');
-        };
-
-        async function loadDataFromFirebase() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "nexrise_videos"));
-                if (!querySnapshot.empty) {
-                    const fbData = [];
-                    querySnapshot.forEach((docSnap) => {
-                        fbData.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    videoData = fbData;
-                }
-            } catch (err) {
-                console.log("Using local cache due to network or rules:", err);
-            }
-            renderFeeds();
-        }
-
-        function updateLiveUsersCounter() {
-            const counterEl = document.getElementById('liveUsersCount');
-            if (counterEl) {
-                let count = Math.floor(Math.random() * 3) + 1;
-                counterEl.innerText = count;
-            }
-        }
-
-        function init3DIntroParticleCanvas() {
-            const container = document.getElementById('threejsCanvasContainer');
-            if (!container || typeof THREE === 'undefined') return;
-
-            try {
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-                
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                container.appendChild(renderer.domElement);
-
-                const count = 300;
-                const positions = new Float32Array(count * 3);
-                for(let i=0; i<count*3; i++) positions[i] = (Math.random() - 0.5) * 10;
-
-                const geo = new THREE.BufferGeometry();
-                geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                const mat = new THREE.PointsMaterial({ size: 0.035, color: 0x39FF14 });
-
-                const pSystem = new THREE.Points(geo, mat);
-                scene.add(pSystem);
-                camera.position.z = 3;
-
-                function animate() {
-                    requestAnimationFrame(animate);
-                    pSystem.rotation.y += 0.003;
-                    pSystem.rotation.x += 0.0015;
-                    renderer.render(scene, camera);
-                }
-                animate();
-            } catch(e) {
-                console.log("ThreeJS Fallback Active.");
-            }
-        }
-
-        window.toggleSideMenu = function() {
-            const drawer = document.getElementById('collapsibleSidebar');
-            const overlay = document.getElementById('sideDrawerOverlay');
-            if (!drawer || !overlay) return;
-            const isHidden = drawer.classList.contains('-translate-x-full');
-            if (isHidden) {
-                drawer.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                drawer.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
-        }
-
-        window.selectMenuTab = function(tabId) {
-            toggleSideMenu();
-            switchTab(tabId);
-        }
-
-        window.switchTab = function(tabId, pushHistory = true) {
-            if (pushHistory) {
-                window.history.pushState({ tab: tabId }, '', window.location.href);
-            }
-
-            ['home', 'nextip', 'nexvid', 'upload', 'profile'].forEach(t => {
-                const sec = document.getElementById(`tab-${t}`);
-                if (sec) sec.classList.toggle('hidden', t !== tabId);
-
-                const nbtn = document.getElementById(`nav-${t}`); if (nbtn) { nbtn.className = (t === tabId) ? "flex flex-col items-center justify-center gap-1 text-brand-parrot transition" : "flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition"; } }); renderFeeds(); if(tabId === 'nextip') { setTimeout(setupReelsAutoPauseScrollObserver, 300); } }  window.toggleThemeMode = function() { document.documentElement.classList.toggle('light'); }  window.startVoiceTyping = function(targetInputId) { activeTargetInputId = targetInputId; const modal = document.getElementById('voiceSearchModal'); const textEl = document.getElementById('voiceRecognizedText'); if (modal) modal.classList.remove('hidden');  const SpeechRecognition = window.SpeechRecognition \vert{}\vert{} window.webkitSpeechRecognition; if (SpeechRecognition) { const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.start();  recognition.onresult = (e) => { const transcript = e.results[0][0].transcript; if (textEl) textEl.innerText = `Typed: "${transcript}"`;
-                    
-                    const input = document.getElementById(activeTargetInputId);
-                    if (input) input.value = transcript;
-
-                    setTimeout(() => {
-                        closeVoiceSearchModal();
-                        executeSearch(activeTargetInputId);
-                    }, 1000);
-                };
-            } else {
-                let phrases = ["Quran Recitation", "Educational Tech", "Moral Cartoons"];
-                let chosen = phrases[Math.floor(Math.random() * phrases.length)];
-                let idx = 0;
-                let timer = setInterval(() => {
-                    if (idx <= chosen.length) {
-                        textEl.innerText = `Typing: "${chosen.slice(0, idx)}"`; idx++; } else { clearInterval(timer); const input = document.getElementById(activeTargetInputId); if (input) input.value = chosen; setTimeout(() => { closeVoiceSearchModal(); executeSearch(activeTargetInputId); }, 800); } }, 100); } }  window.closeVoiceSearchModal = function() { const modal = document.getElementById('voiceSearchModal'); if (modal) modal.classList.add('hidden'); }  window.executeSearch = function(inputId) { const input = document.getElementById(inputId); if (!input) return; renderFeeds(input.value.trim().toLowerCase()); }  window.filterCategory = function(cat) { activeSelectedCategory = cat; document.querySelectorAll('.category-chip').forEach(btn => { if (btn.innerText.includes(cat) \vert{}\vert{} (cat === 'All' && btn.innerText === 'All')) { btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-parrot text-black border border-brand-parrot"; } else { btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot"; } }); renderFeeds(); }  function extractYouTubeId(url) { let regExp = /^.*(youtu.be\/\vert{}v\/\vert{}u\/\w\/\vert{}embed\/\vert{}watch\?v=\vert{}\&v=)([^#\&\?]*).*/; let match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : 'dQw4w9WgXcQ'; }  function cleanEmbedUrl(rawUrl, extraParams = '') { let clean = rawUrl.trim(); if(!clean.includes('youtube.com/embed/') && clean.includes('watch?v=')) { let id = extractYouTubeId(clean); clean = `https://www.youtube.com/embed/${id}`;
-            }
-            let sep = clean.includes('?') ? '&' : '?';
-            return `${clean}${sep}rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`; }  // PROPER HIGH-RES THUMBNAIL GENERATOR function getHighResThumbnail(url) { let id = extractYouTubeId(url); return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-        }
-
-        function renderFeeds(filterQuery = '') {
-            const approved = videoData.filter(v => v.status === 'approved' &&
-                (activeSelectedCategory === 'All' || v.category === activeSelectedCategory) &&
-                (v.title.toLowerCase().includes(filterQuery) || v.creator.toLowerCase().includes(filterQuery)));
-
-            const homeFeed = document.getElementById('youtubeStyleHomeFeed');
-            if (homeFeed) {
-                const longs = approved.filter(v => v.type === 'long');
-                const shorts = approved.filter(v => v.type === 'short');
-
-                let html = '';
-                if (longs.length > 0) {
-                    html += `<div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">
-                        ${longs.map(v => render
+            const mainScroll = document.getElementById('mainScroll

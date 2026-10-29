@@ -120,7 +120,7 @@
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
 
     <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN -->
-    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden pointer-events-none">
+    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden">
         <div id="threejsCanvasContainer" class="absolute inset-0 z-0"></div>
 
         <div class="text-center z-10">
@@ -180,7 +180,6 @@
     <!-- 2. PUBLIC TOP HEADER WITH WINDOW ARROWS -->
     <header id="mainAppHeader" class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-brand-border px-4 py-3 flex items-center justify-between w-full header-transform">
         <div class="flex items-center gap-3">
-            <!-- WINDOW PAGE NAVIGATION ARROWS -->
             <div class="flex items-center gap-1 bg-brand-card border border-brand-border rounded-xl p-1">
                 <button onclick="navigatePageHistory('back')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition" title="Go Back Page">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -305,7 +304,6 @@
                                         <button onclick="rotateActiveVideo()" title="Rotate Screen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                             <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                                         </button>
-                                        <!-- DUAL FUNCTION FULLSCREEN TOGGLE BUTTON -->
                                         <button id="fullscreenToggleBtn" onclick="toggleIframeFullscreen()" title="Toggle Fullscreen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                             <i id="fullscreenIcon" data-lucide="maximize" class="w-4 h-4"></i>
                                         </button>
@@ -331,7 +329,6 @@
                                                 <button onclick="toggleMuteAudio()" class="text-gray-300 hover:text-brand-parrot transition">
                                                     <i id="volumeMuteIcon" data-lucide="volume-2" class="w-4 h-4"></i>
                                                 </button>
-                                                <!-- UPDATED SOUND SECTION (0 TO 200 MAX VOLUME BOOSTER) -->
                                                 <input type="range" id="volumeControlSlider" min="0" max="200" value="100" oninput="setCustomVolume(this.value)" class="w-20 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer" title="Volume Control (Up to 200%)">
                                                 <span id="volumeValueLabel" class="text-[9px] font-mono text-brand-parrot font-bold">100%</span>
                                             </div>
@@ -696,7 +693,7 @@
             const splash = document.getElementById('splashScreen');
             if (splash) {
                 splash.style.opacity = '0';
-                setTimeout(() => { if (splash) splash.style.display = 'none'; }, 700);
+                setTimeout(() => { if (splash) splash.remove(); }, 700);
             }
         }
 
@@ -726,10 +723,9 @@
             init3DIntroParticleCanvas();
             setupAutoHidingHeaderOnScroll();
 
-            // Push initial state for page history navigation
             try { window.history.replaceState({ tab: 'home' }, '', window.location.href); } catch(e){}
 
-            // Automatic removal to prevent freezing
+            // Guaranteed removal timer so logo never freezes
             setTimeout(hideSplashScreenSafely, 800);
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
@@ -750,4 +746,916 @@
         });
 
         function setupAutoHidingHeaderOnScroll() {
-            const mainScroll = document.getElementById('mainScroll
+            const mainScroll = document.getElementById('mainScrollContainer');
+            const header = document.getElementById('mainAppHeader');
+            const mobileSearch = document.getElementById('mobileSearchContainer');
+            if (!mainScroll || !header) return;
+
+            let lastScrollTop = 0;
+            mainScroll.addEventListener('scroll', () => {
+                let st = mainScroll.scrollTop;
+                if (st > lastScrollTop && st > 60) {
+                    header.classList.add('header-hidden');
+                    if(mobileSearch) mobileSearch.classList.add('header-hidden');
+                } else {
+                    header.classList.remove('header-hidden');
+                    if(mobileSearch) mobileSearch.classList.remove('header-hidden');
+                }
+                lastScrollTop = st <= 0 ? 0 : st;
+            });
+        }
+
+        window.grantAllAppPermissions = function() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => console.log("Mic permission denied:", err));
+            }
+            if ("Notification" in window) {
+                Notification.requestPermission().catch(err => console.log("Notification permission error:", err));
+            }
+            localStorage.setItem("nexrise_permissions_asked", "true");
+            localStorage.setItem("nexrise_storage_allowed", "true");
+
+            const pModal = document.getElementById('permissionModal');
+            if (pModal) pModal.classList.add('hidden');
+        };
+
+        async function loadDataFromFirebase() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "nexrise_videos"));
+                if (!querySnapshot.empty) {
+                    const fbData = [];
+                    querySnapshot.forEach((docSnap) => {
+                        fbData.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    videoData = fbData;
+                }
+            } catch (err) {
+                console.log("Using local cache due to network or rules:", err);
+            }
+            renderFeeds();
+        }
+
+        function updateLiveUsersCounter() {
+            const counterEl = document.getElementById('liveUsersCount');
+            if (counterEl) {
+                let count = Math.floor(Math.random() * 3) + 1;
+                counterEl.innerText = count;
+            }
+        }
+
+        function init3DIntroParticleCanvas() {
+            const container = document.getElementById('threejsCanvasContainer');
+            if (!container || typeof THREE === 'undefined') return;
+
+            try {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                container.appendChild(renderer.domElement);
+
+                const count = 300;
+                const positions = new Float32Array(count * 3);
+                for(let i=0; i<count*3; i++) positions[i] = (Math.random() - 0.5) * 10;
+
+                const geo = new THREE.BufferGeometry();
+                geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const mat = new THREE.PointsMaterial({ size: 0.035, color: 0x39FF14 });
+
+                const pSystem = new THREE.Points(geo, mat);
+                scene.add(pSystem);
+                camera.position.z = 3;
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    pSystem.rotation.y += 0.003;
+                    pSystem.rotation.x += 0.0015;
+                    renderer.render(scene, camera);
+                }
+                animate();
+            } catch(e) {
+                console.log("ThreeJS Fallback Active.");
+            }
+        }
+
+        window.toggleSideMenu = function() {
+            const drawer = document.getElementById('collapsibleSidebar');
+            const overlay = document.getElementById('sideDrawerOverlay');
+            if (!drawer || !overlay) return;
+            const isHidden = drawer.classList.contains('-translate-x-full');
+            if (isHidden) {
+                drawer.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        window.selectMenuTab = function(tabId) {
+            toggleSideMenu();
+            switchTab(tabId);
+        }
+
+        window.switchTab = function(tabId, pushHistory = true) {
+            if (pushHistory) {
+                try { window.history.pushState({ tab: tabId }, '', window.location.href); } catch(e){}
+            }
+
+            ['home', 'nextip', 'nexvid', 'upload', 'profile'].forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                if (sec) sec.classList.toggle('hidden', t !== tabId);
+
+                const nbtn = document.getElementById(`nav-${t}`);
+                if (nbtn) {
+                    nbtn.className = (t === tabId) 
+                        ? "flex flex-col items-center justify-center gap-1 text-brand-parrot transition" 
+                        : "flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-gray-300 transition";
+                }
+            });
+            renderFeeds();
+            if(tabId === 'nextip') {
+                setTimeout(setupReelsAutoPauseScrollObserver, 300);
+            }
+        }
+
+        window.toggleThemeMode = function() {
+            document.documentElement.classList.toggle('light');
+        }
+
+        window.startVoiceTyping = function(targetInputId) {
+            activeTargetInputId = targetInputId;
+            const modal = document.getElementById('voiceSearchModal');
+            const textEl = document.getElementById('voiceRecognizedText');
+            if (modal) modal.classList.remove('hidden');
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.start();
+
+                recognition.onresult = (e) => {
+                    const transcript = e.results[0][0].transcript;
+                    if (textEl) textEl.innerText = `Typed: "${transcript}"`;
+                    
+                    const input = document.getElementById(activeTargetInputId);
+                    if (input) input.value = transcript;
+
+                    setTimeout(() => {
+                        closeVoiceSearchModal();
+                        executeSearch(activeTargetInputId);
+                    }, 1000);
+                };
+            } else {
+                let phrases = ["Quran Recitation", "Educational Tech", "Moral Cartoons"];
+                let chosen = phrases[Math.floor(Math.random() * phrases.length)];
+                let idx = 0;
+                let timer = setInterval(() => {
+                    if (idx <= chosen.length) {
+                        textEl.innerText = `Typing: "${chosen.slice(0, idx)}"`;
+                        idx++;
+                    } else {
+                        clearInterval(timer);
+                        const input = document.getElementById(activeTargetInputId);
+                        if (input) input.value = chosen;
+                        setTimeout(() => {
+                            closeVoiceSearchModal();
+                            executeSearch(activeTargetInputId);
+                        }, 800);
+                    }
+                }, 100);
+            }
+        }
+
+        window.closeVoiceSearchModal = function() {
+            const modal = document.getElementById('voiceSearchModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        window.executeSearch = function(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            renderFeeds(input.value.trim().toLowerCase());
+        }
+
+        window.filterCategory = function(cat) {
+            activeSelectedCategory = cat;
+            document.querySelectorAll('.category-chip').forEach(btn => {
+                if (btn.innerText.includes(cat) || (cat === 'All' && btn.innerText === 'All')) {
+                    btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-parrot text-black border border-brand-parrot";
+                } else {
+                    btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot";
+                }
+            });
+            renderFeeds();
+        }
+
+        function extractYouTubeId(url) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : 'dQw4w9WgXcQ';
+        }
+
+        function cleanEmbedUrl(rawUrl, extraParams = '') {
+            let clean = rawUrl.trim();
+            if(!clean.includes('youtube.com/embed/') && clean.includes('watch?v=')) {
+                let id = extractYouTubeId(clean);
+                clean = `https://www.youtube.com/embed/${id}`;
+            }
+            let sep = clean.includes('?') ? '&' : '?';
+            return `${clean}${sep}rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`;
+        }
+
+        function getHighResThumbnail(url) {
+            let id = extractYouTubeId(url);
+            return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+        }
+
+        function renderFeeds(filterQuery = '') {
+            const approved = videoData.filter(v => v.status === 'approved' &&
+                (activeSelectedCategory === 'All' || v.category === activeSelectedCategory) &&
+                (v.title.toLowerCase().includes(filterQuery) || v.creator.toLowerCase().includes(filterQuery)));
+
+            const homeFeed = document.getElementById('youtubeStyleHomeFeed');
+            if (homeFeed) {
+                const longs = approved.filter(v => v.type === 'long');
+                const shorts = approved.filter(v => v.type === 'short');
+
+                let html = '';
+                if (longs.length > 0) {
+                    html += `<div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">
+                        ${longs.map(v => renderCardHtml(v)).join('')}
+                    </div>`;
+                }
+
+                if (shorts.length > 0) {
+                    html += `
+                        <div class="bg-brand-card p-4 rounded-2xl border border-brand-border space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-black uppercase text-white tracking-wider flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i> NexTip Reels Shelf
+                                </h3>
+                                <button onclick="switchTab('nextip')" class="text-xs text-brand-parrot font-bold hover:underline">View All</button>
+                            </div>
+                            <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                                ${shorts.map(s => `
+                                    <div onclick="playStreamInTopPlayer('${s.id}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
+                                        <img src="${getHighResThumbnail(s.url)}" alt="${s.title}" class="w-full h-full object-cover" loading="lazy">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
+                                            <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
+                                            <p class="text-[9px] text-brand-parrot mt-1">@${s.creator}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                homeFeed.innerHTML = html || `<p class="text-gray-500 text-center py-8 text-xs">No matching streams found.</p>`;
+            }
+
+            const nexvidFeed = document.getElementById('longVideosContainer');
+            if (nexvidFeed) {
+                const longs = approved.filter(v => v.type === 'long');
+                nexvidFeed.innerHTML = longs.map(v => renderCardHtml(v)).join('');
+            }
+
+            const shortsContainer = document.getElementById('shortsContainer');
+            if (shortsContainer) {
+                const shorts = approved.filter(v => v.type === 'short');
+                shortsContainer.innerHTML = shorts.map(v => `
+                    <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden" data-raw-url="${v.url}">
+                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>
+                        <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
+                            <div>
+                                <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
+                                <p class="text-[10px] text-brand-parrot">@${v.creator}</p>
+                            </div>
+                            <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">
+                                👍 ${v.likes}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            try { lucide.createIcons(); } catch(e){}
+            setupReelsAutoPauseScrollObserver();
+        }
+
+        function setupReelsAutoPauseScrollObserver() {
+            const reelItems = document.querySelectorAll('.reel-item');
+            if (!reelItems.length) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const iframe = entry.target.querySelector('.reel-iframe');
+                    if (!iframe) return;
+
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                        if (!iframe.src || iframe.src === 'about:blank') {
+                            iframe.src = iframe.getAttribute('data-src');
+                        }
+                    } else {
+                        if (iframe.src && iframe.src !== 'about:blank') {
+                            iframe.src = 'about:blank';
+                        }
+                    }
+                });
+            }, {
+                root: document.getElementById('shortsContainer'),
+                threshold: 0.6
+            });
+
+            reelItems.forEach(item => observer.observe(item));
+        }
+
+        window.startShortcutPreview = function(cardEl, rawUrl) {
+            const iframe = cardEl.querySelector('.preview-iframe');
+            const thumb = cardEl.querySelector('.card-thumbnail');
+            if (iframe && thumb) {
+                iframe.src = cleanEmbedUrl(rawUrl, '&autoplay=1&mute=1&controls=0&loop=1');
+                iframe.classList.remove('hidden');
+                thumb.classList.add('opacity-0');
+            }
+        };
+
+        window.stopShortcutPreview = function(cardEl) {
+            const iframe = cardEl.querySelector('.preview-iframe');
+            const thumb = cardEl.querySelector('.card-thumbnail');
+            if (iframe && thumb) {
+                iframe.src = 'about:blank';
+                iframe.classList.add('hidden');
+                thumb.classList.remove('opacity-0');
+            }
+        };
+
+        window.handleTouchStartPreview = function(cardEl, rawUrl) {
+            previewTouchTimer = setTimeout(() => {
+                startShortcutPreview(cardEl, rawUrl);
+            }, 300);
+        };
+
+        window.handleTouchEndPreview = function(cardEl) {
+            if (previewTouchTimer) clearTimeout(previewTouchTimer);
+            stopShortcutPreview(cardEl);
+        };
+
+        function renderCardHtml(v) {
+            const thumbUrl = getHighResThumbnail(v.url);
+            const duration = v.duration || '04:15';
+
+            return `
+                <div class="feed-video-card bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
+                    <div class="aspect-video-container bg-black relative cursor-pointer" 
+                         onmouseenter="startShortcutPreview(this, '${v.url}')" 
+                         onmouseleave="stopShortcutPreview(this)"
+                         ontouchstart="handleTouchStartPreview(this, '${v.url}')"
+                         ontouchend="handleTouchEndPreview(this)"
+                         onclick="playStreamInTopPlayer('${v.id}')">
+                        
+                        <img src="${thumbUrl}" alt="${v.title}" class="card-thumbnail absolute inset-0 w-full h-full object-cover transition duration-300" loading="lazy">
+                        
+                        <iframe class="preview-iframe absolute inset-0 w-full h-full hidden pointer-events-none" frameborder="0"></iframe>
+
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 flex items-center justify-center transition">
+                            <div class="w-10 h-10 rounded-full bg-black/60 text-white flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition border border-white/20">
+                                <i data-lucide="play" class="w-5 h-5 fill-white ml-0.5"></i>
+                            </div>
+                        </div>
+
+                        <div class="absolute bottom-2 right-2 bg-black/80 text-brand-parrot font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-brand-parrot/30 shadow-md">
+                            ${duration}
+                        </div>
+                    </div>
+
+                    <div class="p-4 space-y-2">
+                        <span class="text-[9px] font-black uppercase tracking-wider text-brand-parrot bg-brand-green/10 px-2 py-0.5 rounded-md">
+                            ${v.category}
+                        </span>
+                        <h3 class="font-bold text-sm text-white line-clamp-2 cursor-pointer hover:text-brand-parrot" onclick="playStreamInTopPlayer('${v.id}')">${v.title}</h3>
+                        <div class="flex items-center justify-between pt-2 text-xs text-gray-400 border-t border-white/5">
+                            <span class="font-medium text-gray-300">${v.creator}</span>
+                            <div class="flex items-center gap-3">
+                                <button onclick="toggleLike('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
+                                    👍 ${v.likes}
+                                </button>
+                                <button onclick="openCommentsModal('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
+                                    💬 ${v.comments ? v.comments.length : 0}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.playStreamInTopPlayer = function(id) {
+            const target = videoData.find(v => v.id === id);
+            if(!target) return;
+
+            const playerBox = document.getElementById('stickyVideoPlayerBox');
+            const titleEl = document.getElementById('playerVideoTitle');
+            const creatorEl = document.getElementById('playerVideoCreator');
+            const recContainer = document.getElementById('playerRecommendationList');
+
+            const videoId = extractYouTubeId(target.url);
+
+            if (playerBox) {
+                if (titleEl) titleEl.innerText = target.title;
+                if (creatorEl) creatorEl.innerText = `@${target.creator}`;
+
+                if(recContainer) {
+                    const recs = videoData.filter(v => v.id !== id && v.status === 'approved');
+                    recContainer.innerHTML = recs.map(v => `
+                        <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2 p-2 bg-black/50 hover:bg-black/90 rounded-xl border border-white/5 hover:border-brand-parrot/50 transition cursor-pointer">
+                            <div class="w-24 h-14 bg-black rounded-lg overflow-hidden shrink-0 relative">
+                                <img src="${getHighResThumbnail(v.url)}" class="w-full h-full object-cover" loading="lazy">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
+                                <p class="text-[10px] text-brand-parrot mt-0.5">@${v.creator}</p>
+                            </div>
+                        </div>
+                    `).join('') || `<p class="text-xs text-gray-500">No other recommendations.</p>`;
+                }
+
+                playerBox.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+                    ytPlayer.loadVideoById(videoId);
+                } else {
+                    ytPlayer = new YT.Player('ytPlayerTarget', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: videoId,
+                        playerVars: {
+                            'autoplay': 1,
+                            'controls': 0,
+                            'modestbranding': 1,
+                            'rel': 0,
+                            'playsinline': 1
+                        },
+                        events: {
+                            'onReady': onCustomPlayerReady,
+                            'onStateChange': onCustomPlayerStateChange
+                        }
+                    });
+                }
+            }
+        }
+
+        function onCustomPlayerReady(event) {
+            event.target.playVideo();
+            isCustomPlaying = true;
+            updatePlayPauseUI(true);
+            startScrubberTimer();
+        }
+
+        function onCustomPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isCustomPlaying = true;
+                updatePlayPauseUI(true);
+                startScrubberTimer();
+            } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                isCustomPlaying = false;
+                updatePlayPauseUI(false);
+                stopScrubberTimer();
+            }
+        }
+
+        window.toggleCustomPlayerPlayPause = function() {
+            if (!ytPlayer) return;
+            if (isCustomPlaying) {
+                ytPlayer.pauseVideo();
+            } else {
+                ytPlayer.playVideo();
+            }
+        }
+
+        function updatePlayPauseUI(playing) {
+            const centerIcon = document.getElementById('centerPlayPauseIcon');
+            const bottomIcon = document.getElementById('bottomPlayIcon');
+            if (centerIcon) centerIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
+            if (bottomIcon) bottomIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
+            try { lucide.createIcons(); } catch(e){}
+        }
+
+        function startScrubberTimer() {
+            stopScrubberTimer();
+            scrubberInterval = setInterval(() => {
+                if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
+                    const current = ytPlayer.getCurrentTime();
+                    const duration = ytPlayer.getDuration();
+                    const scrubber = document.getElementById('customVideoScrubber');
+                    const currentTxt = document.getElementById('currentTimeText');
+                    const durTxt = document.getElementById('durationTimeText');
+
+                    if (duration > 0 && scrubber) {
+                        scrubber.value = (current / duration) * 100;
+                    }
+                    if (currentTxt) currentTxt.innerText = formatTime(current);
+                    if (durTxt) durTxt.innerText = formatTime(duration);
+                }
+            }, 500);
+        }
+
+        function stopScrubberTimer() {
+            if (scrubberInterval) clearInterval(scrubberInterval);
+        }
+
+        function formatTime(seconds) {
+            let s = Math.floor(seconds || 0);
+            let m = Math.floor(s / 60);
+            s = s % 60;
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        window.seekCustomVideo = function(val) {
+            if (ytPlayer && typeof ytPlayer.getDuration === 'function') {
+                const duration = ytPlayer.getDuration();
+                const targetTime = (val / 100) * duration;
+                ytPlayer.seekTo(targetTime, true);
+            }
+        }
+
+        window.setCustomVolume = function(val) {
+            const label = document.getElementById('volumeValueLabel');
+            if (label) label.innerText = `${val}%`;
+
+            if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
+                if (val <= 100) {
+                    ytPlayer.setVolume(val);
+                } else {
+                    ytPlayer.setVolume(100);
+                }
+
+                const icon = document.getElementById('volumeMuteIcon');
+                if (icon) {
+                    icon.setAttribute('data-lucide', val == 0 ? 'volume-x' : 'volume-2');
+                    try { lucide.createIcons(); } catch(e){}
+                }
+            }
+        }
+
+        window.toggleMuteAudio = function() {
+            if (!ytPlayer) return;
+            const slider = document.getElementById('volumeControlSlider');
+            if (ytPlayer.isMuted()) {
+                ytPlayer.unMute();
+                if(slider) slider.value = 100;
+                setCustomVolume(100);
+            } else {
+                ytPlayer.mute();
+                if(slider) slider.value = 0;
+                setCustomVolume(0);
+            }
+        }
+
+        window.showPlayerControls = function() {
+            const overlay = document.getElementById('customPlayerControlsOverlay');
+            if (overlay) {
+                overlay.style.opacity = '1';
+                if (hoverHideTimeout) clearTimeout(hoverHideTimeout);
+                hoverHideTimeout = setTimeout(() => {
+                    if (isCustomPlaying) overlay.style.opacity = '0';
+                }, 3000);
+            }
+        }
+
+        window.triggerControlsTouchToggle = function() {
+            const overlay = document.getElementById('customPlayerControlsOverlay');
+            if (overlay) {
+                if (overlay.style.opacity === '1') {
+                    overlay.style.opacity = '0';
+                } else {
+                    showPlayerControls();
+                }
+            }
+        }
+
+        window.toggleBackgroundAudioMode = function() {
+            const bgBar = document.getElementById('backgroundPlaybackBar');
+            if(bgBar) {
+                bgBar.classList.remove('hidden');
+                alert('Background Audio playback activated!');
+            }
+        }
+
+        window.stopBackgroundAudioMode = function() {
+            const bgBar = document.getElementById('backgroundPlaybackBar');
+            if(bgBar) bgBar.classList.add('hidden');
+        }
+
+        window.closeActivePlayer = function() {
+            const playerBox = document.getElementById('stickyVideoPlayerBox');
+            if (playerBox) {
+                if(ytPlayer && typeof ytPlayer.stopVideo === 'function') ytPlayer.stopVideo();
+                playerBox.classList.add('hidden');
+                stopBackgroundAudioMode();
+                stopScrubberTimer();
+            }
+        }
+
+        window.toggleIframeFullscreen = function() {
+            const container = document.getElementById('playerHoverContainer');
+            const icon = document.getElementById('fullscreenIcon');
+
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                }
+                if(icon) icon.setAttribute('data-lucide', 'minimize');
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+                if(icon) icon.setAttribute('data-lucide', 'maximize');
+            }
+            try { lucide.createIcons(); } catch(e){}
+        };
+
+        window.rotateActiveVideo = function() {
+            const target = document.getElementById('playerHoverContainer');
+            if (target) {
+                target.classList.toggle('video-rotate-90');
+            }
+        }
+
+        window.adjustVideoBrightness = function(val) {
+            const target = document.getElementById('ytPlayerTarget');
+            if (target) {
+                target.style.filter = `brightness(${val}%)`;
+            }
+        }
+
+        window.toggleLike = async function(id) {
+            const item = videoData.find(v => v.id === id);
+            if (item) {
+                item.likes += 1;
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderFeeds();
+            }
+        }
+
+        window.triggerAdminSecretPrompt = function() {
+            document.getElementById('adminAuthModal').classList.remove('hidden');
+        }
+
+        window.closeAdminAuthModal = function() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+        }
+
+        window.verifyAdminPinLogin = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmailInput').value;
+            const pin = document.getElementById('adminPinInput').value;
+
+            if (email === OFFICIAL_EMAIL && pin === SECURITY_PIN) {
+                closeAdminAuthModal();
+                document.getElementById('unlockedAdminDashboard').classList.remove('hidden');
+                switchTab('profile');
+                renderAdminVideoManager();
+            } else {
+                alert('Invalid Official Admin Email or Security PIN!');
+            }
+        }
+
+        window.lockAdminDashboard = function() {
+            document.getElementById('unlockedAdminDashboard').classList.add('hidden');
+        }
+
+        window.handleBulkMultipleImport = async function() {
+            const textarea = document.getElementById('bulkLinksTextarea');
+            const defaultCategory = document.getElementById('bulkDefaultCategory').value;
+            const defaultCreatorInput = document.getElementById('bulkDefaultCreator').value.trim();
+            const defaultCreator = defaultCreatorInput || "Islamic Scholar";
+
+            if (!textarea || !textarea.value.trim()) {
+                alert('Khadam! Pehle links ya list paste karein.');
+                return;
+            }
+
+            const rawLines = textarea.value.trim().split('\n');
+            let addedCount = 0;
+
+            for (let i = 0; i < rawLines.length; i++) {
+                let line = rawLines[i].trim();
+                if (!line) continue;
+
+                let title = "";
+                let creator = defaultCreator;
+                let category = defaultCategory;
+                let rawUrl = "";
+
+                if (line.includes('|')) {
+                    let parts = line.split('|').map(p => p.trim());
+                    if (parts.length >= 4) {
+                        title = parts[0];
+                        creator = parts[1];
+                        category = parts[2];
+                        rawUrl = parts[3];
+                    } else if (parts.length === 2) {
+                        title = parts[0];
+                        rawUrl = parts[1];
+                    } else {
+                        rawUrl = parts[parts.length - 1];
+                    }
+                } else {
+                    rawUrl = line;
+                }
+
+                if (!rawUrl.startsWith('http')) continue;
+
+                let videoId = extractYouTubeId(rawUrl);
+                let cleanUrl = `https://www.youtube.com/embed/${videoId}`;
+                if (!title) title = `${creator} Lecture Stream #${videoData.length + 1}`;
+
+                let newItem = {
+                    type: "long",
+                    category: category,
+                    url: cleanUrl,
+                    title: title,
+                    creator: creator,
+                    duration: "05:00",
+                    likes: Math.floor(Math.random() * 100) + 20,
+                    comments: ["Bulk import via Admin Studio."],
+                    status: "approved"
+                };
+
+                if (!videoData.some(v => v.url.includes(videoId))) {
+                    try {
+                        const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
+                        newItem.id = docRef.id;
+                        videoData.unshift(newItem);
+                        addedCount++;
+                    } catch(err) {
+                        console.log("Firebase bulk save note:", err);
+                        newItem.id = "local_" + Date.now() + "_" + i;
+                        videoData.unshift(newItem);
+                        addedCount++;
+                    }
+                }
+            }
+
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+            renderAdminVideoManager();
+            renderFeeds();
+            textarea.value = '';
+            alert(`Zabardast! Total ${addedCount} videos ek sath kamyabi se aapki app aur Firebase mein add ho chuki hain!`);
+        }
+
+        window.renderAdminVideoManager = function() {
+            const container = document.getElementById('adminVideoManagerList');
+            if (!container) return;
+
+            const searchInput = document.getElementById('adminVideoSearchInput');
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+            const filtered = videoData.filter(v => 
+                v.title.toLowerCase().includes(query) || 
+                v.creator.toLowerCase().includes(query)
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center py-3 text-xs">No matching videos found.</p>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(v => `
+                <div class="flex items-center justify-between p-2.5 bg-black/60 rounded-xl border border-white/10 hover:border-brand-parrot/40 transition">
+                    <div class="truncate max-w-[200px] sm:max-w-[320px]">
+                        <p class="font-bold text-white truncate text-xs">${v.title}</p>
+                        <p class="text-[10px] text-gray-400">By ${v.creator} • ${v.category}</p>
+                    </div>
+                    <button onclick="deleteVideoItem('${v.id}')" class="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold text-[10px] rounded-lg transition shrink-0">
+                        Delete
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.deleteVideoItem = async function(id) {
+            if (confirm('Delete this stream from Firebase?')) {
+                try {
+                    await deleteDoc(doc(db, "nexrise_videos", id));
+                } catch(e) {
+                    console.log("Firebase delete note:", e);
+                }
+                videoData = videoData.filter(v => v.id !== id);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderAdminVideoManager();
+                renderFeeds();
+            }
+        }
+
+        window.handleDirectAdminPublish = async function(e) {
+            e.preventDefault();
+            const title = document.getElementById('adminPubTitle').value;
+            const creator = document.getElementById('adminPubCreator').value;
+            const url = document.getElementById('adminPubUrl').value;
+            const category = document.getElementById('adminPubCategory').value;
+            const type = document.getElementById('adminPubType').value;
+
+            let videoId = extractYouTubeId(url);
+            let cleanUrl = `https://www.youtube.com/embed/${videoId}`;
+
+            const newItem = {
+                type, category,
+                url: cleanUrl, title, creator,
+                duration: "04:30",
+                likes: 0, comments: [], status: "approved"
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
+                newItem.id = docRef.id;
+                videoData.unshift(newItem);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderAdminVideoManager();
+                renderFeeds();
+                e.target.reset();
+                alert('Stream Published & Saved to Firebase!');
+            } catch(err) {
+                alert('Error publishing to Firebase: ' + err.message);
+            }
+        }
+
+        window.handleFormSubmit = async function(e) {
+            e.preventDefault();
+            const type = document.getElementById('videoType').value;
+            const category = document.getElementById('videoCategory').value;
+            const url = document.getElementById('videoUrl').value;
+            const title = document.getElementById('videoTitle').value;
+            const creator = document.getElementById('creatorName').value;
+
+            let videoId = extractYouTubeId(url);
+            let cleanUrl = `https://www.youtube.com/embed/${videoId}`;
+
+            const newItem = {
+                type, category, url: cleanUrl, title, creator,
+                duration: "04:00",
+                likes: 0, comments: [], status: "approved"
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
+                newItem.id = docRef.id;
+                videoData.unshift(newItem);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderFeeds();
+                alert('Submitted & Saved to Firebase Successfully!');
+                e.target.reset();
+            } catch(err) {
+                alert('Error submitting to Firebase: ' + err.message);
+            }
+        }
+
+        window.openCommentsModal = function(id) {
+            activeCommentVideoId = id;
+            document.getElementById('commentsModal').classList.remove('hidden');
+            renderComments();
+        }
+
+        window.closeCommentsModal = function() {
+            document.getElementById('commentsModal').classList.add('hidden');
+        }
+
+        function renderComments() {
+            const container = document.getElementById('commentsList');
+            const item = videoData.find(v => v.id === activeCommentVideoId);
+            if (!item || !item.comments || item.comments.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center py-4">No comments yet.</p>`;
+                return;
+            }
+            container.innerHTML = item.comments.map(c => `
+                <div class="bg-black/50 p-2.5 rounded-xl border border-white/5">
+                    <p class="text-gray-200">${c}</p>
+                </div>
+            `).join('');
+        }
+
+        window.handleAddComment = async function(e) {
+            e.preventDefault();
+            const input = document.getElementById('commentInput');
+            const item = videoData.find(v => v.id === activeCommentVideoId);
+            if (item && input.value.trim()) {
+                if(!item.comments) item.comments = [];
+                item.comments.push(input.value.trim());
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                input.value = '';
+                renderComments();
+                renderFeeds();
+            }
+        }
+    </script>
+</body>
+</html>

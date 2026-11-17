@@ -115,6 +115,14 @@
         cursor: pointer;
         box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
       }
+
+      /* VERTICAL BRIGHTNESS SLIDER STYLING */
+      .vertical-slider-container {
+        writing-mode: vertical-lr;
+        direction: rtl;
+        width: 24px;
+        height: 90px;
+      }
     </style>
 </head>
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
@@ -177,14 +185,14 @@
         </div>
     </div>
 
-    <!-- 2. PUBLIC TOP HEADER WITH WINDOW ARROWS -->
+    <!-- 2. PUBLIC TOP HEADER WITH WORKING HISTORY ARROWS -->
     <header id="mainAppHeader" class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-brand-border px-4 py-3 flex items-center justify-between w-full header-transform">
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-1 bg-brand-card border border-brand-border rounded-xl p-1">
-                <button onclick="navigatePageHistory('back')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition" title="Go Back Page">
+                <button onclick="navigatePageHistory('back')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition cursor-pointer" title="Go Back Page">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 </button>
-                <button onclick="navigatePageHistory('forward')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition" title="Go Forward Page">
+                <button onclick="navigatePageHistory('forward')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition cursor-pointer" title="Go Forward Page">
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -289,7 +297,7 @@
     <div class="flex-1 flex w-full max-w-7xl mx-auto">
         <main id="mainScrollContainer" class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
 
-            <!-- STICKY MEDIA PLAYER BOX -->
+            <!-- STICKY MEDIA PLAYER BOX (PERSONALIZED PLAYER CONTROLS & VERTICAL BRIGHTNESS SLIDER) -->
             <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     <div class="desktop:col-span-2 space-y-3">
@@ -333,9 +341,10 @@
                                                 <span id="volumeValueLabel" class="text-[9px] font-mono text-brand-parrot font-bold">100%</span>
                                             </div>
                                         </div>
-                                        <div class="flex items-center gap-1.5 text-xs">
+                                        <!-- VERTICAL BRIGHTNESS SLIDER CONTROL -->
+                                        <div class="flex items-center gap-1.5 text-xs bg-black/60 p-1.5 rounded-lg border border-white/10" title="Vertical Brightness Adjustment">
                                             <span class="text-[10px] text-gray-300">☀️</span>
-                                            <input type="range" id="brightnessControlSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="w-16 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer">
+                                            <input type="range" id="brightnessControlSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="vertical-slider-container accent-brand-parrot cursor-pointer">
                                         </div>
                                     </div>
                                 </div>
@@ -388,7 +397,7 @@
                 <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
             </section>
 
-            <!-- TAB 2: NEXTIP -->
+            <!-- TAB 2: NEXTIP (WITH WORKING LIKE & NATIVE SHARE) -->
             <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
                 <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black relative"></div>
             </section>
@@ -675,6 +684,7 @@
         let isCustomPlaying = false;
         let scrubberInterval = null;
         let hoverHideTimeout = null;
+        let previewTouchTimer = null;
 
         const defaultData = [
             {
@@ -702,13 +712,10 @@
             }
         });
 
+        // WORKING HISTORY NAVIGATION ARROWS LOGIC
         window.navigatePageHistory = function(direction) {
             if (direction === 'back') {
-                if (window.history.length > 1) {
-                    window.history.back();
-                } else {
-                    switchTab('home');
-                }
+                window.history.back();
             } else if (direction === 'forward') {
                 window.history.forward();
             }
@@ -968,6 +975,25 @@
             return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
         }
 
+        // SHARE REEL FUNCTIONALITY WITH NATIVE APP SHARING
+        window.shareReel = async function(title, url) {
+            const shareData = {
+                title: title,
+                text: `Check out this clean stream on NexRise: ${title}`,
+                url: window.location.href
+            };
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert('Link copied to clipboard!');
+                }
+            } catch (err) {
+                console.log('Error sharing:', err);
+            }
+        };
+
         function renderFeeds(filterQuery = '') {
             const approved = videoData.filter(v => v.status === 'approved' &&
                 (activeSelectedCategory === 'All' || v.category === activeSelectedCategory) &&
@@ -1029,9 +1055,14 @@
                                 <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
                                 <p class="text-[10px] text-brand-parrot">@${v.creator}</p>
                             </div>
-                            <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">
-                                👍 ${v.likes}
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">
+                                    👍 ${v.likes}
+                                </button>
+                                <button onclick="shareReel('${v.title}', '${v.url}')" class="flex items-center gap-1 px-3 py-1.5 bg-white/20 text-white font-extrabold text-xs rounded-lg hover:bg-white/30 transition">
+                                    <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `).join('');
@@ -1068,44 +1099,15 @@
             reelItems.forEach(item => observer.observe(item));
         }
 
-        window.startShortcutPreview = function(cardEl, rawUrl) {
-            // Mobile par hover preview avoid karne ke liye direct return kar do taake bug na aye
-            if (window.innerWidth <= 768) return;
-            const iframe = cardEl.querySelector('.preview-iframe');
-            const thumb = cardEl.querySelector('.card-thumbnail');
-            if (iframe && thumb) {
-                iframe.src = cleanEmbedUrl(rawUrl, '&autoplay=1&mute=1&controls=0&loop=1');
-                iframe.classList.remove('hidden');
-                thumb.classList.add('opacity-0');
-            }
-        };
-
-        window.stopShortcutPreview = function(cardEl) {
-            if (window.innerWidth <= 768) return;
-            const iframe = cardEl.querySelector('.preview-iframe');
-            const thumb = cardEl.querySelector('.card-thumbnail');
-            if (iframe && thumb) {
-                iframe.src = 'about:blank';
-                iframe.classList.add('hidden');
-                thumb.classList.remove('opacity-0');
-            }
-        };
-
-        function renderCardHtml(v) {
+        window.renderCardHtml = function(v) {
             const thumbUrl = getHighResThumbnail(v.url);
             const duration = v.duration || '04:15';
 
             return `
                 <div class="feed-video-card bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
-                    <div class="aspect-video-container bg-black relative cursor-pointer" 
-                         onmouseenter="startShortcutPreview(this, '${v.url}')" 
-                         onmouseleave="stopShortcutPreview(this)"
-                         onclick="playStreamInTopPlayer('${v.id}')">
-                        
+                    <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.id}')">
                         <img src="${thumbUrl}" alt="${v.title}" class="card-thumbnail absolute inset-0 w-full h-full object-cover transition duration-300" loading="lazy">
                         
-                        <iframe class="preview-iframe absolute inset-0 w-full h-full hidden pointer-events-none" frameborder="0"></iframe>
-
                         <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 flex items-center justify-center transition">
                             <div class="w-10 h-10 rounded-full bg-black/60 text-white flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition border border-white/20">
                                 <i data-lucide="play" class="w-5 h-5 fill-white ml-0.5"></i>
@@ -1138,6 +1140,7 @@
             `;
         }
 
+        // FIXED MOBILE PLAYBACK & NATIVE PERSONAL PLAYER LOGIC
         window.playStreamInTopPlayer = function(id) {
             const target = videoData.find(v => v.id === id);
             if(!target) return;
@@ -1171,26 +1174,33 @@
                 playerBox.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-                    ytPlayer.loadVideoById(videoId);
-                } else {
-                    ytPlayer = new YT.Player('ytPlayerTarget', {
-                        height: '100%',
-                        width: '100%',
-                        videoId: videoId,
-                        playerVars: {
-                            'autoplay': 1,
-                            'controls': 0,
-                            'modestbranding': 1,
-                            'rel': 0,
-                            'playsinline': 1
-                        },
-                        events: {
-                            'onReady': onCustomPlayerReady,
-                            'onStateChange': onCustomPlayerStateChange
-                        }
-                    });
+                // Reset and recreate player container target to bypass mobile click restriction
+                const targetContainer = document.getElementById('ytPlayerTarget');
+                if (targetContainer) {
+                    targetContainer.innerHTML = '';
                 }
+
+                if (ytPlayer && typeof ytPlayer.destroy === 'function') {
+                    try { ytPlayer.destroy(); } catch(e){}
+                }
+
+                ytPlayer = new YT.Player('ytPlayerTarget', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: videoId,
+                    playerVars: {
+                        'autoplay': 1,
+                        'controls': 0,
+                        'modestbranding': 1,
+                        'rel': 0,
+                        'playsinline': 1,
+                        'enablejsapi': 1
+                    },
+                    events: {
+                        'onReady': onCustomPlayerReady,
+                        'onStateChange': onCustomPlayerStateChange
+                    }
+                });
             }
         }
 
@@ -1616,7 +1626,7 @@
 
         function renderComments() {
             const container = document.getElementById('commentsList');
-            const item = videoData.path ? null : videoData.find(v => v.id === activeCommentVideoId);
+            const item = videoData.find(v => v.id === activeCommentVideoId);
             if (!item || !item.comments || item.comments.length === 0) {
                 container.innerHTML = `<p class="text-gray-500 text-center py-4">No comments yet.</p>`;
                 return;

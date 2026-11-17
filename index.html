@@ -116,12 +116,12 @@
         box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
       }
 
-      /* VERTICAL BRIGHTNESS SLIDER STYLING */
+      /* VERTICAL BRIGHTNESS SLIDER STYLING (VIDMATE STYLE) */
       .vertical-slider-container {
         writing-mode: vertical-lr;
         direction: rtl;
         width: 24px;
-        height: 90px;
+        height: 80px;
       }
     </style>
 </head>
@@ -341,7 +341,7 @@
                                                 <span id="volumeValueLabel" class="text-[9px] font-mono text-brand-parrot font-bold">100%</span>
                                             </div>
                                         </div>
-                                        <!-- VERTICAL BRIGHTNESS SLIDER CONTROL -->
+                                        <!-- VIDMATE STYLE VERTICAL BRIGHTNESS SLIDER CONTROL -->
                                         <div class="flex items-center gap-1.5 text-xs bg-black/60 p-1.5 rounded-lg border border-white/10" title="Vertical Brightness Adjustment">
                                             <span class="text-[10px] text-gray-300">☀️</span>
                                             <input type="range" id="brightnessControlSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="vertical-slider-container accent-brand-parrot cursor-pointer">
@@ -653,7 +653,7 @@
         </div>
     </div>
 
-    <!-- APP CORE ENGINE & FIREBASE JS -->
+    <!-- APP CORE ENGINE & FIREBASE (WEBVIEW SAFE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
@@ -668,8 +668,13 @@
             measurementId: "G-QB5J1TYJDR"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        let db = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch(e) {
+            console.log("Firebase offline mode active in WebView:", e);
+        }
 
         const APP_VERSION = "2.8.6";
         const LOCAL_STORAGE_KEY = "NEXRISE_V285_DATA";
@@ -684,7 +689,6 @@
         let isCustomPlaying = false;
         let scrubberInterval = null;
         let hoverHideTimeout = null;
-        let previewTouchTimer = null;
 
         const defaultData = [
             {
@@ -782,6 +786,7 @@
         };
 
         async function loadDataFromFirebase() {
+            if (!db) return;
             try {
                 const querySnapshot = await getDocs(collection(db, "nexrise_videos"));
                 if (!querySnapshot.empty) {
@@ -817,7 +822,7 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 container.appendChild(renderer.domElement);
 
-                const count = 300;
+                const count = 150;
                 const positions = new Float32Array(count * 3);
                 for(let i=0; i<count*3; i++) positions[i] = (Math.random() - 0.5) * 10;
 
@@ -1140,7 +1145,7 @@
             `;
         }
 
-        // FIXED MOBILE PLAYBACK & NATIVE PERSONAL PLAYER LOGIC
+        // 100% FIXED MOBILE PLAYBACK & NATIVE PERSONAL PLAYER LOGIC (NO THUMBNAIL FREEZE)
         window.playStreamInTopPlayer = function(id) {
             const target = videoData.find(v => v.id === id);
             if(!target) return;
@@ -1174,7 +1179,7 @@
                 playerBox.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                // Reset and recreate player container target to bypass mobile click restriction
+                // FRESH CONTAINER INITIALIZATION FOR MOBILE (BYPASSES THUMBNAIL FREEZE)
                 const targetContainer = document.getElementById('ytPlayerTarget');
                 if (targetContainer) {
                     targetContainer.innerHTML = '';
@@ -1184,23 +1189,28 @@
                     try { ytPlayer.destroy(); } catch(e){}
                 }
 
-                ytPlayer = new YT.Player('ytPlayerTarget', {
-                    height: '100%',
-                    width: '100%',
-                    videoId: videoId,
-                    playerVars: {
-                        'autoplay': 1,
-                        'controls': 0,
-                        'modestbranding': 1,
-                        'rel': 0,
-                        'playsinline': 1,
-                        'enablejsapi': 1
-                    },
-                    events: {
-                        'onReady': onCustomPlayerReady,
-                        'onStateChange': onCustomPlayerStateChange
-                    }
-                });
+                // If YouTube API is ready, load player, else fallback to direct iframe
+                if (typeof YT !== 'undefined' && YT.Player) {
+                    ytPlayer = new YT.Player('ytPlayerTarget', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: videoId,
+                        playerVars: {
+                            'autoplay': 1,
+                            'controls': 0,
+                            'modestbranding': 1,
+                            'rel': 0,
+                            'playsinline': 1,
+                            'enablejsapi': 1
+                        },
+                        events: {
+                            'onReady': onCustomPlayerReady,
+                            'onStateChange': onCustomPlayerStateChange
+                        }
+                    });
+                } else {
+                    targetContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+                }
             }
         }
 
@@ -1488,8 +1498,12 @@
 
                 if (!videoData.some(v => v.url.includes(videoId))) {
                     try {
-                        const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
-                        newItem.id = docRef.id;
+                        if (db) {
+                            const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
+                            newItem.id = docRef.id;
+                        } else {
+                            newItem.id = "local_" + Date.now() + "_" + i;
+                        }
                         videoData.unshift(newItem);
                         addedCount++;
                     } catch(err) {
@@ -1505,7 +1519,7 @@
             renderAdminVideoManager();
             renderFeeds();
             textarea.value = '';
-            alert(`Zabardast! Total ${addedCount} videos ek sath kamyabi se aapki app aur Firebase mein add ho chuki hain!`);
+            alert(`Zabardast! Total ${addedCount} videos ek sath kamyabi se aapki app mein add ho chuki hain!`);
         }
 
         window.renderAdminVideoManager = function() {
@@ -1539,9 +1553,11 @@
         }
 
         window.deleteVideoItem = async function(id) {
-            if (confirm('Delete this stream from Firebase?')) {
+            if (confirm('Delete this stream?')) {
                 try {
-                    await deleteDoc(doc(db, "nexrise_videos", id));
+                    if (db && !id.startsWith('local_')) {
+                        await deleteDoc(doc(db, "nexrise_videos", id));
+                    }
                 } catch(e) {
                     console.log("Firebase delete note:", e);
                 }
@@ -1567,20 +1583,23 @@
                 type, category,
                 url: cleanUrl, title, creator,
                 duration: "04:30",
-                likes: 0, comments: [], status: "approved"
+                likes: 0, comments: [], status: "approved",
+                id: "local_" + Date.now()
             };
 
             try {
-                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
-                newItem.id = docRef.id;
+                if (db) {
+                    const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
+                    newItem.id = docRef.id;
+                }
                 videoData.unshift(newItem);
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 renderAdminVideoManager();
                 renderFeeds();
                 e.target.reset();
-                alert('Stream Published & Saved to Firebase!');
+                alert('Stream Published Successfully!');
             } catch(err) {
-                alert('Error publishing to Firebase: ' + err.message);
+                alert('Error publishing: ' + err.message);
             }
         }
 
@@ -1598,19 +1617,22 @@
             const newItem = {
                 type, category, url: cleanUrl, title, creator,
                 duration: "04:00",
-                likes: 0, comments: [], status: "approved"
+                likes: 0, comments: [], status: "approved",
+                id: "local_" + Date.now()
             };
 
             try {
-                const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
-                newItem.id = docRef.id;
+                if (db) {
+                    const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
+                    newItem.id = docRef.id;
+                }
                 videoData.unshift(newItem);
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 renderFeeds();
-                alert('Submitted & Saved to Firebase Successfully!');
+                alert('Submitted Successfully!');
                 e.target.reset();
             } catch(err) {
-                alert('Error submitting to Firebase: ' + err.message);
+                alert('Error submitting: ' + err.message);
             }
         }
 

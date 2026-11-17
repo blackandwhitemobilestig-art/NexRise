@@ -12,9 +12,6 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Three.js CDN for 3D Particle Intro -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -77,7 +74,7 @@
         height: 0;
         overflow: hidden;
       }
-      .aspect-video-container iframe, .aspect-video-container video, .aspect-video-container #ytPlayerTarget {
+      .aspect-video-container iframe, .aspect-video-container video {
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 100%;
@@ -108,11 +105,9 @@
 </head>
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
 
-    <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN -->
-    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden">
-        <div id="threejsCanvasContainer" class="absolute inset-0 z-0"></div>
-
-        <div class="text-center z-10">
+    <!-- 1. SAFE SPLASH INTRO SCREEN (AUTO DISMISSES GUARANTEED WITHIN 1.5 SECONDS) -->
+    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-500 overflow-hidden">
+        <div class="text-center z-10 pt-6">
             <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
                 Powered by TiG (v2.8.6)
             </span>
@@ -135,7 +130,7 @@
             </div>
         </div>
 
-        <div class="text-center z-10 space-y-2 px-4">
+        <div class="text-center z-10 space-y-2 px-4 pb-6">
             <h1 class="text-4xl font-black tracking-wider flex items-center justify-center">
                 <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
             </h1>
@@ -153,12 +148,7 @@
             </div>
             <div class="space-y-1">
                 <h3 class="text-base font-bold text-white">App Permissions Required</h3>
-                <p class="text-xs text-gray-400">Please allow core features for seamless experience (Asked only once).</p>
-            </div>
-            <div class="space-y-2 text-left text-xs text-gray-300 bg-black/60 p-3 rounded-xl border border-white/10">
-                <div class="flex items-center gap-2"><span>🎙️</span> <span>Microphone (For Voice Search)</span></div>
-                <div class="flex items-center gap-2"><span>🔔</span> <span>Notifications (For Updates)</span></div>
-                <div class="flex items-center gap-2"><span>📁</span> <span>Storage Access (For Cache & Data)</span></div>
+                <p class="text-xs text-gray-400">Please allow core features for seamless experience.</p>
             </div>
             <button onclick="grantAllAppPermissions()" class="w-full py-3 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition shadow-lg">
                 Allow &amp; Continue
@@ -166,14 +156,14 @@
         </div>
     </div>
 
-    <!-- 2. PUBLIC TOP HEADER WITH WORKING HISTORY ARROWS -->
+    <!-- 2. PUBLIC TOP HEADER -->
     <header id="mainAppHeader" class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-brand-border px-4 py-3 flex items-center justify-between w-full header-transform">
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-1 bg-brand-card border border-brand-border rounded-xl p-1">
-                <button onclick="navigatePageHistory('back')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition cursor-pointer" title="Go Back Page">
+                <button onclick="navigatePageHistory('back')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition cursor-pointer" title="Go Back">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 </button>
-                <button onclick="navigatePageHistory('forward')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition cursor-pointer" title="Go Forward Page">
+                <button onclick="navigatePageHistory('forward')" class="p-1.5 text-gray-400 hover:text-brand-parrot hover:bg-black rounded-lg transition cursor-pointer" title="Go Forward">
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -206,7 +196,7 @@
                     <i data-lucide="search" class="w-4 h-4"></i>
                 </span>
                 <input type="text" id="desktopSearchInput" onkeypress="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search clean lectures, cartoons, gaming..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-                <button onclick="startVoiceTyping('desktopSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
+                <button onclick="startVoiceTyping('desktopSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Search">
                     <i data-lucide="mic" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -216,10 +206,10 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <button onclick="manualShuffleFeed()" class="p-2 text-gray-300 hover:text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Refresh Random Order">
+            <button onclick="manualShuffleFeed()" class="p-2 text-gray-300 hover:text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Shuffle Order">
                 <i data-lucide="shuffle" class="w-4 h-4"></i>
             </button>
-            <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
+            <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Theme">
                 <span class="text-lg">🌓</span>
             </button>
         </div>
@@ -231,7 +221,7 @@
                 <i data-lucide="search" class="w-4 h-4"></i>
             </span>
             <input type="text" id="mobileSearchInput" onkeypress="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Voice or text search..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-            <button onclick="startVoiceTyping('mobileSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
+            <button onclick="startVoiceTyping('mobileSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Search">
                 <i data-lucide="mic" class="w-4 h-4"></i>
             </button>
         </div>
@@ -265,9 +255,6 @@
                 <button onclick="selectMenuTab('upload')" id="drawer-upload" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
                     <i data-lucide="plus-square" class="w-4 h-4"></i> Submit Content
                 </button>
-                <button onclick="toggleThemeMode()" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-brand-card transition">
-                    <span class="flex items-center gap-3"><span class="text-base">🌓</span> Light/Dark Theme</span>
-                </button>
             </div>
         </div>
 
@@ -281,16 +268,14 @@
     <div class="flex-1 flex w-full max-w-7xl mx-auto">
         <main id="mainScrollContainer" class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
 
-            <!-- STICKY MEDIA PLAYER BOX (100% ANDROID WEBVIEW + WEB COMPATIBLE) -->
+            <!-- STICKY MEDIA PLAYER BOX -->
             <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     <div class="desktop:col-span-2 space-y-3">
                         <div id="playerHoverContainer" class="aspect-video-container bg-black rounded-xl overflow-hidden relative border border-white/10">
-                            <!-- Direct Android-Safe Video Frame -->
                             <div id="ytPlayerTarget" class="w-full h-full"></div>
 
-                            <!-- TOP FLOATING BAR (NON-BLOCKING SO NATIVE PLAYER TOUCH WORKS 100%) -->
-                            <div class="absolute top-2 left-2 right-2 flex items-center justify-between z-20 pointer-events-none">
+                            <div class="absolute top-2 left-2 right-2 flex items-center justify-between z-25 pointer-events-none">
                                 <button onclick="toggleBackgroundAudioMode()" title="Background Playback" class="pointer-events-auto px-2.5 py-1 rounded-lg bg-brand-parrot/95 text-black font-extrabold text-[11px] shadow-lg flex items-center gap-1 hover:bg-green-400 transition">
                                     <i data-lucide="headphones" class="w-3.5 h-3.5"></i> Background
                                 </button>
@@ -298,14 +283,13 @@
                                     <button onclick="rotateActiveVideo()" title="Rotate Screen" class="w-8 h-8 rounded-full bg-black/75 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                         <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                                     </button>
-                                    <button id="fullscreenToggleBtn" onclick="toggleIframeFullscreen()" title="Toggle Fullscreen" class="w-8 h-8 rounded-full bg-black/75 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
+                                    <button id="fullscreenToggleBtn" onclick="toggleIframeFullscreen()" title="Fullscreen" class="w-8 h-8 rounded-full bg-black/75 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                         <i id="fullscreenIcon" data-lucide="maximize" class="w-4 h-4"></i>
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- VIDMATE STYLE SIDE VERTICAL BRIGHTNESS SLIDER (ALWAYS ACCESSIBLE WITHOUT BLOCKING VIDEO) -->
-                            <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1 bg-black/75 backdrop-blur-sm p-1.5 rounded-xl border border-white/15 shadow-lg" title="Brightness Control">
+                            <div class="absolute right-2 top-1/2 -translate-y-1/2 z-25 flex flex-col items-center gap-1 bg-black/75 backdrop-blur-sm p-1.5 rounded-xl border border-white/15 shadow-lg" title="Brightness Control">
                                 <span class="text-[10px]">☀️</span>
                                 <input type="range" id="brightnessControlSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="vertical-slider-container accent-brand-parrot cursor-pointer">
                             </div>
@@ -357,7 +341,7 @@
                 <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
             </section>
 
-            <!-- TAB 2: NEXTIP (WITH WORKING LIKE & NATIVE SHARE) -->
+            <!-- TAB 2: NEXTIP -->
             <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
                 <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black relative"></div>
             </section>
@@ -413,7 +397,7 @@
                 </div>
             </section>
 
-            <!-- TAB 5: PROFILE & SECRET UNLOCKED STUDIO -->
+            <!-- TAB 5: PROFILE & SECRET ADMIN STUDIO -->
             <section id="tab-profile" class="hidden space-y-6 max-w-3xl mx-auto">
                 <div class="bg-brand-card p-5 rounded-2xl border border-brand-border flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-black border border-brand-parrot flex items-center justify-center text-brand-parrot">
@@ -425,7 +409,6 @@
                     </div>
                 </div>
 
-                <!-- SECRET UNLOCKED ADMIN STUDIO -->
                 <div id="unlockedAdminDashboard" class="hidden space-y-6">
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
@@ -435,7 +418,6 @@
                             <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                         </div>
 
-                        <!-- LIVE STATS -->
                         <div class="grid grid-cols-2 gap-3 text-center">
                             <div class="bg-black/60 p-3 rounded-xl border border-white/10">
                                 <p class="text-[9px] text-gray-400 uppercase font-semibold">Live Active Viewers</p>
@@ -447,85 +429,26 @@
                             </div>
                         </div>
 
-                        <!-- MULTIPLE BULK LINKS IMPORT BOX -->
                         <div class="bg-black/80 p-4 rounded-xl border-2 border-brand-parrot/60 space-y-3 shadow-lg">
                             <h4 class="text-xs font-bold text-brand-parrot flex items-center gap-2">
-                                <i data-lucide="layers" class="w-4 h-4"></i> Bulk Multiple Videos Import (20-50 Links at Once)
+                                <i data-lucide="layers" class="w-4 h-4"></i> Bulk Multiple Videos Import
                             </h4>
-                            <p class="text-[10px] text-gray-300">
-                                Ek waqt mein jitni chahein videos paste karein. Format: <br>
-                                <code class="text-brand-parrot">Title | Creator Name | Category | Embed Link</code> <br>
-                                (Ya har line mein sirf ek Direct Embed Link paste kar dein):
-                            </p>
-
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div>
-                                    <label class="text-[9px] text-gray-400 block mb-0.5">Default Category for Links</label>
-                                    <select id="bulkDefaultCategory" class="w-full bg-black border border-white/20 p-2 rounded-lg text-white">
-                                        <option value="Moral & Islamic">Moral &amp; Islamic</option>
-                                        <option value="Educational">Educational</option>
-                                        <option value="Cartoons">Cartoons &amp; Kids</option>
-                                        <option value="Gaming">Gaming</option>
-                                        <option value="Movies & Series">Movies &amp; Series</option>
-                                        <option value="Songs">Songs</option>
-                                        <option value="Others">Others</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="text-[9px] text-gray-400 block mb-0.5">Default Creator Name</label>
-                                    <input type="text" id="bulkDefaultCreator" placeholder="Scholar / Creator" class="w-full bg-black border border-white/20 p-2 rounded-lg text-white">
-                                </div>
-                            </div>
-
-                            <textarea id="bulkLinksTextarea" rows="5" placeholder="Title 1 | Creator | Category | https://www.youtube.com/embed/XXXXX&#10;https://www.youtube.com/embed/YYYYY" class="w-full bg-black border border-white/20 p-2.5 rounded-xl text-xs text-white placeholder-gray-500 font-mono focus:outline-none focus:border-brand-parrot"></textarea>
-
-                            <button onclick="handleBulkMultipleImport()" class="w-full py-2.5 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition shadow-md flex items-center justify-center gap-2">
-                                <i data-lucide="upload-cloud" class="w-4 h-4"></i> Batch Import All Links Directly to Live Feed
+                            <textarea id="bulkLinksTextarea" rows="4" placeholder="Title | Creator | Category | https://www.youtube.com/embed/XXXXX" class="w-full bg-black border border-white/20 p-2.5 rounded-xl text-xs text-white placeholder-gray-500 font-mono focus:outline-none focus:border-brand-parrot"></textarea>
+                            <button onclick="handleBulkMultipleImport()" class="w-full py-2.5 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition shadow-md">
+                                Batch Import All Links Directly
                             </button>
                         </div>
 
-                        <!-- PUBLISH SINGLE LINK DIRECTLY -->
-                        <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
-                            <h4 class="text-xs font-bold text-gray-200">Publish Single Stream Link</h4>
-                            <form onsubmit="handleDirectAdminPublish(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                                <input type="text" id="adminPubTitle" placeholder="Title" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                <input type="text" id="adminPubCreator" placeholder="Creator / Scholar" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                <input type="url" id="adminPubUrl" placeholder="Embed URL" required class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                <select id="adminPubCategory" class="bg-black/80 border border-white/20 p-2 rounded-lg text-white">
-                                    <option value="Moral & Islamic">Moral &amp; Islamic</option>
-                                    <option value="Cartoons">Cartoons &amp; Kids</option>
-                                    <option value="Educational">Educational</option>
-                                    <option value="Gaming">Gaming</option>
-                                    <option value="Movies & Series">Movies &amp; Series</option>
-                                    <option value="Songs">Songs</option>
-                                    <option value="Others">Others</option>
-                                </select>
-                                <select id="adminPubType" class="bg-black/80 border border-white/20 p-2 rounded-lg text-white sm:col-span-2">
-                                    <option value="long">NexVid Stream</option>
-                                    <option value="short">NexTip Reel</option>
-                                </select>
-                                <button type="submit" class="sm:col-span-2 py-2 bg-brand-parrot text-black font-extrabold rounded-lg hover:bg-green-400">
-                                    Publish Directly To Live Feed
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- DELETE MANAGER WITH SEARCH FILTER -->
                         <div class="bg-black/70 p-4 rounded-xl border border-white/10 space-y-3">
                             <h4 class="text-xs font-bold text-gray-200 flex items-center justify-between">
                                 <span>Manage Published Videos</span>
-                                <span class="text-[10px] text-brand-parrot">Single-Click Delete</span>
                             </h4>
-                            <div class="relative">
-                                <input type="text" id="adminVideoSearchInput" oninput="renderAdminVideoManager()" placeholder="Search video by title or creator to delete..." class="w-full bg-black/80 border border-white/20 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot">
-                            </div>
+                            <input type="text" id="adminVideoSearchInput" oninput="renderAdminVideoManager()" placeholder="Search video to delete..." class="w-full bg-black/80 border border-white/20 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot">
                             <div id="adminVideoManagerList" class="space-y-2 text-xs max-h-64 overflow-y-auto no-scrollbar"></div>
                         </div>
-
                     </div>
                 </div>
             </section>
-
         </main>
     </div>
 
@@ -556,39 +479,20 @@
         <div class="w-24 h-24 rounded-full bg-brand-parrot/20 border-2 border-brand-parrot flex items-center justify-center text-brand-parrot neon-glow">
             <i data-lucide="mic" class="w-10 h-10 animate-bounce"></i>
         </div>
-        <div class="flex items-center justify-center gap-1.5 h-12">
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.1s;"></div>
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.3s;"></div>
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.2s;"></div>
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.4s;"></div>
-            <div class="w-1.5 bg-brand-parrot rounded-full wave-bar" style="animation-delay: 0.15s;"></div>
-        </div>
-        <div class="space-y-2 max-w-sm">
-            <h3 class="text-base font-extrabold text-white">Green AI Voice Typing...</h3>
-            <p id="voiceRecognizedText" class="text-xs text-brand-parrot font-mono min-h-[20px]">Listening to your voice...</p>
-        </div>
-        <button onclick="closeVoiceSearchModal()" class="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-gray-300 font-bold text-xs rounded-xl">Cancel</button>
+        <p id="voiceRecognizedText" class="text-xs text-brand-parrot font-mono">Listening...</p>
+        <button onclick="closeVoiceSearchModal()" class="px-6 py-2.5 bg-white/10 text-gray-300 font-bold text-xs rounded-xl">Cancel</button>
     </div>
 
     <!-- SECRET ADMIN LOGIN MODAL -->
     <div id="adminAuthModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-brand-card border border-brand-parrot max-w-sm w-full p-6 rounded-2xl space-y-4 shadow-2xl">
-            <div class="text-center space-y-1">
-                <h3 class="text-base font-bold text-white">TiG Admin Verification</h3>
-                <p class="text-xs text-gray-400">Enter Email &amp; Security PIN</p>
-            </div>
+            <h3 class="text-base font-bold text-white text-center">TiG Admin Verification</h3>
             <form onsubmit="verifyAdminPinLogin(event)" class="space-y-3">
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Official Email</label>
-                    <input type="email" id="adminEmailInput" required placeholder="admin@tig.official" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-parrot">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">4-Digit Security PIN</label>
-                    <input type="password" id="adminPinInput" maxlength="4" required placeholder="••••" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-parrot text-center text-lg tracking-widest">
-                </div>
+                <input type="email" id="adminEmailInput" required placeholder="admin@tig.official" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white">
+                <input type="password" id="adminPinInput" maxlength="4" required placeholder="••••" class="w-full bg-black/70 border border-white/20 rounded-xl p-2.5 text-xs text-white text-center text-lg tracking-widest">
                 <div class="flex gap-2 pt-2">
                     <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 bg-white/10 text-gray-300 font-bold text-xs rounded-xl">Cancel</button>
-                    <button type="submit" class="w-1/2 py-2.5 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400">Unlock Studio</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">Unlock</button>
                 </div>
             </form>
         </div>
@@ -596,24 +500,20 @@
 
     <!-- COMMENTS MODAL -->
     <div id="commentsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center">
-        <div class="bg-brand-card border border-brand-border p-5 rounded-t-3xl sm:rounded-2xl max-w-md w-full h-[65vh] sm:h-[500px] flex flex-col justify-between">
+        <div class="bg-brand-card border border-brand-border p-5 rounded-t-3xl sm:rounded-2xl max-w-md w-full h-[65vh] flex flex-col justify-between">
             <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <h3 class="text-xs font-bold text-white flex items-center gap-2">
-                    <i data-lucide="message-circle" class="w-4 h-4 text-brand-parrot"></i> Discussion
-                </h3>
-                <button onclick="closeCommentsModal()" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+                <h3 class="text-xs font-bold text-white">Discussion</h3>
+                <button onclick="closeCommentsModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div id="commentsList" class="flex-1 overflow-y-auto py-3 space-y-3 text-xs"></div>
             <form onsubmit="handleAddComment(event)" class="flex gap-2 pt-3 border-t border-white/10">
-                <input type="text" id="commentInput" placeholder="Add a comment..." required class="flex-1 bg-black/60 border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-parrot">
+                <input type="text" id="commentInput" placeholder="Add comment..." required class="flex-1 bg-black/60 border border-white/20 rounded-xl px-3 py-2 text-xs text-white">
                 <button type="submit" class="px-4 py-2 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">Post</button>
             </form>
         </div>
     </div>
 
-    <!-- APP CORE ENGINE & FIREBASE (ANDROID WEBVIEW + WEB 100% COMPATIBLE) -->
+    <!-- APP ENGINE & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
@@ -633,10 +533,9 @@
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
         } catch(e) {
-            console.log("Firebase offline mode active in WebView:", e);
+            console.log("Firebase offline mode active:", e);
         }
 
-        const APP_VERSION = "2.8.6";
         const LOCAL_STORAGE_KEY = "NEXRISE_V285_DATA";
         const SECURITY_PIN = "3835";
         const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
@@ -644,7 +543,6 @@
         let activeTargetInputId = "desktopSearchInput";
         let activeSelectedCategory = "All";
         let activeCommentVideoId = null;
-        let activePlayingVideoId = null;
 
         const defaultData = [
             {
@@ -657,7 +555,6 @@
 
         let videoData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || defaultData;
 
-        // FISHER-YATES RANDOM SHUFFLE FUNCTION
         function shuffleArray(array) {
             const arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -681,13 +578,11 @@
             applyRandomOrderAndRender(true);
         };
 
-        // AUTO-ROTATE / SHUFFLE FEED EVERY 3.5 MINUTES (210,000 ms) FOR FRESH DYNAMIC UI
+        // Auto-Shuffle every 3.5 minutes
         setInterval(() => {
             const desktopInput = document.getElementById('desktopSearchInput');
             const mobileInput = document.getElementById('mobileSearchInput');
             const isSearching = (desktopInput && desktopInput.value.trim() !== '') || (mobileInput && mobileInput.value.trim() !== '');
-            
-            // Only shuffle if user is not actively typing a search query
             if (!isSearching) {
                 applyRandomOrderAndRender(true);
             }
@@ -697,85 +592,19 @@
             const splash = document.getElementById('splashScreen');
             if (splash) {
                 splash.style.opacity = '0';
-                setTimeout(() => { if (splash) splash.remove(); }, 700);
+                setTimeout(() => { if (splash) splash.remove(); }, 300);
             }
         }
-
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
-                e.preventDefault();
-                triggerAdminSecretPrompt();
-            }
-        });
-
-        window.navigatePageHistory = function(direction) {
-            if (direction === 'back') {
-                window.history.back();
-            } else if (direction === 'forward') {
-                window.history.forward();
-            }
-        };
 
         window.onload = async function() {
             try { lucide.createIcons(); } catch(e){}
-            init3DIntroParticleCanvas();
-            setupAutoHidingHeaderOnScroll();
+            
+            // Guaranteed instant removal of splash screen so it never freezes
+            setTimeout(hideSplashScreenSafely, 500);
 
-            try { window.history.replaceState({ tab: 'home' }, '', window.location.href); } catch(e){}
-
-            setTimeout(hideSplashScreenSafely, 800);
-
-            if (!localStorage.getItem("nexrise_permissions_asked")) {
-                const pModal = document.getElementById('permissionModal');
-                if (pModal) pModal.classList.remove('hidden');
-            }
-
-            // Initial random shuffle immediately on open
             applyRandomOrderAndRender(true);
             await loadDataFromFirebase();
             renderAdminVideoManager();
-            updateLiveUsersCounter();
-            setupReelsAutoPauseScrollObserver();
-        };
-
-        window.addEventListener('popstate', (e) => {
-            if (e.state && e.state.tab) {
-                switchTab(e.state.tab, false);
-            }
-        });
-
-        function setupAutoHidingHeaderOnScroll() {
-            const mainScroll = document.getElementById('mainScrollContainer');
-            const header = document.getElementById('mainAppHeader');
-            const mobileSearch = document.getElementById('mobileSearchContainer');
-            if (!mainScroll || !header) return;
-
-            let lastScrollTop = 0;
-            mainScroll.addEventListener('scroll', () => {
-                let st = mainScroll.scrollTop;
-                if (st > lastScrollTop && st > 60) {
-                    header.classList.add('header-hidden');
-                    if(mobileSearch) mobileSearch.classList.add('header-hidden');
-                } else {
-                    header.classList.remove('header-hidden');
-                    if(mobileSearch) mobileSearch.classList.remove('header-hidden');
-                }
-                lastScrollTop = st <= 0 ? 0 : st;
-            });
-        }
-
-        window.grantAllAppPermissions = function() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => console.log("Mic permission denied:", err));
-            }
-            if ("Notification" in window) {
-                Notification.requestPermission().catch(err => console.log("Notification permission error:", err));
-            }
-            localStorage.setItem("nexrise_permissions_asked", "true");
-            localStorage.setItem("nexrise_storage_allowed", "true");
-
-            const pModal = document.getElementById('permissionModal');
-            if (pModal) pModal.classList.add('hidden');
         };
 
         async function loadDataFromFirebase() {
@@ -791,53 +620,9 @@
                     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 }
             } catch (err) {
-                console.log("Using local cache due to network or rules:", err);
+                console.log("Firebase sync note:", err);
             }
             renderFeeds();
-        }
-
-        function updateLiveUsersCounter() {
-            const counterEl = document.getElementById('liveUsersCount');
-            if (counterEl) {
-                let count = Math.floor(Math.random() * 3) + 1;
-                counterEl.innerText = count;
-            }
-        }
-
-        function init3DIntroParticleCanvas() {
-            const container = document.getElementById('threejsCanvasContainer');
-            if (!container || typeof THREE === 'undefined') return;
-
-            try {
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-                
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                container.appendChild(renderer.domElement);
-
-                const count = 150;
-                const positions = new Float32Array(count * 3);
-                for(let i=0; i<count*3; i++) positions[i] = (Math.random() - 0.5) * 10;
-
-                const geo = new THREE.BufferGeometry();
-                geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                const mat = new THREE.PointsMaterial({ size: 0.035, color: 0x39FF14 });
-
-                const pSystem = new THREE.Points(geo, mat);
-                scene.add(pSystem);
-                camera.position.z = 3;
-
-                function animate() {
-                    requestAnimationFrame(animate);
-                    pSystem.rotation.y += 0.003;
-                    pSystem.rotation.x += 0.0015;
-                    renderer.render(scene, camera);
-                }
-                animate();
-            } catch(e) {
-                console.log("ThreeJS Fallback Active.");
-            }
         }
 
         window.toggleSideMenu = function() {
@@ -845,13 +630,8 @@
             const overlay = document.getElementById('sideDrawerOverlay');
             if (!drawer || !overlay) return;
             const isHidden = drawer.classList.contains('-translate-x-full');
-            if (isHidden) {
-                drawer.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                drawer.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
+            drawer.classList.toggle('-translate-x-full', !isHidden);
+            overlay.classList.toggle('hidden', isHidden);
         }
 
         window.selectMenuTab = function(tabId) {
@@ -860,10 +640,6 @@
         }
 
         window.switchTab = function(tabId, pushHistory = true) {
-            if (pushHistory) {
-                try { window.history.pushState({ tab: tabId }, '', window.location.href); } catch(e){}
-            }
-
             ['home', 'nextip', 'nexvid', 'upload', 'profile'].forEach(t => {
                 const sec = document.getElementById(`tab-${t}`);
                 if (sec) sec.classList.toggle('hidden', t !== tabId);
@@ -876,63 +652,10 @@
                 }
             });
             renderFeeds();
-            if(tabId === 'nextip') {
-                setTimeout(setupReelsAutoPauseScrollObserver, 300);
-            }
         }
 
         window.toggleThemeMode = function() {
             document.documentElement.classList.toggle('light');
-        }
-
-        window.startVoiceTyping = function(targetInputId) {
-            activeTargetInputId = targetInputId;
-            const modal = document.getElementById('voiceSearchModal');
-            const textEl = document.getElementById('voiceRecognizedText');
-            if (modal) modal.classList.remove('hidden');
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                const recognition = new SpeechRecognition();
-                recognition.lang = 'en-US';
-                recognition.start();
-
-                recognition.onresult = (e) => {
-                    const transcript = e.results[0][0].transcript;
-                    if (textEl) textEl.innerText = `Typed: "${transcript}"`;
-                    
-                    const input = document.getElementById(activeTargetInputId);
-                    if (input) input.value = transcript;
-
-                    setTimeout(() => {
-                        closeVoiceSearchModal();
-                        executeSearch(activeTargetInputId);
-                    }, 1000);
-                };
-            } else {
-                let phrases = ["Quran Recitation", "Educational Tech", "Moral Cartoons"];
-                let chosen = phrases[Math.floor(Math.random() * phrases.length)];
-                let idx = 0;
-                let timer = setInterval(() => {
-                    if (idx <= chosen.length) {
-                        textEl.innerText = `Typing: "${chosen.slice(0, idx)}"`;
-                        idx++;
-                    } else {
-                        clearInterval(timer);
-                        const input = document.getElementById(activeTargetInputId);
-                        if (input) input.value = chosen;
-                        setTimeout(() => {
-                            closeVoiceSearchModal();
-                            executeSearch(activeTargetInputId);
-                        }, 800);
-                    }
-                }, 100);
-            }
-        }
-
-        window.closeVoiceSearchModal = function() {
-            const modal = document.getElementById('voiceSearchModal');
-            if (modal) modal.classList.add('hidden');
         }
 
         window.executeSearch = function(inputId) {
@@ -950,7 +673,6 @@
                     btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot";
                 }
             });
-            // Shuffle slightly when switching categories for fresh variety
             applyRandomOrderAndRender(true);
         }
 
@@ -961,34 +683,15 @@
             return (match && match[2].length === 11) ? match[2] : 'dQw4w9WgXcQ';
         }
 
-        // ANDROID WEBVIEW & WEB SAFE EMBED URL GENERATOR (FIXES ERROR 153 / THUMBNAIL FREEZE)
-        function buildSafeEmbedUrl(rawUrl, extraParams = '') {
+        function buildSafeEmbedUrl(rawUrl) {
             const videoId = extractYouTubeId(rawUrl);
-            return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&controls=1${extraParams}`;
+            return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&controls=1`;
         }
 
         function getHighResThumbnail(url) {
             let id = extractYouTubeId(url);
             return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
         }
-
-        window.shareReel = async function(title, url) {
-            const shareData = {
-                title: title,
-                text: `Check out this clean stream on NexRise: ${title}`,
-                url: window.location.href
-            };
-            try {
-                if (navigator.share) {
-                    await navigator.share(shareData);
-                } else {
-                    await navigator.clipboard.writeText(window.location.href);
-                    alert('Link copied to clipboard!');
-                }
-            } catch (err) {
-                console.log('Error sharing:', err);
-            }
-        };
 
         function renderFeeds(filterQuery = '') {
             const approved = videoData.filter(v => v.status === 'approved' &&
@@ -1001,8 +704,6 @@
                 const shorts = approved.filter(v => v.type === 'short');
 
                 let html = '';
-                
-                // Dynamic Layout Variation: Sometimes show Shorts Shelf on top, sometimes after first 3 videos
                 const showShortsFirst = Math.random() > 0.65 && shorts.length > 0;
 
                 const shortsShelfHtml = shorts.length > 0 ? `
@@ -1027,26 +728,16 @@
                     </div>
                 ` : '';
 
-                if (showShortsFirst) {
-                    html += shortsShelfHtml;
-                }
+                if (showShortsFirst) html += shortsShelfHtml;
 
                 if (longs.length > 0) {
                     const topChunk = longs.slice(0, 3);
                     const restChunk = longs.slice(3);
 
-                    html += `<div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">
-                        ${topChunk.map(v => renderCardHtml(v)).join('')}
-                    </div>`;
-
-                    if (!showShortsFirst && shortsShelfHtml) {
-                        html += shortsShelfHtml;
-                    }
-
+                    html += `<div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">${topChunk.map(v => renderCardHtml(v)).join('')}</div>`;
+                    if (!showShortsFirst && shortsShelfHtml) html += shortsShelfHtml;
                     if (restChunk.length > 0) {
-                        html += `<div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">
-                            ${restChunk.map(v => renderCardHtml(v)).join('')}
-                        </div>`;
+                        html += `<div class="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-5">${restChunk.map(v => renderCardHtml(v)).join('')}</div>`;
                     }
                 } else if (!showShortsFirst && shortsShelfHtml) {
                     html += shortsShelfHtml;
@@ -1057,119 +748,57 @@
 
             const nexvidFeed = document.getElementById('longVideosContainer');
             if (nexvidFeed) {
-                const longs = approved.filter(v => v.type === 'long');
-                nexvidFeed.innerHTML = longs.map(v => renderCardHtml(v)).join('');
+                nexvidFeed.innerHTML = approved.filter(v => v.type === 'long').map(v => renderCardHtml(v)).join('');
             }
 
             const shortsContainer = document.getElementById('shortsContainer');
             if (shortsContainer) {
-                const shorts = approved.filter(v => v.type === 'short');
-                shortsContainer.innerHTML = shorts.map(v => `
-                    <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden" data-raw-url="${v.url}">
-                        <iframe data-src="${buildSafeEmbedUrl(v.url, '&mute=0')}" src="" referrerpolicy="strict-origin-when-cross-origin" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen loading="lazy"></iframe>
-                        <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
-                            <div>
-                                <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
-                                <p class="text-[10px] text-brand-parrot">@${v.creator}</p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">
-                                    👍 ${v.likes}
-                                </button>
-                                <button onclick="shareReel('${v.title}', '${v.url}')" class="flex items-center gap-1 px-3 py-1.5 bg-white/20 text-white font-extrabold text-xs rounded-lg hover:bg-white/30 transition">
-                                    <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                        </div>
+                shortsContainer.innerHTML = approved.filter(v => v.type === 'short').map(v => `
+                    <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden">
+                        <iframe src="${buildSafeEmbedUrl(v.url)}" referrerpolicy="strict-origin-when-cross-origin" class="w-full h-full scale-105" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
                     </div>
                 `).join('');
             }
 
             try { lucide.createIcons(); } catch(e){}
-            setupReelsAutoPauseScrollObserver();
-        }
-
-        function setupReelsAutoPauseScrollObserver() {
-            const reelItems = document.querySelectorAll('.reel-item');
-            if (!reelItems.length) return;
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const iframe = entry.target.querySelector('.reel-iframe');
-                    if (!iframe) return;
-
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-                        if (!iframe.src || iframe.src === 'about:blank') {
-                            iframe.src = iframe.getAttribute('data-src');
-                        }
-                    } else {
-                        if (iframe.src && iframe.src !== 'about:blank') {
-                            iframe.src = 'about:blank';
-                        }
-                    }
-                });
-            }, {
-                root: document.getElementById('shortsContainer'),
-                threshold: 0.6
-            });
-
-            reelItems.forEach(item => observer.observe(item));
         }
 
         window.renderCardHtml = function(v) {
             const thumbUrl = getHighResThumbnail(v.url);
-            const duration = v.duration || '04:15';
-
             return `
-                <div class="feed-video-card bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
+                <div class="bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
                     <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.id}')">
-                        <img src="${thumbUrl}" alt="${v.title}" class="card-thumbnail absolute inset-0 w-full h-full object-cover transition duration-300" loading="lazy">
-                        
+                        <img src="${thumbUrl}" alt="${v.title}" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 flex items-center justify-center transition">
                             <div class="w-11 h-11 rounded-full bg-black/70 text-brand-parrot flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition border border-brand-parrot/50 shadow-lg">
                                 <i data-lucide="play" class="w-5 h-5 fill-brand-parrot ml-0.5"></i>
                             </div>
                         </div>
-
-                        <div class="absolute bottom-2 right-2 bg-black/80 text-brand-parrot font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-brand-parrot/30 shadow-md">
-                            ${duration}
+                        <div class="absolute bottom-2 right-2 bg-black/80 text-brand-parrot font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-brand-parrot/30">
+                            ${v.duration || '04:15'}
                         </div>
                     </div>
-
                     <div class="p-4 space-y-2">
-                        <span class="text-[9px] font-black uppercase tracking-wider text-brand-parrot bg-brand-green/10 px-2 py-0.5 rounded-md">
-                            ${v.category}
-                        </span>
+                        <span class="text-[9px] font-black uppercase tracking-wider text-brand-parrot bg-brand-green/10 px-2 py-0.5 rounded-md">${v.category}</span>
                         <h3 class="font-bold text-sm text-white line-clamp-2 cursor-pointer hover:text-brand-parrot" onclick="playStreamInTopPlayer('${v.id}')">${v.title}</h3>
                         <div class="flex items-center justify-between pt-2 text-xs text-gray-400 border-t border-white/5">
                             <span class="font-medium text-gray-300">${v.creator}</span>
-                            <div class="flex items-center gap-3">
-                                <button onclick="toggleLike('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
-                                    👍 ${v.likes}
-                                </button>
-                                <button onclick="openCommentsModal('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">
-                                    💬 ${v.comments ? v.comments.length : 0}
-                                </button>
-                            </div>
+                            <button onclick="toggleLike('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">👍 ${v.likes}</button>
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        // 100% ANDROID APK + WEB BROWSER DIRECT PLAYBACK ENGINE
         window.playStreamInTopPlayer = function(id) {
             const target = videoData.find(v => v.id === id);
             if(!target) return;
 
-            activePlayingVideoId = id;
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             const titleEl = document.getElementById('playerVideoTitle');
             const creatorEl = document.getElementById('playerVideoCreator');
             const recContainer = document.getElementById('playerRecommendationList');
             const targetContainer = document.getElementById('ytPlayerTarget');
-
-            const safeEmbedSrc = buildSafeEmbedUrl(target.url);
 
             if (playerBox && targetContainer) {
                 if (titleEl) titleEl.innerText = target.title;
@@ -1187,47 +816,143 @@
                                 <p class="text-[10px] text-brand-parrot mt-0.5">@${v.creator}</p>
                             </div>
                         </div>
-                    `).join('') || `<p class="text-xs text-gray-500">No other recommendations.</p>`;
+                    `).join('');
                 }
 
                 playerBox.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                // Direct Android WebView & Browser Iframe Injection with Referrer Policy
                 targetContainer.innerHTML = `
                     <iframe 
-                        src="${safeEmbedSrc}" 
+                        src="${buildSafeEmbedUrl(target.url)}" 
                         referrerpolicy="strict-origin-when-cross-origin"
                         class="w-full h-full border-0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
                         allowfullscreen>
                     </iframe>
                 `;
-
-                // Re-apply current brightness setting to new iframe
-                const bSlider = document.getElementById('brightnessControlSlider');
-                if (bSlider) adjustVideoBrightness(bSlider.value);
             }
-        }
-
-        window.toggleBackgroundAudioMode = function() {
-            const bgBar = document.getElementById('backgroundPlaybackBar');
-            if(bgBar) {
-                bgBar.classList.remove('hidden');
-                alert('Background Audio Mode Active!');
-            }
-        }
-
-        window.stopBackgroundAudioMode = function() {
-            const bgBar = document.getElementById('backgroundPlaybackBar');
-            if(bgBar) bgBar.classList.add('hidden');
         }
 
         window.closeActivePlayer = function() {
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             const targetContainer = document.getElementById('ytPlayerTarget');
-            activePlayingVideoId = null;
             if (targetContainer) targetContainer.innerHTML = '';
-            if (playerBox) {
-                playerBox.classList.add('hidden');
-                stopBackgroundAudioMode
+            if (playerBox) playerBox.classList.add('hidden');
+        }
+
+        window.adjustVideoBrightness = function(val) {
+            const target = document.getElementById('ytPlayerTarget');
+            if (target) target.style.filter = `brightness(${val}%)`;
+        }
+
+        window.toggleLike = async function(id) {
+            const item = videoData.find(v => v.id === id);
+            if (item) {
+                item.likes += 1;
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderFeeds();
+            }
+        }
+
+        window.triggerAdminSecretPrompt = function() {
+            document.getElementById('adminAuthModal').classList.remove('hidden');
+        }
+
+        window.closeAdminAuthModal = function() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+        }
+
+        window.verifyAdminPinLogin = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmailInput').value;
+            const pin = document.getElementById('adminPinInput').value;
+
+            if (email === OFFICIAL_EMAIL && pin === SECURITY_PIN) {
+                closeAdminAuthModal();
+                document.getElementById('unlockedAdminDashboard').classList.remove('hidden');
+                switchTab('profile');
+                renderAdminVideoManager();
+            } else {
+                alert('Invalid Admin Email or PIN!');
+            }
+        }
+
+        window.lockAdminDashboard = function() {
+            document.getElementById('unlockedAdminDashboard').classList.add('hidden');
+        }
+
+        window.handleBulkMultipleImport = async function() {
+            const textarea = document.getElementById('bulkLinksTextarea');
+            if (!textarea || !textarea.value.trim()) return alert('Pehle links paste karein.');
+
+            const rawLines = textarea.value.trim().split('\n');
+            let addedCount = 0;
+
+            for (let i = 0; i < rawLines.length; i++) {
+                let line = rawLines[i].trim();
+                if (!line) continue;
+                let rawUrl = line.includes('|') ? line.split('|').pop().trim() : line;
+                if (!rawUrl.startsWith('http')) continue;
+
+                let videoId = extractYouTubeId(rawUrl);
+                let newItem = {
+                    type: "long", category: "Moral & Islamic",
+                    url: `https://www.youtube.com/embed/${videoId}`,
+                    title: `Stream #${videoData.length + 1}`,
+                    creator: "Scholar", duration: "05:00",
+                    likes: 15, comments: [], status: "approved",
+                    id: "local_" + Date.now() + "_" + i
+                };
+
+                videoData.unshift(newItem);
+                addedCount++;
+            }
+
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+            renderAdminVideoManager();
+            applyRandomOrderAndRender(true);
+            textarea.value = '';
+            alert(`${addedCount} videos successfully added!`);
+        }
+
+        window.renderAdminVideoManager = function() {
+            const container = document.getElementById('adminVideoManagerList');
+            if (!container) return;
+            container.innerHTML = videoData.map(v => `
+                <div class="flex items-center justify-between p-2 bg-black/60 rounded-xl border border-white/10">
+                    <span class="truncate text-xs text-white max-w-[200px]">${v.title}</span>
+                    <button onclick="deleteVideoItem('${v.id}')" class="px-2.5 py-1 bg-red-500/20 text-red-400 font-bold text-[10px] rounded-lg">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        window.deleteVideoItem = async function(id) {
+            if (confirm('Delete video?')) {
+                videoData = videoData.filter(v => v.id !== id);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+                renderAdminVideoManager();
+                renderFeeds();
+            }
+        }
+
+        window.handleFormSubmit = async function(e) {
+            e.preventDefault();
+            const newItem = {
+                type: document.getElementById('videoType').value,
+                category: document.getElementById('videoCategory').value,
+                url: `https://www.youtube.com/embed/${extractYouTubeId(document.getElementById('videoUrl').value)}`,
+                title: document.getElementById('videoTitle').value,
+                creator: document.getElementById('creatorName').value,
+                duration: "04:00", likes: 0, comments: [], status: "approved",
+                id: "local_" + Date.now()
+            };
+            videoData.unshift(newItem);
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
+            renderFeeds();
+            alert('Submitted Successfully!');
+            e.target.reset();
+        }
+    </script>
+</body>
+</html>

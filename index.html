@@ -675,7 +675,6 @@
         let isCustomPlaying = false;
         let scrubberInterval = null;
         let hoverHideTimeout = null;
-        let previewTouchTimer = null;
 
         const defaultData = [
             {
@@ -688,7 +687,6 @@
 
         let videoData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || defaultData;
 
-        // SAFE SPLASH SCREEN REMOVER (Prevents Logo Freeze)
         function hideSplashScreenSafely() {
             const splash = document.getElementById('splashScreen');
             if (splash) {
@@ -697,7 +695,6 @@
             }
         }
 
-        // SECRET KEYBOARD SHORTCUT (Ctrl + Shift + J)
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
                 e.preventDefault();
@@ -705,7 +702,6 @@
             }
         });
 
-        // WINDOW PAGE NAVIGATION ARROWS LOGIC
         window.navigatePageHistory = function(direction) {
             if (direction === 'back') {
                 if (window.history.length > 1) {
@@ -725,7 +721,6 @@
 
             try { window.history.replaceState({ tab: 'home' }, '', window.location.href); } catch(e){}
 
-            // Guaranteed removal timer so logo never freezes
             setTimeout(hideSplashScreenSafely, 800);
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
@@ -1028,7 +1023,7 @@
                 const shorts = approved.filter(v => v.type === 'short');
                 shortsContainer.innerHTML = shorts.map(v => `
                     <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden" data-raw-url="${v.url}">
-                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>
+                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
                         <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
                             <div>
                                 <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
@@ -1074,6 +1069,8 @@
         }
 
         window.startShortcutPreview = function(cardEl, rawUrl) {
+            // Mobile par hover preview avoid karne ke liye direct return kar do taake bug na aye
+            if (window.innerWidth <= 768) return;
             const iframe = cardEl.querySelector('.preview-iframe');
             const thumb = cardEl.querySelector('.card-thumbnail');
             if (iframe && thumb) {
@@ -1084,6 +1081,7 @@
         };
 
         window.stopShortcutPreview = function(cardEl) {
+            if (window.innerWidth <= 768) return;
             const iframe = cardEl.querySelector('.preview-iframe');
             const thumb = cardEl.querySelector('.card-thumbnail');
             if (iframe && thumb) {
@@ -1091,17 +1089,6 @@
                 iframe.classList.add('hidden');
                 thumb.classList.remove('opacity-0');
             }
-        };
-
-        window.handleTouchStartPreview = function(cardEl, rawUrl) {
-            previewTouchTimer = setTimeout(() => {
-                startShortcutPreview(cardEl, rawUrl);
-            }, 300);
-        };
-
-        window.handleTouchEndPreview = function(cardEl) {
-            if (previewTouchTimer) clearTimeout(previewTouchTimer);
-            stopShortcutPreview(cardEl);
         };
 
         function renderCardHtml(v) {
@@ -1113,8 +1100,6 @@
                     <div class="aspect-video-container bg-black relative cursor-pointer" 
                          onmouseenter="startShortcutPreview(this, '${v.url}')" 
                          onmouseleave="stopShortcutPreview(this)"
-                         ontouchstart="handleTouchStartPreview(this, '${v.url}')"
-                         ontouchend="handleTouchEndPreview(this)"
                          onclick="playStreamInTopPlayer('${v.id}')">
                         
                         <img src="${thumbUrl}" alt="${v.title}" class="card-thumbnail absolute inset-0 w-full h-full object-cover transition duration-300" loading="lazy">
@@ -1631,7 +1616,7 @@
 
         function renderComments() {
             const container = document.getElementById('commentsList');
-            const item = videoData.find(v => v.id === activeCommentVideoId);
+            const item = videoData.path ? null : videoData.find(v => v.id === activeCommentVideoId);
             if (!item || !item.comments || item.comments.length === 0) {
                 container.innerHTML = `<p class="text-gray-500 text-center py-4">No comments yet.</p>`;
                 return;

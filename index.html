@@ -100,7 +100,7 @@
         100% { transform: rotate(360deg); }
       }
       .earth-globe-loader {
-        animation: earthSpin 1.3s linear infinite;
+        animation: earthSpin 1.2s linear infinite;
         filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.55));
       }
 
@@ -146,15 +146,15 @@
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
 
     <!-- CENTER EARTH GLOBE LOADING OVERLAY (Small lowercase text below globe) -->
-    <div id="centerEarthLoader" class="hidden fixed inset-0 z-[90] bg-black/55 backdrop-blur-[2px] flex flex-col items-center justify-center pointer-events-none">
-        <div class="w-12 h-12 rounded-full border-2 border-brand-parrot/80 bg-black/85 flex items-center justify-center text-brand-parrot earth-globe-loader">
-            <i data-lucide="globe" class="w-7 h-7"></i>
+    <div id="centerEarthLoader" class="hidden fixed inset-0 z-[90] bg-black/45 flex flex-col items-center justify-center pointer-events-none">
+        <div class="w-11 h-11 rounded-full border-2 border-brand-parrot/80 bg-black/85 flex items-center justify-center text-brand-parrot earth-globe-loader">
+            <i data-lucide="globe" class="w-6 h-6"></i>
         </div>
         <span id="centerEarthLoaderText" class="text-[11px] font-medium lowercase text-gray-200 mt-2 tracking-wide">searching...</span>
     </div>
 
     <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN -->
-    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden">
+    <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-500 overflow-hidden">
         <div id="threejsCanvasContainer" class="absolute inset-0 z-0"></div>
 
         <div class="text-center z-10">
@@ -725,7 +725,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const APP_VERSION = "2.8.7";
         const LOCAL_STORAGE_KEY = "NEXRISE_V287_DATA";
         const DEVICE_REEL_CACHE_KEY = "NEXRISE_V287_DEVICE_REELS_CACHE";
         const SECURITY_PIN = "3835";
@@ -740,7 +739,6 @@
         let scrubberInterval = null;
         let hoverHideTimeout = null;
         let currentActiveVideoId = null;
-        let currentActiveVideoCategory = null;
         let activeWatchSeconds = 0;
         let smartBufferActivated = false;
 
@@ -767,6 +765,14 @@
             localStorage.removeItem(DEVICE_REEL_CACHE_KEY);
         } catch(e){}
 
+        function safeRefreshIcons() {
+            try {
+                if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+            } catch(e){}
+        }
+
         function normalizeItems(rawList) {
             if (!Array.isArray(rawList)) return [];
             return rawList.map((item, idx) => ({
@@ -783,19 +789,32 @@
             }));
         }
 
-        // Fast instant load from any existing local storage key so feed is never stuck empty
-        const existingLocal = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem("NEXRISE_V285_DATA") || "null");
-        let videoData = normalizeItems(existingLocal && existingLocal.length ? existingLocal : defaultData);
+        // FISHER-YATES RANDOM SHUFFLE FUNCTION
+        function shuffleVideoArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Instant local load + shuffle right away
+        let existingLocal = null;
+        try {
+            existingLocal = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem("NEXRISE_V285_DATA") || "null");
+        } catch(e){}
+        let videoData = shuffleVideoArray(normalizeItems(existingLocal && existingLocal.length ? existingLocal : defaultData));
 
         // CENTER EARTH LOADER HELPER (Lowercase small text below globe)
-        function showEarthLoader(labelText = "searching...", autoHideMs = 900) {
+        function showEarthLoader(labelText = "searching...", autoHideMs = 500) {
             const loader = document.getElementById('centerEarthLoader');
             const txt = document.getElementById('centerEarthLoaderText');
             if (!loader) return;
             if (earthLoaderTimeout) clearTimeout(earthLoaderTimeout);
             if (txt) txt.innerText = String(labelText).toLowerCase();
             loader.classList.remove('hidden');
-            try { lucide.createIcons(); } catch(e){}
+            safeRefreshIcons();
             if (autoHideMs > 0) {
                 earthLoaderTimeout = setTimeout(() => {
                     loader.classList.add('hidden');
@@ -809,20 +828,8 @@
             if (loader) loader.classList.add('hidden');
         }
 
-        // FISHER-YATES RANDOM SHUFFLE FUNCTION
-        function shuffleVideoArray(array) {
-            const arr = [...array];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        videoData = shuffleVideoArray(videoData);
-
         window.shuffleAndRefreshFeed = function() {
-            showEarthLoader("searching...", 750);
+            showEarthLoader("searching...", 450);
             try { localStorage.removeItem(DEVICE_REEL_CACHE_KEY); } catch(e){}
             videoData = shuffleVideoArray(videoData);
             renderFeeds();
@@ -833,7 +840,7 @@
             const splash = document.getElementById('splashScreen');
             if (splash) {
                 splash.style.opacity = '0';
-                setTimeout(() => { if (splash) splash.remove(); }, 700);
+                setTimeout(() => { if (splash) splash.remove(); }, 500);
             }
         }
 
@@ -881,7 +888,7 @@
         // APPLY NAVIGATION STATE (Used by Back & Forward Keys)
         function applyNavigationState(stateObj) {
             if (!stateObj) return;
-            showEarthLoader("loading...", 600);
+            showEarthLoader("loading...", 400);
             activeSelectedCategory = stateObj.category || 'All';
             updateCategoryChipsUI(activeSelectedCategory);
 
@@ -917,29 +924,33 @@
             }
         };
 
-        window.onload = async function() {
-            try { lucide.createIcons(); } catch(e){}
+        // Fast immediate boot so data renders without waiting on slow network
+        function bootAppImmediately() {
+            safeRefreshIcons();
             init3DIntroParticleCanvas();
             setupAutoHidingHeaderOnScroll();
             updateArrowButtonsState();
-
-            // Render local feed immediately with zero waiting
             renderFeeds();
             renderAdminVideoManager();
+            updateLiveUsersCounter();
 
             try { window.history.replaceState(appNavHistory[0], '', window.location.href); } catch(e){}
-
-            setTimeout(hideSplashScreenSafely, 750);
+            setTimeout(hideSplashScreenSafely, 500);
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
                 const pModal = document.getElementById('permissionModal');
                 if (pModal) pModal.classList.remove('hidden');
             }
 
-            await loadDataFromFirebase();
-            updateLiveUsersCounter();
-            setupReelsAutoPauseScrollObserver();
-        };
+            // Background sync from Firestore without blocking UI
+            syncDataFromFirebaseInBackground();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bootAppImmediately);
+        } else {
+            bootAppImmediately();
+        }
 
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.tab) {
@@ -974,10 +985,10 @@
 
         window.grantAllAppPermissions = function() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => console.log("Mic permission denied:", err));
+                navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => {});
             }
             if ("Notification" in window) {
-                Notification.requestPermission().catch(err => console.log("Notification permission error:", err));
+                Notification.requestPermission().catch(() => {});
             }
             localStorage.setItem("nexrise_permissions_asked", "true");
             localStorage.setItem("nexrise_storage_allowed", "true");
@@ -986,15 +997,9 @@
             if (pModal) pModal.classList.add('hidden');
         };
 
-        async function loadDataFromFirebase() {
-            showEarthLoader("loading...", 0);
-            const fetchPromise = getDocs(collection(db, "nexrise_videos"));
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Firestore sync timeout")), 3500)
-            );
-
+        async function syncDataFromFirebaseInBackground() {
             try {
-                const querySnapshot = await Promise.race([fetchPromise, timeoutPromise]);
+                const querySnapshot = await getDocs(collection(db, "nexrise_videos"));
                 if (!querySnapshot.empty) {
                     const fbData = [];
                     querySnapshot.forEach((docSnap) => {
@@ -1002,17 +1007,14 @@
                     });
                     const normalized = normalizeItems(fbData);
                     if (normalized.length > 0) {
-                        videoData = shuffleVideoArray(normalized);
                         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(normalized));
+                        videoData = shuffleVideoArray(normalized);
+                        renderFeeds();
                         renderAdminVideoManager();
                     }
                 }
             } catch (err) {
-                console.log("Using instant local cache:", err);
-                videoData = shuffleVideoArray(videoData);
-            } finally {
-                hideEarthLoader();
-                renderFeeds();
+                console.log("Background sync fallback to local cache:", err);
             }
         }
 
@@ -1055,9 +1057,7 @@
                     renderer.render(scene, camera);
                 }
                 animate();
-            } catch(e) {
-                console.log("ThreeJS Fallback Active.");
-            }
+            } catch(e) {}
         }
 
         window.toggleSideMenu = function() {
@@ -1108,7 +1108,7 @@
         }
 
         window.switchTab = function(tabId, pushHistory = true) {
-            showEarthLoader("loading...", 550);
+            showEarthLoader("loading...", 350);
             if (pushHistory) {
                 pushAppNavigationState({
                     tab: tabId,
@@ -1131,7 +1131,7 @@
             renderFeeds();
             if(tabId === 'nextip') {
                 startNextipSessionTracker();
-                setTimeout(setupReelsAutoPauseScrollObserver, 300);
+                setTimeout(setupReelsAutoPauseScrollObserver, 200);
             }
         }
 
@@ -1161,7 +1161,7 @@
                     setTimeout(() => {
                         closeVoiceSearchModal();
                         executeSearch(activeTargetInputId);
-                    }, 1000);
+                    }, 800);
                 };
             } else {
                 let phrases = ["Quran Recitation", "Educational Tech", "Moral Cartoons"];
@@ -1178,9 +1178,9 @@
                         setTimeout(() => {
                             closeVoiceSearchModal();
                             executeSearch(activeTargetInputId);
-                        }, 800);
+                        }, 600);
                     }
-                }, 100);
+                }, 80);
             }
         }
 
@@ -1192,7 +1192,7 @@
         window.executeSearch = function(inputId) {
             const input = document.getElementById(inputId);
             if (!input) return;
-            showEarthLoader("searching...", 750);
+            showEarthLoader("searching...", 450);
             renderFeeds(input.value.trim().toLowerCase());
         }
 
@@ -1207,7 +1207,7 @@
         }
 
         window.filterCategory = function(cat) {
-            showEarthLoader("searching...", 600);
+            showEarthLoader("searching...", 400);
             activeSelectedCategory = cat;
             updateCategoryChipsUI(cat);
             pushAppNavigationState({
@@ -1237,7 +1237,7 @@
         }
 
         window.shareReelItem = function(title, url) {
-            showEarthLoader("loading...", 650);
+            showEarthLoader("loading...", 400);
             if (navigator.share) {
                 navigator.share({ title: title, url: url }).catch(() => {});
             } else if (navigator.clipboard) {
@@ -1332,7 +1332,7 @@
                 `).join('') || `<p class="text-gray-500 text-center py-12 text-xs">No reels available.</p>`;
             }
 
-            try { lucide.createIcons(); } catch(e){}
+            safeRefreshIcons();
             setupReelsAutoPauseScrollObserver();
         }
 
@@ -1451,7 +1451,7 @@
             ytPlayer.seekTo(nextTime, true);
         }
 
-        window.handlePlayerScreenSingleTap = function(e) {
+        window.handlePlayerScreenSingleTap = function() {
             if (singleTapTimer) clearTimeout(singleTapTimer);
             singleTapTimer = setTimeout(() => {
                 toggleCustomPlayerPlayPause();
@@ -1482,9 +1482,8 @@
             const target = videoData.find(v => v.id === id);
             if(!target) return;
 
-            showEarthLoader("loading...", 750);
+            showEarthLoader("loading...", 450);
             currentActiveVideoId = id;
-            currentActiveVideoCategory = target.category;
             activeWatchSeconds = 0;
             smartBufferActivated = false;
 
@@ -1517,7 +1516,6 @@
                 if (creatorEl) creatorEl.innerText = `@${target.creator}`;
                 if (fallbackOverlay) fallbackOverlay.classList.add('hidden');
 
-                // Filter recommendations STRICTLY to the played video's category
                 if(recContainer) {
                     const sameCategoryRecs = videoData.filter(
                         v => v.id !== id && v.status === 'approved' && v.category === target.category
@@ -1670,10 +1668,10 @@
             const bottomIcon = document.getElementById('bottomPlayIcon');
             if (centerIcon) centerIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
             if (bottomIcon) bottomIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
-            try { lucide.createIcons(); } catch(e){}
+            safeRefreshIcons();
         }
 
-        // SUBTLE LIGHT-GREEN PLAY LINE AFTER 2.5 MINS OF WATCHING (No text/badge)
+        // SUBTLE LIGHT-GREEN PLAY LINE AFTER 2.5 MINS OF WATCHING
         function triggerSmartBackgroundBuffering() {
             if (smartBufferActivated) return;
             smartBufferActivated = true;
@@ -1732,16 +1730,11 @@
             if (label) label.innerText = `${val}%`;
 
             if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
-                if (val <= 100) {
-                    ytPlayer.setVolume(val);
-                } else {
-                    ytPlayer.setVolume(100);
-                }
-
+                ytPlayer.setVolume(val <= 100 ? val : 100);
                 const icon = document.getElementById('volumeMuteIcon');
                 if (icon) {
                     icon.setAttribute('data-lucide', val == 0 ? 'volume-x' : 'volume-2');
-                    try { lucide.createIcons(); } catch(e){}
+                    safeRefreshIcons();
                 }
             }
         }
@@ -1771,17 +1764,6 @@
             }
         }
 
-        window.triggerControlsTouchToggle = function() {
-            const overlay = document.getElementById('customPlayerControlsOverlay');
-            if (overlay) {
-                if (overlay.style.opacity === '1') {
-                    overlay.style.opacity = '0';
-                } else {
-                    showPlayerControls();
-                }
-            }
-        }
-
         window.toggleBackgroundAudioMode = function() {
             const bgBar = document.getElementById('backgroundPlaybackBar');
             if(bgBar) {
@@ -1798,7 +1780,6 @@
         window.closeActivePlayer = function() {
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             currentActiveVideoId = null;
-            currentActiveVideoCategory = null;
             if (playerBox) {
                 if(ytPlayer && typeof ytPlayer.stopVideo === 'function') {
                     try { ytPlayer.stopVideo(); } catch(e){}
@@ -1828,7 +1809,7 @@
                 }
                 if(icon) icon.setAttribute('data-lucide', 'maximize');
             }
-            try { lucide.createIcons(); } catch(e){}
+            safeRefreshIcons();
         };
 
         window.rotateActiveVideo = function() {
@@ -1845,7 +1826,7 @@
             }
         }
 
-        window.toggleLike = async function(id) {
+        window.toggleLike = function(id) {
             const item = videoData.find(v => v.id === id);
             if (item) {
                 item.likes += 1;
@@ -1888,11 +1869,11 @@
             const defaultCreator = defaultCreatorInput || "Islamic Scholar";
 
             if (!textarea || !textarea.value.trim()) {
-                alert('Khadam! Pehle links ya list paste karein.');
+                alert('Pehle links ya list paste karein.');
                 return;
             }
 
-            showEarthLoader("loading...", 1200);
+            showEarthLoader("loading...", 0);
             const rawLines = textarea.value.trim().split('\n');
             let addedCount = 0;
 
@@ -1947,7 +1928,6 @@
                         videoData.unshift(newItem);
                         addedCount++;
                     } catch(err) {
-                        console.log("Firebase bulk save note:", err);
                         newItem.id = "local_" + Date.now() + "_" + i;
                         videoData.unshift(newItem);
                         addedCount++;
@@ -1960,7 +1940,7 @@
             renderFeeds();
             textarea.value = '';
             hideEarthLoader();
-            alert(`Zabardast! Total ${addedCount} videos ek sath kamyabi se aapki app aur Firebase mein add ho chuki hain!`);
+            alert(`Total ${addedCount} videos add ho chuki hain.`);
         }
 
         window.renderAdminVideoManager = function() {
@@ -1995,22 +1975,21 @@
 
         window.deleteVideoItem = async function(id) {
             if (confirm('Delete this stream from Firebase?')) {
-                showEarthLoader("loading...", 800);
+                showEarthLoader("loading...", 0);
                 try {
                     await deleteDoc(doc(db, "nexrise_videos", id));
-                } catch(e) {
-                    console.log("Firebase delete note:", e);
-                }
+                } catch(e) {}
                 videoData = videoData.filter(v => v.id !== id);
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 renderAdminVideoManager();
                 renderFeeds();
+                hideEarthLoader();
             }
         }
 
         window.handleDirectAdminPublish = async function(e) {
             e.preventDefault();
-            showEarthLoader("loading...", 800);
+            showEarthLoader("loading...", 0);
             const title = document.getElementById('adminPubTitle').value;
             const creator = document.getElementById('adminPubCreator').value;
             const url = document.getElementById('adminPubUrl').value;
@@ -2045,7 +2024,7 @@
 
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
-            showEarthLoader("loading...", 800);
+            showEarthLoader("loading...", 0);
             const type = document.getElementById('videoType').value;
             const category = document.getElementById('videoCategory').value;
             const url = document.getElementById('videoUrl').value;
@@ -2100,7 +2079,7 @@
             `).join('');
         }
 
-        window.handleAddComment = async function(e) {
+        window.handleAddComment = function(e) {
             e.preventDefault();
             const input = document.getElementById('commentInput');
             const item = videoData.find(v => v.id === activeCommentVideoId);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.6 — Powered by TiG</title>
+    <title>NexRise v2.8.7 — Powered by TiG</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -94,6 +94,18 @@
         animation: waveBar 1.2s infinite ease-in-out;
       }
 
+      /* 3D SPINNING GREEN N LOADER */
+      @keyframes spin3DN {
+        0% { transform: perspective(240px) rotateY(0deg) scale(1); }
+        50% { transform: perspective(240px) rotateY(180deg) scale(1.12); }
+        100% { transform: perspective(240px) rotateY(360deg) scale(1); }
+      }
+      .loader-3d-n {
+        animation: spin3DN 1.2s infinite ease-in-out;
+        transform-style: preserve-3d;
+        filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.75));
+      }
+
       .video-rotate-90 {
         transform: rotate(90deg) scale(0.85);
         transform-origin: center center;
@@ -102,9 +114,14 @@
       /* CUSTOM SCRUBBER RANGE SLIDER */
       input[type=range].custom-scrubber {
         -webkit-appearance: none;
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.25);
         border-radius: 9999px;
         height: 5px;
+        transition: background-color 0.35s ease, height 0.25s ease;
+      }
+      input[type=range].custom-scrubber.buffer-ready-line {
+        background: linear-gradient(90deg, rgba(134, 239, 172, 0.85) 0%, rgba(187, 247, 208, 0.7) 100%);
+        height: 6px;
       }
       input[type=range].custom-scrubber::-webkit-slider-thumb {
         -webkit-appearance: none;
@@ -115,9 +132,28 @@
         cursor: pointer;
         box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
       }
+
+      /* BLACK-TO-WHITE / DARK-TO-LIGHT PLAYER GUARD LAYER */
+      .player-guard-shade {
+        background: linear-gradient(
+          to top,
+          rgba(240, 245, 242, 0.14) 0%,
+          rgba(11, 15, 12, 0.72) 28%,
+          rgba(11, 15, 12, 0.35) 68%,
+          rgba(11, 15, 12, 0.75) 100%
+        );
+      }
     </style>
 </head>
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
+
+    <!-- 3D GREEN N LOADING OVERLAY (For Search / Click / Loading States) -->
+    <div id="action3DNLoader" class="hidden fixed top-20 right-4 z-[90] bg-black/90 border border-brand-parrot/60 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 pointer-events-none">
+        <div class="w-7 h-7 rounded-lg bg-black border border-brand-parrot flex items-center justify-center loader-3d-n">
+            <span class="font-black text-sm leading-none text-brand-parrot">N</span>
+        </div>
+        <span id="action3DNLoaderText" class="text-[11px] font-bold text-brand-parrot tracking-wide">Loading...</span>
+    </div>
 
     <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN -->
     <div id="splashScreen" class="fixed inset-0 z-50 bg-[#0B0F0C] flex flex-col items-center justify-between py-12 transition-opacity duration-700 overflow-hidden">
@@ -125,7 +161,7 @@
 
         <div class="text-center z-10">
             <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                Powered by TiG (v2.8.6)
+                Powered by TiG (v2.8.7)
             </span>
         </div>
 
@@ -207,7 +243,7 @@
                     <div class="font-black tracking-wider text-base block leading-none">
                         <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
                     </div>
-                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.6 • TiG</span>
+                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.7 • TiG</span>
                 </div>
             </div>
         </div>
@@ -257,7 +293,7 @@
     <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
-                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.6</span>
+                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.7</span>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -297,11 +333,12 @@
             <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     <div class="desktop:col-span-2 space-y-3">
-                        <div id="playerHoverContainer" class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10" onmousemove="showPlayerControls()" onclick="triggerControlsTouchToggle()">
+                        <div id="playerHoverContainer" class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10" onmousemove="showPlayerControls()">
                             <div id="ytPlayerWrapper" class="absolute inset-0 w-full h-full">
                                 <div id="ytPlayerTarget"></div>
                             </div>
-                            <!-- Android Tap-to-Unmute / Play Helper Overlay (Only shows if WebView blocks autoplay) -->
+
+                            <!-- Android Tap-to-Unmute / Play Helper Overlay -->
                             <div id="androidPlayFallbackOverlay" onclick="forceAndroidPlayResume(event)" class="hidden absolute inset-0 z-30 bg-black/60 flex flex-col items-center justify-center cursor-pointer">
                                 <div class="w-16 h-16 rounded-full bg-brand-parrot text-black flex items-center justify-center shadow-2xl animate-pulse">
                                     <i data-lucide="play" class="w-8 h-8 fill-black ml-1"></i>
@@ -309,8 +346,20 @@
                                 <span class="text-[11px] font-bold text-white mt-2 bg-black/80 px-3 py-1 rounded-full border border-brand-parrot/50">Tap to Start Stream</span>
                             </div>
 
-                            <div id="customPlayerControlsOverlay" class="absolute inset-0 z-20 bg-gradient-to-t from-black/90 via-black/30 to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3 pointer-events-auto">
-                                <div class="flex items-center justify-between">
+                            <!-- LEFT / RIGHT DOUBLE-TAP (-10s / +10s) & SINGLE-TAP PLAY/PAUSE LAYER -->
+                            <div id="gestureTapLayer" onclick="handlePlayerScreenSingleTap(event)" ondblclick="handlePlayerScreenDoubleTap(event)" class="absolute inset-0 z-20 flex">
+                                <div class="w-1/3 h-full flex items-center justify-start pl-4 pointer-events-none">
+                                    <span id="seekRewindBadge" class="opacity-0 transition-opacity duration-200 bg-black/75 text-brand-parrot font-mono text-xs font-black px-2.5 py-1 rounded-full border border-brand-parrot/40">-10s</span>
+                                </div>
+                                <div class="w-1/3 h-full pointer-events-none"></div>
+                                <div class="w-1/3 h-full flex items-center justify-end pr-4 pointer-events-none">
+                                    <span id="seekForwardBadge" class="opacity-0 transition-opacity duration-200 bg-black/75 text-brand-parrot font-mono text-xs font-black px-2.5 py-1 rounded-full border border-brand-parrot/40">+10s</span>
+                                </div>
+                            </div>
+
+                            <!-- BLACK-TO-WHITE / DARK GUARD LAYER & CONTROLS OVERLAY -->
+                            <div id="customPlayerControlsOverlay" class="absolute inset-0 z-25 player-guard-shade opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3 pointer-events-none">
+                                <div class="flex items-center justify-between pointer-events-auto">
                                     <button onclick="event.stopPropagation(); toggleBackgroundAudioMode()" title="Background Playback" class="px-3 py-1.5 rounded-lg bg-brand-parrot text-black font-extrabold text-xs shadow-lg flex items-center gap-1.5 hover:bg-green-400 transition">
                                         <i data-lucide="headphones" class="w-4 h-4"></i> Background Play
                                     </button>
@@ -323,12 +372,14 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="flex items-center justify-center">
+
+                                <div class="flex items-center justify-center pointer-events-auto">
                                     <button onclick="event.stopPropagation(); toggleCustomPlayerPlayPause()" class="w-14 h-14 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-2xl transform hover:scale-110 transition">
                                         <i id="centerPlayPauseIcon" data-lucide="pause" class="w-7 h-7 fill-black"></i>
                                     </button>
                                 </div>
-                                <div class="space-y-2" onclick="event.stopPropagation()">
+
+                                <div class="space-y-2 pointer-events-auto bg-gradient-to-t from-white/10 via-black/70 to-transparent rounded-xl p-2" onclick="event.stopPropagation()">
                                     <div class="flex items-center gap-2">
                                         <span id="currentTimeText" class="text-[10px] font-mono text-brand-parrot font-bold">0:00</span>
                                         <input type="range" id="customVideoScrubber" min="0" max="100" value="0" oninput="seekCustomVideo(this.value)" class="flex-1 custom-scrubber accent-brand-parrot cursor-pointer">
@@ -354,14 +405,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Smart Offline / Buffer Status Badge (Appears subtly after 2.5 mins of watching) -->
-                        <div id="smartBufferBadge" class="hidden bg-brand-green/10 border border-brand-parrot/40 px-3 py-1.5 rounded-xl flex items-center justify-between text-[11px]">
-                            <span class="text-brand-parrot font-bold flex items-center gap-1.5">
-                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Smart Stream Buffer Active (Offline Protection Ready)
-                            </span>
-                            <span id="bufferProgressText" class="font-mono text-gray-300 text-[10px]">Buffered</span>
                         </div>
 
                         <div id="backgroundPlaybackBar" class="hidden bg-black/80 border border-brand-parrot p-3 rounded-xl flex items-center justify-between">
@@ -410,9 +453,9 @@
                 <div id="youtubeStyleHomeFeed" class="space-y-6"></div>
             </section>
 
-            <!-- TAB 2: NEXTIP -->
+            <!-- TAB 2: NEXTIP (CLEAN FULLSCREEN REELS FEED) -->
             <section id="tab-nextip" class="hidden space-y-4 max-w-md mx-auto">
-                <div id="shortsContainer" class="h-[75vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black relative"></div>
+                <div id="shortsContainer" class="h-[78vh] overflow-y-scroll snap-y-mandatory no-scrollbar rounded-2xl border border-brand-border bg-black relative"></div>
             </section>
 
             <!-- TAB 3: NEXVID -->
@@ -483,7 +526,7 @@
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
                             <h3 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.6)
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.7)
                             </h3>
                             <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                         </div>
@@ -684,8 +727,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const APP_VERSION = "2.8.6";
-        const LOCAL_STORAGE_KEY = "NEXRISE_V285_DATA";
+        const APP_VERSION = "2.8.7";
+        const LOCAL_STORAGE_KEY = "NEXRISE_V287_DATA";
+        const DEVICE_REEL_CACHE_KEY = "NEXRISE_V287_DEVICE_REELS_CACHE";
         const SECURITY_PIN = "3835";
         const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
 
@@ -694,16 +738,20 @@
         let activeCommentVideoId = null;
 
         let ytPlayer = null;
-        let isYtApiReady = false;
         let isCustomPlaying = false;
         let scrubberInterval = null;
         let hoverHideTimeout = null;
-        let previewTouchTimer = null;
         let currentActiveVideoId = null;
+        let currentActiveVideoCategory = null;
         let activeWatchSeconds = 0;
         let smartBufferActivated = false;
 
-        // CUSTOM APP NAVIGATION HISTORY STACK (Works 100% on Android APK & Browsers)
+        // NexTip usage & local device cache tracking
+        let nextipUsageSeconds = 0;
+        let nextipSessionTimer = null;
+        let singleTapTimer = null;
+
+        // CUSTOM APP NAVIGATION HISTORY STACK
         let appNavHistory = [{ tab: 'home', category: 'All', videoId: null }];
         let appNavIndex = 0;
 
@@ -716,7 +764,32 @@
             }
         ];
 
+        // Clear stale local reel cache on every fresh page/app refresh
+        try {
+            localStorage.removeItem(DEVICE_REEL_CACHE_KEY);
+            localStorage.removeItem("NEXRISE_V285_DATA");
+        } catch(e){}
+
         let videoData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || defaultData;
+
+        // 3D GREEN N LOADER HELPER
+        function show3DNLoader(labelText = "Loading...", autoHideMs = 1100) {
+            const loader = document.getElementById('action3DNLoader');
+            const txt = document.getElementById('action3DNLoaderText');
+            if (!loader) return;
+            if (txt) txt.innerText = labelText;
+            loader.classList.remove('hidden');
+            if (autoHideMs > 0) {
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                }, autoHideMs);
+            }
+        }
+
+        function hide3DNLoader() {
+            const loader = document.getElementById('action3DNLoader');
+            if (loader) loader.classList.add('hidden');
+        }
 
         // FISHER-YATES RANDOM SHUFFLE FUNCTION
         function shuffleVideoArray(array) {
@@ -728,17 +801,13 @@
             return arr;
         }
 
-        // Initial random shuffle on load/refresh
         videoData = shuffleVideoArray(videoData);
 
         window.shuffleAndRefreshFeed = function() {
+            show3DNLoader("Shuffling...", 900);
+            try { localStorage.removeItem(DEVICE_REEL_CACHE_KEY); } catch(e){}
             videoData = shuffleVideoArray(videoData);
             renderFeeds();
-        };
-
-        // YOUTUBE API READY HOOK
-        window.onYouTubeIframeAPIReady = function() {
-            isYtApiReady = true;
         };
 
         // SAFE SPLASH SCREEN REMOVER
@@ -794,6 +863,7 @@
         // APPLY NAVIGATION STATE (Used by Back & Forward Keys)
         function applyNavigationState(stateObj) {
             if (!stateObj) return;
+            show3DNLoader("Navigating...", 700);
             activeSelectedCategory = stateObj.category || 'All';
             updateCategoryChipsUI(activeSelectedCategory);
 
@@ -814,7 +884,6 @@
                     appNavIndex--;
                     applyNavigationState(appNavHistory[appNavIndex]);
                 } else {
-                    // Fallback if at root: close player if open, or go to home
                     const playerBox = document.getElementById('stickyVideoPlayerBox');
                     if (playerBox && !playerBox.classList.contains('hidden')) {
                         closeActivePlayer();
@@ -897,6 +966,7 @@
         };
 
         async function loadDataFromFirebase() {
+            show3DNLoader("Syncing...", 900);
             try {
                 const querySnapshot = await getDocs(collection(db, "nexrise_videos"));
                 if (!querySnapshot.empty) {
@@ -904,7 +974,6 @@
                     querySnapshot.forEach((docSnap) => {
                         fbData.push({ id: docSnap.id, ...docSnap.data() });
                     });
-                    // Randomly shuffle videos on every app launch / refresh
                     videoData = shuffleVideoArray(fbData);
                     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fbData));
                 }
@@ -912,6 +981,7 @@
                 console.log("Using local cache due to network or rules:", err);
                 videoData = shuffleVideoArray(videoData);
             }
+            hide3DNLoader();
             renderFeeds();
         }
 
@@ -978,7 +1048,38 @@
             switchTab(tabId);
         }
 
+        // Cache next 10-15 reels into user's device storage after 5-7 mins of NexTip usage
+        function cacheAdvanceNextipReelsToDevice() {
+            try {
+                const allShorts = videoData.filter(v => v.type === 'short' && v.status === 'approved');
+                const advanceBatch = allShorts.slice(0, 15).map(r => ({
+                    id: r.id,
+                    title: r.title,
+                    creator: r.creator,
+                    category: r.category,
+                    url: r.url,
+                    thumb: getHighResThumbnail(r.url),
+                    likes: r.likes || 0,
+                    comments: r.comments || [],
+                    cachedAt: Date.now()
+                }));
+                localStorage.setItem(DEVICE_REEL_CACHE_KEY, JSON.stringify(advanceBatch));
+            } catch(e){}
+        }
+
+        function startNextipSessionTracker() {
+            if (nextipSessionTimer) clearInterval(nextipSessionTimer);
+            nextipSessionTimer = setInterval(() => {
+                nextipUsageSeconds += 5;
+                // Between 5 minutes (300s) and 7 minutes (420s), cache next 10-15 reels locally on user device
+                if (nextipUsageSeconds >= 300) {
+                    cacheAdvanceNextipReelsToDevice();
+                }
+            }, 5000);
+        }
+
         window.switchTab = function(tabId, pushHistory = true) {
+            show3DNLoader("Loading...", 600);
             if (pushHistory) {
                 pushAppNavigationState({
                     tab: tabId,
@@ -1000,6 +1101,7 @@
             });
             renderFeeds();
             if(tabId === 'nextip') {
+                startNextipSessionTracker();
                 setTimeout(setupReelsAutoPauseScrollObserver, 300);
             }
         }
@@ -1061,6 +1163,7 @@
         window.executeSearch = function(inputId) {
             const input = document.getElementById(inputId);
             if (!input) return;
+            show3DNLoader("Searching...", 800);
             renderFeeds(input.value.trim().toLowerCase());
         }
 
@@ -1075,6 +1178,7 @@
         }
 
         window.filterCategory = function(cat) {
+            show3DNLoader("Filtering...", 600);
             activeSelectedCategory = cat;
             updateCategoryChipsUI(cat);
             pushAppNavigationState({
@@ -1095,13 +1199,22 @@
         function cleanEmbedUrl(rawUrl, extraParams = '') {
             let id = extractYouTubeId(rawUrl);
             let clean = `https://www.youtube.com/embed/${id}`;
-            return `${clean}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`;
+            return `${clean}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3${extraParams}`;
         }
 
         function getHighResThumbnail(url) {
             let id = extractYouTubeId(url);
             return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
         }
+
+        window.shareReelItem = function(title, url) {
+            show3DNLoader("Sharing...", 700);
+            if (navigator.share) {
+                navigator.share({ title: title, url: url }).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).catch(() => {});
+            }
+        };
 
         function renderFeeds(filterQuery = '') {
             const approved = videoData.filter(v => v.status === 'approved' &&
@@ -1153,23 +1266,41 @@
                 nexvidFeed.innerHTML = longs.map(v => renderCardHtml(v)).join('');
             }
 
+            // CLEAN NEXTIP REELS FEED (Only video + bottom title + Like, Comment, Share; zero extra labels)
             const shortsContainer = document.getElementById('shortsContainer');
             if (shortsContainer) {
-                const shorts = approved.filter(v => v.type === 'short');
-                shortsContainer.innerHTML = shorts.map(v => `
-                    <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden" data-raw-url="${v.url}">
-                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
-                        <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
-                            <div>
-                                <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
-                                <p class="text-[10px] text-brand-parrot">@${v.creator}</p>
+                let shortsSource = videoData.filter(v => v.type === 'short' && v.status === 'approved');
+                if (!navigator.onLine) {
+                    try {
+                        const cached = JSON.parse(localStorage.getItem(DEVICE_REEL_CACHE_KEY) || '[]');
+                        if (cached.length > 0) shortsSource = cached;
+                    } catch(e){}
+                }
+
+                shortsContainer.innerHTML = shortsSource.map(v => `
+                    <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black overflow-hidden" data-raw-url="${v.url}">
+                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=0&loop=1')}" src="" class="reel-iframe w-full h-full scale-105 pointer-events-none" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent flex items-end justify-between p-4 z-20">
+                            <div class="max-w-[72%]">
+                                <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
+                                <p class="text-[10px] text-gray-300 mt-0.5">@${v.creator}</p>
                             </div>
-                            <button onclick="toggleLike('${v.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-brand-parrot text-black font-extrabold text-xs rounded-lg">
-                                👍 ${v.likes}
-                            </button>
+                            <div class="flex flex-col items-center gap-3">
+                                <button onclick="toggleLike('${v.id}')" class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-black/70 border border-white/15 text-white hover:text-brand-parrot text-[10px] font-bold">
+                                    <span>👍</span>
+                                    <span>${v.likes || 0}</span>
+                                </button>
+                                <button onclick="openCommentsModal('${v.id}')" class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-black/70 border border-white/15 text-white hover:text-brand-parrot text-[10px] font-bold">
+                                    <span>💬</span>
+                                    <span>${v.comments ? v.comments.length : 0}</span>
+                                </button>
+                                <button onclick="shareReelItem('${v.title.replace(/'/g, "\\'")}', '${v.url}')" class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-black/70 border border-white/15 text-white hover:text-brand-parrot text-[10px] font-bold">
+                                    <span>↗</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                `).join('');
+                `).join('') || `<p class="text-gray-500 text-center py-12 text-xs">No reels available.</p>`;
             }
 
             try { lucide.createIcons(); } catch(e){}
@@ -1204,7 +1335,7 @@
         }
 
         window.startShortcutPreview = function(cardEl, rawUrl) {
-            if ('ontouchstart' in window) return; // Prevent touch conflict on Android
+            if ('ontouchstart' in window) return;
             const iframe = cardEl.querySelector('.preview-iframe');
             const thumb = cardEl.querySelector('.card-thumbnail');
             if (iframe && thumb) {
@@ -1271,17 +1402,65 @@
             `;
         }
 
+        // SINGLE TAP / CLICK PLAY-PAUSE & DOUBLE TAP ±10s SEEK HANDLERS
+        function flashSeekBadge(badgeId) {
+            const badge = document.getElementById(badgeId);
+            if (!badge) return;
+            badge.classList.remove('opacity-0');
+            badge.classList.add('opacity-100');
+            setTimeout(() => {
+                badge.classList.remove('opacity-100');
+                badge.classList.add('opacity-0');
+            }, 650);
+        }
+
+        function seekRelativeBySeconds(deltaSec) {
+            if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function' || typeof ytPlayer.seekTo !== 'function') return;
+            const current = ytPlayer.getCurrentTime() || 0;
+            const duration = (typeof ytPlayer.getDuration === 'function' ? ytPlayer.getDuration() : 0) || current + Math.abs(deltaSec);
+            const nextTime = Math.max(0, Math.min(duration, current + deltaSec));
+            ytPlayer.seekTo(nextTime, true);
+        }
+
+        window.handlePlayerScreenSingleTap = function(e) {
+            if (singleTapTimer) clearTimeout(singleTapTimer);
+            singleTapTimer = setTimeout(() => {
+                toggleCustomPlayerPlayPause();
+                showPlayerControls();
+            }, 220);
+        };
+
+        window.handlePlayerScreenDoubleTap = function(e) {
+            if (singleTapTimer) {
+                clearTimeout(singleTapTimer);
+                singleTapTimer = null;
+            }
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            if (clickX < rect.width * 0.4) {
+                seekRelativeBySeconds(-10);
+                flashSeekBadge('seekRewindBadge');
+            } else if (clickX > rect.width * 0.6) {
+                seekRelativeBySeconds(10);
+                flashSeekBadge('seekForwardBadge');
+            } else {
+                toggleCustomPlayerPlayPause();
+            }
+        };
+
         // ANDROID + BROWSER DUAL-ENGINE AUTOPLAY STREAM LAUNCHER
         window.playStreamInTopPlayer = function(id, recordHistory = true) {
             const target = videoData.find(v => v.id === id);
             if(!target) return;
 
+            show3DNLoader("Playing...", 900);
             currentActiveVideoId = id;
+            currentActiveVideoCategory = target.category;
             activeWatchSeconds = 0;
             smartBufferActivated = false;
 
-            const bufferBadge = document.getElementById('smartBufferBadge');
-            if (bufferBadge) bufferBadge.classList.add('hidden');
+            const scrubberEl = document.getElementById('customVideoScrubber');
+            if (scrubberEl) scrubberEl.classList.remove('buffer-ready-line');
 
             if (recordHistory) {
                 const activeTab = ['home', 'nextip', 'nexvid', 'upload', 'profile'].find(t => {
@@ -1309,9 +1488,12 @@
                 if (creatorEl) creatorEl.innerText = `@${target.creator}`;
                 if (fallbackOverlay) fallbackOverlay.classList.add('hidden');
 
+                // Filter recommendations STRICTLY to the played video's category
                 if(recContainer) {
-                    const recs = shuffleVideoArray(videoData.filter(v => v.id !== id && v.status === 'approved'));
-                    recContainer.innerHTML = recs.map(v => `
+                    const sameCategoryRecs = videoData.filter(
+                        v => v.id !== id && v.status === 'approved' && v.category === target.category
+                    );
+                    recContainer.innerHTML = sameCategoryRecs.map(v => `
                         <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2 p-2 bg-black/50 hover:bg-black/90 rounded-xl border border-white/5 hover:border-brand-parrot/50 transition cursor-pointer">
                             <div class="w-24 h-14 bg-black rounded-lg overflow-hidden shrink-0 relative">
                                 <img src="${getHighResThumbnail(v.url)}" class="w-full h-full object-cover" loading="lazy">
@@ -1321,7 +1503,7 @@
                                 <p class="text-[10px] text-brand-parrot mt-0.5">@${v.creator}</p>
                             </div>
                         </div>
-                    `).join('') || `<p class="text-xs text-gray-500">No other recommendations.</p>`;
+                    `).join('') || `<p class="text-xs text-gray-500">No more streams in ${target.category}.</p>`;
                 }
 
                 playerBox.classList.remove('hidden');
@@ -1329,7 +1511,6 @@
                 if (mainScroll) mainScroll.scrollTo({ top: 0, behavior: 'smooth' });
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                // Recreate clean player container to prevent Android WebView stale iframe lock
                 const wrapper = document.getElementById('ytPlayerWrapper');
                 if (ytPlayer && typeof ytPlayer.destroy === 'function') {
                     try { ytPlayer.destroy(); } catch(e){}
@@ -1339,7 +1520,6 @@
                     wrapper.innerHTML = `<div id="ytPlayerTarget"></div>`;
                 }
 
-                // Initialize YT Player with Android WebView compatibility
                 if (typeof YT !== 'undefined' && YT.Player) {
                     ytPlayer = new YT.Player('ytPlayerTarget', {
                         height: '100%',
@@ -1362,7 +1542,6 @@
                         }
                     });
 
-                    // Android WebView Autoplay Watchdog: If player hasn't started within 2.2s, force start or unmute-play
                     setTimeout(() => {
                         if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
                             const state = ytPlayer.getPlayerState();
@@ -1394,7 +1573,7 @@
             wrapper.innerHTML = `
                 <iframe 
                     id="ytPlayerTarget"
-                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&modestbranding=1&controls=1" 
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&modestbranding=1&controls=0&iv_load_policy=3" 
                     class="w-full h-full border-0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
                     allowfullscreen>
@@ -1418,7 +1597,6 @@
         function onCustomPlayerReady(event) {
             try {
                 event.target.playVideo();
-                // Android WebView policy check: if blocked unmuted, briefly mute-play then unmute
                 setTimeout(() => {
                     if (event.target.getPlayerState() !== YT.PlayerState.PLAYING) {
                         event.target.mute();
@@ -1466,35 +1644,12 @@
             try { lucide.createIcons(); } catch(e){}
         }
 
-        // SMART BACKGROUND BUFFERING & SCRUBBER ENGINE (Activates after 2.5 mins of watching)
+        // SUBTLE LIGHT-GREEN PLAY LINE AFTER 2.5 MINS OF WATCHING (No text/badge)
         function triggerSmartBackgroundBuffering() {
             if (smartBufferActivated) return;
             smartBufferActivated = true;
-
-            const badge = document.getElementById('smartBufferBadge');
-            const progTxt = document.getElementById('bufferProgressText');
-            if (badge) {
-                badge.classList.remove('hidden');
-                try { lucide.createIcons(); } catch(e){}
-            }
-
-            // Persist current watched video metadata into offline storage cache
-            try {
-                const target = videoData.find(v => v.id === currentActiveVideoId);
-                if (target) {
-                    const cachedStreams = JSON.parse(localStorage.getItem('NEXRISE_OFFLINE_BUFFER_META') || '[]');
-                    if (!cachedStreams.some(c => c.id === target.id)) {
-                        cachedStreams.unshift({ ...target, cachedAt: Date.now() });
-                        localStorage.setItem('NEXRISE_OFFLINE_BUFFER_META', JSON.stringify(cachedStreams.slice(0, 15)));
-                    }
-                }
-            } catch(e){}
-
-            // Keep YouTube player buffer active smoothly without overloading bandwidth
-            if (ytPlayer && typeof ytPlayer.getVideoLoadedFraction === 'function' && progTxt) {
-                const loadedPct = Math.min(100, Math.round((ytPlayer.getVideoLoadedFraction() || 0.4) * 100));
-                progTxt.innerText = `${loadedPct}% Cached`;
-            }
+            const scrubberEl = document.getElementById('customVideoScrubber');
+            if (scrubberEl) scrubberEl.classList.add('buffer-ready-line');
         }
 
         function startScrubberTimer() {
@@ -1515,14 +1670,8 @@
 
                     if (isCustomPlaying) {
                         activeWatchSeconds += 0.5;
-                        // Trigger smart background buffering after 2.5 minutes (150s)
                         if (activeWatchSeconds >= 150) {
                             triggerSmartBackgroundBuffering();
-                        }
-                        if (smartBufferActivated && typeof ytPlayer.getVideoLoadedFraction === 'function') {
-                            const progTxt = document.getElementById('bufferProgressText');
-                            const loadedPct = Math.min(100, Math.round((ytPlayer.getVideoLoadedFraction() || 0) * 100));
-                            if (progTxt) progTxt.innerText = `${loadedPct}% Cached`;
                         }
                     }
                 }
@@ -1541,6 +1690,7 @@
         }
 
         window.seekCustomVideo = function(val) {
+            showPlayerControls();
             if (ytPlayer && typeof ytPlayer.getDuration === 'function') {
                 const duration = ytPlayer.getDuration();
                 const targetTime = (val / 100) * duration;
@@ -1619,6 +1769,7 @@
         window.closeActivePlayer = function() {
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             currentActiveVideoId = null;
+            currentActiveVideoCategory = null;
             if (playerBox) {
                 if(ytPlayer && typeof ytPlayer.stopVideo === 'function') {
                     try { ytPlayer.stopVideo(); } catch(e){}
@@ -1712,6 +1863,7 @@
                 return;
             }
 
+            show3DNLoader("Importing...", 1500);
             const rawLines = textarea.value.trim().split('\n');
             let addedCount = 0;
 
@@ -1778,6 +1930,7 @@
             renderAdminVideoManager();
             renderFeeds();
             textarea.value = '';
+            hide3DNLoader();
             alert(`Zabardast! Total ${addedCount} videos ek sath kamyabi se aapki app aur Firebase mein add ho chuki hain!`);
         }
 
@@ -1813,6 +1966,7 @@
 
         window.deleteVideoItem = async function(id) {
             if (confirm('Delete this stream from Firebase?')) {
+                show3DNLoader("Deleting...", 1000);
                 try {
                     await deleteDoc(doc(db, "nexrise_videos", id));
                 } catch(e) {
@@ -1827,6 +1981,7 @@
 
         window.handleDirectAdminPublish = async function(e) {
             e.preventDefault();
+            show3DNLoader("Publishing...", 1000);
             const title = document.getElementById('adminPubTitle').value;
             const creator = document.getElementById('adminPubCreator').value;
             const url = document.getElementById('adminPubUrl').value;
@@ -1851,14 +2006,17 @@
                 renderAdminVideoManager();
                 renderFeeds();
                 e.target.reset();
+                hide3DNLoader();
                 alert('Stream Published & Saved to Firebase!');
             } catch(err) {
+                hide3DNLoader();
                 alert('Error publishing to Firebase: ' + err.message);
             }
         }
 
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
+            show3DNLoader("Submitting...", 1000);
             const type = document.getElementById('videoType').value;
             const category = document.getElementById('videoCategory').value;
             const url = document.getElementById('videoUrl').value;
@@ -1880,9 +2038,11 @@
                 videoData.unshift(newItem);
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 renderFeeds();
+                hide3DNLoader();
                 alert('Submitted & Saved to Firebase Successfully!');
                 e.target.reset();
             } catch(err) {
+                hide3DNLoader();
                 alert('Error submitting to Firebase: ' + err.message);
             }
         }

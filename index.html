@@ -94,14 +94,16 @@
         animation: waveBar 1.2s infinite ease-in-out;
       }
 
-      /* CENTER EARTH GLOBE SPINNER */
-      @keyframes earthSpin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+      /* 3D SPINNING GREEN N LOADER */
+      @keyframes spin3DN {
+        0% { transform: perspective(240px) rotateY(0deg) scale(1); }
+        50% { transform: perspective(240px) rotateY(180deg) scale(1.12); }
+        100% { transform: perspective(240px) rotateY(360deg) scale(1); }
       }
-      .earth-globe-loader {
-        animation: earthSpin 1.3s linear infinite;
-        filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.55));
+      .loader-3d-n {
+        animation: spin3DN 1.2s infinite ease-in-out;
+        transform-style: preserve-3d;
+        filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.75));
       }
 
       .video-rotate-90 {
@@ -145,12 +147,12 @@
 </head>
 <body class="bg-brand-dark text-white min-h-screen flex flex-col select-none">
 
-    <!-- CENTER EARTH GLOBE LOADING OVERLAY (Small lowercase text below globe) -->
-    <div id="centerEarthLoader" class="hidden fixed inset-0 z-[90] bg-black/55 backdrop-blur-[2px] flex flex-col items-center justify-center pointer-events-none">
-        <div class="w-12 h-12 rounded-full border-2 border-brand-parrot/80 bg-black/85 flex items-center justify-center text-brand-parrot earth-globe-loader">
-            <i data-lucide="globe" class="w-7 h-7"></i>
+    <!-- 3D GREEN N LOADING OVERLAY (For Search / Click / Loading States) -->
+    <div id="action3DNLoader" class="hidden fixed top-20 right-4 z-[90] bg-black/90 border border-brand-parrot/60 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 pointer-events-none">
+        <div class="w-7 h-7 rounded-lg bg-black border border-brand-parrot flex items-center justify-center loader-3d-n">
+            <span class="font-black text-sm leading-none text-brand-parrot">N</span>
         </div>
-        <span id="centerEarthLoaderText" class="text-[11px] font-medium lowercase text-gray-200 mt-2 tracking-wide">searching...</span>
+        <span id="action3DNLoaderText" class="text-[11px] font-bold text-brand-parrot tracking-wide">Loading...</span>
     </div>
 
     <!-- 1. 3D PARTICLE SPLASH INTRO SCREEN -->
@@ -744,10 +746,10 @@
         let activeWatchSeconds = 0;
         let smartBufferActivated = false;
 
+        // NexTip usage & local device cache tracking
         let nextipUsageSeconds = 0;
         let nextipSessionTimer = null;
         let singleTapTimer = null;
-        let earthLoaderTimeout = null;
 
         // CUSTOM APP NAVIGATION HISTORY STACK
         let appNavHistory = [{ tab: 'home', category: 'All', videoId: null }];
@@ -762,50 +764,30 @@
             }
         ];
 
-        // Clear stale cached reels on refresh
+        // Clear stale local reel cache on every fresh page/app refresh
         try {
             localStorage.removeItem(DEVICE_REEL_CACHE_KEY);
+            localStorage.removeItem("NEXRISE_V285_DATA");
         } catch(e){}
 
-        function normalizeItems(rawList) {
-            if (!Array.isArray(rawList)) return [];
-            return rawList.map((item, idx) => ({
-                id: String(item.id || ("item_" + idx)),
-                type: item.type === 'short' ? 'short' : 'long',
-                category: item.category || 'Others',
-                url: item.url || 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                title: item.title || 'Untitled Stream',
-                creator: item.creator || 'NexRise Creator',
-                duration: item.duration || '04:00',
-                likes: Number(item.likes) || 0,
-                comments: Array.isArray(item.comments) ? item.comments : [],
-                status: 'approved'
-            }));
-        }
+        let videoData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || defaultData;
 
-        // Fast instant load from any existing local storage key so feed is never stuck empty
-        const existingLocal = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem("NEXRISE_V285_DATA") || "null");
-        let videoData = normalizeItems(existingLocal && existingLocal.length ? existingLocal : defaultData);
-
-        // CENTER EARTH LOADER HELPER (Lowercase small text below globe)
-        function showEarthLoader(labelText = "searching...", autoHideMs = 900) {
-            const loader = document.getElementById('centerEarthLoader');
-            const txt = document.getElementById('centerEarthLoaderText');
+        // 3D GREEN N LOADER HELPER
+        function show3DNLoader(labelText = "Loading...", autoHideMs = 1100) {
+            const loader = document.getElementById('action3DNLoader');
+            const txt = document.getElementById('action3DNLoaderText');
             if (!loader) return;
-            if (earthLoaderTimeout) clearTimeout(earthLoaderTimeout);
-            if (txt) txt.innerText = String(labelText).toLowerCase();
+            if (txt) txt.innerText = labelText;
             loader.classList.remove('hidden');
-            try { lucide.createIcons(); } catch(e){}
             if (autoHideMs > 0) {
-                earthLoaderTimeout = setTimeout(() => {
+                setTimeout(() => {
                     loader.classList.add('hidden');
                 }, autoHideMs);
             }
         }
 
-        function hideEarthLoader() {
-            const loader = document.getElementById('centerEarthLoader');
-            if (earthLoaderTimeout) clearTimeout(earthLoaderTimeout);
+        function hide3DNLoader() {
+            const loader = document.getElementById('action3DNLoader');
             if (loader) loader.classList.add('hidden');
         }
 
@@ -822,7 +804,7 @@
         videoData = shuffleVideoArray(videoData);
 
         window.shuffleAndRefreshFeed = function() {
-            showEarthLoader("searching...", 750);
+            show3DNLoader("Shuffling...", 900);
             try { localStorage.removeItem(DEVICE_REEL_CACHE_KEY); } catch(e){}
             videoData = shuffleVideoArray(videoData);
             renderFeeds();
@@ -881,7 +863,7 @@
         // APPLY NAVIGATION STATE (Used by Back & Forward Keys)
         function applyNavigationState(stateObj) {
             if (!stateObj) return;
-            showEarthLoader("loading...", 600);
+            show3DNLoader("Navigating...", 700);
             activeSelectedCategory = stateObj.category || 'All';
             updateCategoryChipsUI(activeSelectedCategory);
 
@@ -923,13 +905,9 @@
             setupAutoHidingHeaderOnScroll();
             updateArrowButtonsState();
 
-            // Render local feed immediately with zero waiting
-            renderFeeds();
-            renderAdminVideoManager();
-
             try { window.history.replaceState(appNavHistory[0], '', window.location.href); } catch(e){}
 
-            setTimeout(hideSplashScreenSafely, 750);
+            setTimeout(hideSplashScreenSafely, 800);
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
                 const pModal = document.getElementById('permissionModal');
@@ -937,6 +915,7 @@
             }
 
             await loadDataFromFirebase();
+            renderAdminVideoManager();
             updateLiveUsersCounter();
             setupReelsAutoPauseScrollObserver();
         };
@@ -987,33 +966,23 @@
         };
 
         async function loadDataFromFirebase() {
-            showEarthLoader("loading...", 0);
-            const fetchPromise = getDocs(collection(db, "nexrise_videos"));
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Firestore sync timeout")), 3500)
-            );
-
+            show3DNLoader("Syncing...", 900);
             try {
-                const querySnapshot = await Promise.race([fetchPromise, timeoutPromise]);
+                const querySnapshot = await getDocs(collection(db, "nexrise_videos"));
                 if (!querySnapshot.empty) {
                     const fbData = [];
                     querySnapshot.forEach((docSnap) => {
                         fbData.push({ id: docSnap.id, ...docSnap.data() });
                     });
-                    const normalized = normalizeItems(fbData);
-                    if (normalized.length > 0) {
-                        videoData = shuffleVideoArray(normalized);
-                        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(normalized));
-                        renderAdminVideoManager();
-                    }
+                    videoData = shuffleVideoArray(fbData);
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fbData));
                 }
             } catch (err) {
-                console.log("Using instant local cache:", err);
+                console.log("Using local cache due to network or rules:", err);
                 videoData = shuffleVideoArray(videoData);
-            } finally {
-                hideEarthLoader();
-                renderFeeds();
             }
+            hide3DNLoader();
+            renderFeeds();
         }
 
         function updateLiveUsersCounter() {
@@ -1079,6 +1048,7 @@
             switchTab(tabId);
         }
 
+        // Cache next 10-15 reels into user's device storage after 5-7 mins of NexTip usage
         function cacheAdvanceNextipReelsToDevice() {
             try {
                 const allShorts = videoData.filter(v => v.type === 'short' && v.status === 'approved');
@@ -1101,6 +1071,7 @@
             if (nextipSessionTimer) clearInterval(nextipSessionTimer);
             nextipSessionTimer = setInterval(() => {
                 nextipUsageSeconds += 5;
+                // Between 5 minutes (300s) and 7 minutes (420s), cache next 10-15 reels locally on user device
                 if (nextipUsageSeconds >= 300) {
                     cacheAdvanceNextipReelsToDevice();
                 }
@@ -1108,7 +1079,7 @@
         }
 
         window.switchTab = function(tabId, pushHistory = true) {
-            showEarthLoader("loading...", 550);
+            show3DNLoader("Loading...", 600);
             if (pushHistory) {
                 pushAppNavigationState({
                     tab: tabId,
@@ -1192,7 +1163,7 @@
         window.executeSearch = function(inputId) {
             const input = document.getElementById(inputId);
             if (!input) return;
-            showEarthLoader("searching...", 750);
+            show3DNLoader("Searching...", 800);
             renderFeeds(input.value.trim().toLowerCase());
         }
 
@@ -1207,7 +1178,7 @@
         }
 
         window.filterCategory = function(cat) {
-            showEarthLoader("searching...", 600);
+            show3DNLoader("Filtering...", 600);
             activeSelectedCategory = cat;
             updateCategoryChipsUI(cat);
             pushAppNavigationState({
@@ -1237,7 +1208,7 @@
         }
 
         window.shareReelItem = function(title, url) {
-            showEarthLoader("loading...", 650);
+            show3DNLoader("Sharing...", 700);
             if (navigator.share) {
                 navigator.share({ title: title, url: url }).catch(() => {});
             } else if (navigator.clipboard) {
@@ -1482,7 +1453,7 @@
             const target = videoData.find(v => v.id === id);
             if(!target) return;
 
-            showEarthLoader("loading...", 750);
+            show3DNLoader("Playing...", 900);
             currentActiveVideoId = id;
             currentActiveVideoCategory = target.category;
             activeWatchSeconds = 0;
@@ -1892,7 +1863,7 @@
                 return;
             }
 
-            showEarthLoader("loading...", 1200);
+            show3DNLoader("Importing...", 1500);
             const rawLines = textarea.value.trim().split('\n');
             let addedCount = 0;
 
@@ -1959,7 +1930,7 @@
             renderAdminVideoManager();
             renderFeeds();
             textarea.value = '';
-            hideEarthLoader();
+            hide3DNLoader();
             alert(`Zabardast! Total ${addedCount} videos ek sath kamyabi se aapki app aur Firebase mein add ho chuki hain!`);
         }
 
@@ -1995,7 +1966,7 @@
 
         window.deleteVideoItem = async function(id) {
             if (confirm('Delete this stream from Firebase?')) {
-                showEarthLoader("loading...", 800);
+                show3DNLoader("Deleting...", 1000);
                 try {
                     await deleteDoc(doc(db, "nexrise_videos", id));
                 } catch(e) {
@@ -2010,7 +1981,7 @@
 
         window.handleDirectAdminPublish = async function(e) {
             e.preventDefault();
-            showEarthLoader("loading...", 800);
+            show3DNLoader("Publishing...", 1000);
             const title = document.getElementById('adminPubTitle').value;
             const creator = document.getElementById('adminPubCreator').value;
             const url = document.getElementById('adminPubUrl').value;
@@ -2035,17 +2006,17 @@
                 renderAdminVideoManager();
                 renderFeeds();
                 e.target.reset();
-                hideEarthLoader();
+                hide3DNLoader();
                 alert('Stream Published & Saved to Firebase!');
             } catch(err) {
-                hideEarthLoader();
+                hide3DNLoader();
                 alert('Error publishing to Firebase: ' + err.message);
             }
         }
 
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
-            showEarthLoader("loading...", 800);
+            show3DNLoader("Submitting...", 1000);
             const type = document.getElementById('videoType').value;
             const category = document.getElementById('videoCategory').value;
             const url = document.getElementById('videoUrl').value;
@@ -2067,11 +2038,11 @@
                 videoData.unshift(newItem);
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(videoData));
                 renderFeeds();
-                hideEarthLoader();
+                hide3DNLoader();
                 alert('Submitted & Saved to Firebase Successfully!');
                 e.target.reset();
             } catch(err) {
-                hideEarthLoader();
+                hide3DNLoader();
                 alert('Error submitting to Firebase: ' + err.message);
             }
         }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.6 — Powered by TiG</title>
+    <title>NexRise v2.8.5 — Powered by TiG</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -99,6 +99,13 @@
         transform-origin: center center;
       }
 
+      .vertical-slider {
+        writing-mode: bt-lr;
+        -webkit-appearance: slider-vertical;
+        width: 8px;
+        height: 80px;
+      }
+
       /* CUSTOM SCRUBBER RANGE SLIDER */
       input[type=range].custom-scrubber {
         -webkit-appearance: none;
@@ -125,7 +132,7 @@
 
         <div class="text-center z-10">
             <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                Powered by TiG (v2.8.6)
+                Powered by TiG (v2.8.5)
             </span>
         </div>
 
@@ -177,24 +184,14 @@
         </div>
     </div>
 
-    <!-- 2. PUBLIC TOP HEADER WITH WINDOW ARROWS -->
-    <header id="mainAppHeader" class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-brand-border px-3 sm:px-4 py-3 flex items-center justify-between w-full header-transform">
-        <div class="flex items-center gap-2 sm:gap-3">
-            <!-- WORKING BACK & FORWARD NAVIGATION KEYS -->
-            <div class="flex items-center gap-1 bg-brand-card border border-brand-border rounded-xl p-1">
-                <button id="navBackArrowBtn" onclick="navigatePageHistory('back')" class="p-1.5 text-gray-500 rounded-lg transition active:scale-95" title="Go Back Page">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                </button>
-                <button id="navForwardArrowBtn" onclick="navigatePageHistory('forward')" class="p-1.5 text-gray-500 rounded-lg transition active:scale-95" title="Go Forward Page">
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-            </div>
-
+    <!-- 2. PUBLIC TOP HEADER -->
+    <header id="mainAppHeader" class="sticky top-0 z-40 bg-black/95 backdrop-blur-lg border-b border-white/10 px-4 py-3 flex items-center justify-between w-full header-transform">
+        <div class="flex items-center gap-3">
             <button onclick="toggleSideMenu()" class="p-2 text-white hover:text-brand-parrot hover:bg-brand-card rounded-xl transition">
                 <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
 
-            <div class="flex items-center gap-2 cursor-pointer" onclick="triggerAdminSecretPrompt()">
+            <div class="flex items-center gap-2.5 cursor-pointer" onclick="triggerAdminSecretPrompt()">
                 <div class="w-9 h-9 rounded-xl bg-black border border-brand-parrot flex items-center justify-center neon-glow flex-shrink-0 p-1">
                     <svg viewBox="0 0 100 100" class="w-full h-full">
                         <path d="M28 72 V28 C28 22, 38 22, 42 28 L60 62 C64 68, 72 68, 72 62 V28" stroke="#39FF14" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -207,7 +204,7 @@
                     <div class="font-black tracking-wider text-base block leading-none">
                         <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
                     </div>
-                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.6 • TiG</span>
+                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.5 • TiG</span>
                 </div>
             </div>
         </div>
@@ -227,10 +224,7 @@
             </button>
         </div>
 
-        <div class="flex items-center gap-1 sm:gap-2">
-            <button onclick="shuffleAndRefreshFeed()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Shuffle Videos">
-                <i data-lucide="shuffle" class="w-4 h-4"></i>
-            </button>
+        <div class="flex items-center gap-2">
             <button onclick="toggleThemeMode()" class="p-2 text-brand-parrot hover:bg-brand-green/10 rounded-full transition" title="Toggle Light/Dark Theme">
                 <span class="text-lg">🌓</span>
             </button>
@@ -257,7 +251,7 @@
     <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
-                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.6</span>
+                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.5</span>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -298,37 +292,27 @@
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
                     <div class="desktop:col-span-2 space-y-3">
                         <div id="playerHoverContainer" class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10" onmousemove="showPlayerControls()" onclick="triggerControlsTouchToggle()">
-                            <div id="ytPlayerWrapper" class="absolute inset-0 w-full h-full">
-                                <div id="ytPlayerTarget"></div>
-                            </div>
-                            <!-- Android Tap-to-Unmute / Play Helper Overlay (Only shows if WebView blocks autoplay) -->
-                            <div id="androidPlayFallbackOverlay" onclick="forceAndroidPlayResume(event)" class="hidden absolute inset-0 z-30 bg-black/60 flex flex-col items-center justify-center cursor-pointer">
-                                <div class="w-16 h-16 rounded-full bg-brand-parrot text-black flex items-center justify-center shadow-2xl animate-pulse">
-                                    <i data-lucide="play" class="w-8 h-8 fill-black ml-1"></i>
-                                </div>
-                                <span class="text-[11px] font-bold text-white mt-2 bg-black/80 px-3 py-1 rounded-full border border-brand-parrot/50">Tap to Start Stream</span>
-                            </div>
-
-                            <div id="customPlayerControlsOverlay" class="absolute inset-0 z-20 bg-gradient-to-t from-black/90 via-black/30 to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3 pointer-events-auto">
+                            <div id="ytPlayerTarget"></div>
+                            <div id="customPlayerControlsOverlay" class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3 pointer-events-auto">
                                 <div class="flex items-center justify-between">
-                                    <button onclick="event.stopPropagation(); toggleBackgroundAudioMode()" title="Background Playback" class="px-3 py-1.5 rounded-lg bg-brand-parrot text-black font-extrabold text-xs shadow-lg flex items-center gap-1.5 hover:bg-green-400 transition">
+                                    <button onclick="toggleBackgroundAudioMode()" title="Background Playback" class="px-3 py-1.5 rounded-lg bg-brand-parrot text-black font-extrabold text-xs shadow-lg flex items-center gap-1.5 hover:bg-green-400 transition">
                                         <i data-lucide="headphones" class="w-4 h-4"></i> Background Play
                                     </button>
                                     <div class="flex items-center gap-2">
-                                        <button onclick="event.stopPropagation(); rotateActiveVideo()" title="Rotate Screen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
+                                        <button onclick="rotateActiveVideo()" title="Rotate Screen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
                                             <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                                         </button>
-                                        <button id="fullscreenToggleBtn" onclick="event.stopPropagation(); toggleIframeFullscreen()" title="Toggle Fullscreen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
-                                            <i id="fullscreenIcon" data-lucide="maximize" class="w-4 h-4"></i>
+                                        <button onclick="toggleIframeFullscreen()" title="Fullscreen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
+                                            <i data-lucide="maximize" class="w-4 h-4"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="flex items-center justify-center">
-                                    <button onclick="event.stopPropagation(); toggleCustomPlayerPlayPause()" class="w-14 h-14 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-2xl transform hover:scale-110 transition">
+                                    <button onclick="toggleCustomPlayerPlayPause()" class="w-14 h-14 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-2xl transform hover:scale-110 transition">
                                         <i id="centerPlayPauseIcon" data-lucide="pause" class="w-7 h-7 fill-black"></i>
                                     </button>
                                 </div>
-                                <div class="space-y-2" onclick="event.stopPropagation()">
+                                <div class="space-y-2">
                                     <div class="flex items-center gap-2">
                                         <span id="currentTimeText" class="text-[10px] font-mono text-brand-parrot font-bold">0:00</span>
                                         <input type="range" id="customVideoScrubber" min="0" max="100" value="0" oninput="seekCustomVideo(this.value)" class="flex-1 custom-scrubber accent-brand-parrot cursor-pointer">
@@ -343,8 +327,7 @@
                                                 <button onclick="toggleMuteAudio()" class="text-gray-300 hover:text-brand-parrot transition">
                                                     <i id="volumeMuteIcon" data-lucide="volume-2" class="w-4 h-4"></i>
                                                 </button>
-                                                <input type="range" id="volumeControlSlider" min="0" max="200" value="100" oninput="setCustomVolume(this.value)" class="w-20 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer" title="Volume Control (Up to 200%)">
-                                                <span id="volumeValueLabel" class="text-[9px] font-mono text-brand-parrot font-bold">100%</span>
+                                                <input type="range" id="volumeControlSlider" min="0" max="100" value="100" oninput="setCustomVolume(this.value)" class="w-16 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer">
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5 text-xs">
@@ -354,14 +337,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Smart Offline / Buffer Status Badge (Appears subtly after 2.5 mins of watching) -->
-                        <div id="smartBufferBadge" class="hidden bg-brand-green/10 border border-brand-parrot/40 px-3 py-1.5 rounded-xl flex items-center justify-between text-[11px]">
-                            <span class="text-brand-parrot font-bold flex items-center gap-1.5">
-                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Smart Stream Buffer Active (Offline Protection Ready)
-                            </span>
-                            <span id="bufferProgressText" class="font-mono text-gray-300 text-[10px]">Buffered</span>
                         </div>
 
                         <div id="backgroundPlaybackBar" class="hidden bg-black/80 border border-brand-parrot p-3 rounded-xl flex items-center justify-between">
@@ -483,7 +458,7 @@
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
                             <h3 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.6)
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.5)
                             </h3>
                             <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                         </div>
@@ -500,7 +475,7 @@
                             </div>
                         </div>
 
-                        <!-- MULTIPLE BULK LINKS IMPORT BOX -->
+                        <!-- NAYA FEATURE: MULTIPLE BULK LINKS IMPORT BOX -->
                         <div class="bg-black/80 p-4 rounded-xl border-2 border-brand-parrot/60 space-y-3 shadow-lg">
                             <h4 class="text-xs font-bold text-brand-parrot flex items-center gap-2">
                                 <i data-lucide="layers" class="w-4 h-4"></i> Bulk Multiple Videos Import (20-50 Links at Once)
@@ -684,7 +659,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const APP_VERSION = "2.8.6";
+        const APP_VERSION = "2.8.5";
         const LOCAL_STORAGE_KEY = "NEXRISE_V285_DATA";
         const SECURITY_PIN = "3835";
         const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
@@ -694,61 +669,20 @@
         let activeCommentVideoId = null;
 
         let ytPlayer = null;
-        let isYtApiReady = false;
         let isCustomPlaying = false;
         let scrubberInterval = null;
         let hoverHideTimeout = null;
-        let previewTouchTimer = null;
-        let currentActiveVideoId = null;
-        let activeWatchSeconds = 0;
-        let smartBufferActivated = false;
-
-        // CUSTOM APP NAVIGATION HISTORY STACK (Works 100% on Android APK & Browsers)
-        let appNavHistory = [{ tab: 'home', category: 'All', videoId: null }];
-        let appNavIndex = 0;
 
         const defaultData = [
             {
                 id: "1", type: "long", category: "Moral & Islamic",
                 url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
                 title: "Beautiful Quran Recitation & Moral Guidance",
-                creator: "Qari Official", duration: "03:32", likes: 420, comments: ["MashaAllah peaceful."], status: "approved"
+                creator: "Qari Official", likes: 420, comments: ["MashaAllah peaceful."], status: "approved"
             }
         ];
 
         let videoData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || defaultData;
-
-        // FISHER-YATES RANDOM SHUFFLE FUNCTION
-        function shuffleVideoArray(array) {
-            const arr = [...array];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        // Initial random shuffle on load/refresh
-        videoData = shuffleVideoArray(videoData);
-
-        window.shuffleAndRefreshFeed = function() {
-            videoData = shuffleVideoArray(videoData);
-            renderFeeds();
-        };
-
-        // YOUTUBE API READY HOOK
-        window.onYouTubeIframeAPIReady = function() {
-            isYtApiReady = true;
-        };
-
-        // SAFE SPLASH SCREEN REMOVER
-        function hideSplashScreenSafely() {
-            const splash = document.getElementById('splashScreen');
-            if (splash) {
-                splash.style.opacity = '0';
-                setTimeout(() => { if (splash) splash.remove(); }, 700);
-            }
-        }
 
         // SECRET KEYBOARD SHORTCUT (Ctrl + Shift + J)
         document.addEventListener('keydown', (e) => {
@@ -758,87 +692,18 @@
             }
         });
 
-        // UPDATE ARROW BUTTONS VISUAL STATE
-        function updateArrowButtonsState() {
-            const backBtn = document.getElementById('navBackArrowBtn');
-            const fwdBtn = document.getElementById('navForwardArrowBtn');
-            if (backBtn) {
-                if (appNavIndex > 0) {
-                    backBtn.className = "p-1.5 text-brand-parrot hover:bg-black rounded-lg transition active:scale-95 cursor-pointer";
-                } else {
-                    backBtn.className = "p-1.5 text-gray-600 rounded-lg transition opacity-50";
-                }
-            }
-            if (fwdBtn) {
-                if (appNavIndex < appNavHistory.length - 1) {
-                    fwdBtn.className = "p-1.5 text-brand-parrot hover:bg-black rounded-lg transition active:scale-95 cursor-pointer";
-                } else {
-                    fwdBtn.className = "p-1.5 text-gray-600 rounded-lg transition opacity-50";
-                }
-            }
-        }
-
-        // RECORD NAVIGATION STEP
-        function pushAppNavigationState(stateObj) {
-            const current = appNavHistory[appNavIndex];
-            if (current && current.tab === stateObj.tab && current.category === stateObj.category && current.videoId === stateObj.videoId) {
-                return;
-            }
-            appNavHistory = appNavHistory.slice(0, appNavIndex + 1);
-            appNavHistory.push(stateObj);
-            appNavIndex = appNavHistory.length - 1;
-            updateArrowButtonsState();
-            try { window.history.pushState(stateObj, '', window.location.href); } catch(e){}
-        }
-
-        // APPLY NAVIGATION STATE (Used by Back & Forward Keys)
-        function applyNavigationState(stateObj) {
-            if (!stateObj) return;
-            activeSelectedCategory = stateObj.category || 'All';
-            updateCategoryChipsUI(activeSelectedCategory);
-
-            switchTab(stateObj.tab || 'home', false);
-
-            if (stateObj.videoId) {
-                playStreamInTopPlayer(stateObj.videoId, false);
-            } else {
-                closeActivePlayer();
-            }
-            updateArrowButtonsState();
-        }
-
-        // WINDOW & ANDROID PAGE NAVIGATION ARROWS LOGIC
-        window.navigatePageHistory = function(direction) {
-            if (direction === 'back') {
-                if (appNavIndex > 0) {
-                    appNavIndex--;
-                    applyNavigationState(appNavHistory[appNavIndex]);
-                } else {
-                    // Fallback if at root: close player if open, or go to home
-                    const playerBox = document.getElementById('stickyVideoPlayerBox');
-                    if (playerBox && !playerBox.classList.contains('hidden')) {
-                        closeActivePlayer();
-                    } else {
-                        switchTab('home', false);
-                    }
-                }
-            } else if (direction === 'forward') {
-                if (appNavIndex < appNavHistory.length - 1) {
-                    appNavIndex++;
-                    applyNavigationState(appNavHistory[appNavIndex]);
-                }
-            }
-        };
-
         window.onload = async function() {
             try { lucide.createIcons(); } catch(e){}
             init3DIntroParticleCanvas();
             setupAutoHidingHeaderOnScroll();
-            updateArrowButtonsState();
 
-            try { window.history.replaceState(appNavHistory[0], '', window.location.href); } catch(e){}
-
-            setTimeout(hideSplashScreenSafely, 800);
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.remove(), 700);
+                }
+            }, 1200);
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
                 const pModal = document.getElementById('permissionModal');
@@ -849,18 +714,8 @@
             renderAdminVideoManager();
             updateLiveUsersCounter();
             setupReelsAutoPauseScrollObserver();
+            setupFeedAutoPlayOnScroll();
         };
-
-        window.addEventListener('popstate', (e) => {
-            if (e.state && e.state.tab) {
-                if (appNavIndex > 0) {
-                    appNavIndex--;
-                    applyNavigationState(appNavHistory[appNavIndex]);
-                } else {
-                    switchTab(e.state.tab, false);
-                }
-            }
-        });
 
         function setupAutoHidingHeaderOnScroll() {
             const mainScroll = document.getElementById('mainScrollContainer');
@@ -904,13 +759,10 @@
                     querySnapshot.forEach((docSnap) => {
                         fbData.push({ id: docSnap.id, ...docSnap.data() });
                     });
-                    // Randomly shuffle videos on every app launch / refresh
-                    videoData = shuffleVideoArray(fbData);
-                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fbData));
+                    videoData = fbData;
                 }
             } catch (err) {
                 console.log("Using local cache due to network or rules:", err);
-                videoData = shuffleVideoArray(videoData);
             }
             renderFeeds();
         }
@@ -978,15 +830,7 @@
             switchTab(tabId);
         }
 
-        window.switchTab = function(tabId, pushHistory = true) {
-            if (pushHistory) {
-                pushAppNavigationState({
-                    tab: tabId,
-                    category: activeSelectedCategory,
-                    videoId: null
-                });
-            }
-
+        window.switchTab = function(tabId) {
             ['home', 'nextip', 'nexvid', 'upload', 'profile'].forEach(t => {
                 const sec = document.getElementById(`tab-${t}`);
                 if (sec) sec.classList.toggle('hidden', t !== tabId);
@@ -1064,7 +908,8 @@
             renderFeeds(input.value.trim().toLowerCase());
         }
 
-        function updateCategoryChipsUI(cat) {
+        window.filterCategory = function(cat) {
+            activeSelectedCategory = cat;
             document.querySelectorAll('.category-chip').forEach(btn => {
                 if (btn.innerText.includes(cat) || (cat === 'All' && btn.innerText === 'All')) {
                     btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-parrot text-black border border-brand-parrot";
@@ -1072,35 +917,23 @@
                     btn.className = "category-chip px-4 py-1.5 rounded-full text-xs font-bold bg-brand-card text-gray-300 border border-brand-border hover:border-brand-parrot";
                 }
             });
-        }
-
-        window.filterCategory = function(cat) {
-            activeSelectedCategory = cat;
-            updateCategoryChipsUI(cat);
-            pushAppNavigationState({
-                tab: 'home',
-                category: cat,
-                videoId: currentActiveVideoId
-            });
             renderFeeds();
         }
 
         function extractYouTubeId(url) {
-            if (!url) return 'dQw4w9WgXcQ';
-            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             let match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : 'dQw4w9WgXcQ';
         }
 
         function cleanEmbedUrl(rawUrl, extraParams = '') {
-            let id = extractYouTubeId(rawUrl);
-            let clean = `https://www.youtube.com/embed/${id}`;
-            return `${clean}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`;
-        }
-
-        function getHighResThumbnail(url) {
-            let id = extractYouTubeId(url);
-            return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+            let clean = rawUrl.trim();
+            if(!clean.includes('youtube.com/embed/') && clean.includes('watch?v=')) {
+                let id = extractYouTubeId(clean);
+                clean = `https://www.youtube.com/embed/${id}`;
+            }
+            let sep = clean.includes('?') ? '&' : '?';
+            return `${clean}${sep}rel=0&modestbranding=1&playsinline=1&enablejsapi=1${extraParams}`;
         }
 
         function renderFeeds(filterQuery = '') {
@@ -1132,7 +965,7 @@
                             <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
                                 ${shorts.map(s => `
                                     <div onclick="playStreamInTopPlayer('${s.id}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
-                                        <img src="${getHighResThumbnail(s.url)}" alt="${s.title}" class="w-full h-full object-cover" loading="lazy">
+                                        <iframe src="${cleanEmbedUrl(s.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
                                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
                                             <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
                                             <p class="text-[9px] text-brand-parrot mt-1">@${s.creator}</p>
@@ -1158,7 +991,7 @@
                 const shorts = approved.filter(v => v.type === 'short');
                 shortsContainer.innerHTML = shorts.map(v => `
                     <div class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black border-b border-brand-border overflow-hidden" data-raw-url="${v.url}">
-                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
+                        <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=0&controls=1')}" src="" class="reel-iframe w-full h-full scale-105" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
                         <div class="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center justify-between z-20">
                             <div>
                                 <p class="text-xs font-bold text-white line-clamp-1">${v.title}</p>
@@ -1174,6 +1007,7 @@
 
             try { lucide.createIcons(); } catch(e){}
             setupReelsAutoPauseScrollObserver();
+            setupFeedAutoPlayOnScroll();
         }
 
         function setupReelsAutoPauseScrollObserver() {
@@ -1203,53 +1037,43 @@
             reelItems.forEach(item => observer.observe(item));
         }
 
-        window.startShortcutPreview = function(cardEl, rawUrl) {
-            if ('ontouchstart' in window) return; // Prevent touch conflict on Android
-            const iframe = cardEl.querySelector('.preview-iframe');
-            const thumb = cardEl.querySelector('.card-thumbnail');
-            if (iframe && thumb) {
-                iframe.src = cleanEmbedUrl(rawUrl, '&autoplay=1&mute=1&controls=0&loop=1');
-                iframe.classList.remove('hidden');
-                thumb.classList.add('opacity-0');
-            }
-        };
+        function setupFeedAutoPlayOnScroll() {
+            const videoCards = document.querySelectorAll('.feed-video-card');
+            if(!videoCards.length) return;
 
-        window.stopShortcutPreview = function(cardEl) {
-            const iframe = cardEl.querySelector('.preview-iframe');
-            const thumb = cardEl.querySelector('.card-thumbnail');
-            if (iframe && thumb) {
-                iframe.src = 'about:blank';
-                iframe.classList.add('hidden');
-                thumb.classList.remove('opacity-0');
-            }
-        };
+            const feedObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const iframe = entry.target.querySelector('.feed-card-iframe');
+                    if(!iframe) return;
+
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
+                        const rawSrc = iframe.getAttribute('data-raw-src');
+                        if (rawSrc && !iframe.src.includes('autoplay=1')) {
+                            iframe.src = cleanEmbedUrl(rawSrc, '&autoplay=1&mute=1');
+                        }
+                    } else {
+                        const rawSrc = iframe.getAttribute('data-raw-src');
+                        if (rawSrc && iframe.src.includes('autoplay=1')) {
+                            iframe.src = cleanEmbedUrl(rawSrc);
+                        }
+                    }
+                });
+            }, { threshold: 0.75 });
+
+            videoCards.forEach(card => feedObserver.observe(card));
+        }
 
         function renderCardHtml(v) {
-            const thumbUrl = getHighResThumbnail(v.url);
-            const duration = v.duration || '04:15';
-
             return `
                 <div class="feed-video-card bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
-                    <div class="aspect-video-container bg-black relative cursor-pointer" 
-                         onmouseenter="startShortcutPreview(this, '${v.url}')" 
-                         onmouseleave="stopShortcutPreview(this)"
-                         onclick="playStreamInTopPlayer('${v.id}')">
-                        
-                        <img src="${thumbUrl}" alt="${v.title}" class="card-thumbnail absolute inset-0 w-full h-full object-cover transition duration-300" loading="lazy">
-                        
-                        <iframe class="preview-iframe absolute inset-0 w-full h-full hidden pointer-events-none" frameborder="0" allow="autoplay; encrypted-media"></iframe>
-
-                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 flex items-center justify-center transition">
-                            <div class="w-11 h-11 rounded-full bg-black/70 text-brand-parrot flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition border border-brand-parrot/50 shadow-lg">
-                                <i data-lucide="play" class="w-5 h-5 fill-brand-parrot ml-0.5"></i>
+                    <div class="aspect-video-container bg-black relative cursor-pointer" onclick="playStreamInTopPlayer('${v.id}')">
+                        <iframe data-raw-src="${v.url}" src="${cleanEmbedUrl(v.url)}" title="${v.title}" frameborder="0" class="feed-card-iframe pointer-events-none"></iframe>
+                        <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 flex items-center justify-center transition">
+                            <div class="w-12 h-12 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-lg transform group-hover:scale-110 transition">
+                                <i data-lucide="play" class="w-6 h-6 fill-black ml-0.5"></i>
                             </div>
                         </div>
-
-                        <div class="absolute bottom-2 right-2 bg-black/80 text-brand-parrot font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-brand-parrot/30 shadow-md">
-                            ${duration}
-                        </div>
                     </div>
-
                     <div class="p-4 space-y-2">
                         <span class="text-[9px] font-black uppercase tracking-wider text-brand-parrot bg-brand-green/10 px-2 py-0.5 rounded-md">
                             ${v.category}
@@ -1271,50 +1095,27 @@
             `;
         }
 
-        // ANDROID + BROWSER DUAL-ENGINE AUTOPLAY STREAM LAUNCHER
-        window.playStreamInTopPlayer = function(id, recordHistory = true) {
+        window.playStreamInTopPlayer = function(id) {
             const target = videoData.find(v => v.id === id);
             if(!target) return;
-
-            currentActiveVideoId = id;
-            activeWatchSeconds = 0;
-            smartBufferActivated = false;
-
-            const bufferBadge = document.getElementById('smartBufferBadge');
-            if (bufferBadge) bufferBadge.classList.add('hidden');
-
-            if (recordHistory) {
-                const activeTab = ['home', 'nextip', 'nexvid', 'upload', 'profile'].find(t => {
-                    const el = document.getElementById(`tab-${t}`);
-                    return el && !el.classList.contains('hidden');
-                }) || 'home';
-
-                pushAppNavigationState({
-                    tab: activeTab,
-                    category: activeSelectedCategory,
-                    videoId: id
-                });
-            }
 
             const playerBox = document.getElementById('stickyVideoPlayerBox');
             const titleEl = document.getElementById('playerVideoTitle');
             const creatorEl = document.getElementById('playerVideoCreator');
             const recContainer = document.getElementById('playerRecommendationList');
-            const fallbackOverlay = document.getElementById('androidPlayFallbackOverlay');
 
             const videoId = extractYouTubeId(target.url);
 
             if (playerBox) {
                 if (titleEl) titleEl.innerText = target.title;
                 if (creatorEl) creatorEl.innerText = `@${target.creator}`;
-                if (fallbackOverlay) fallbackOverlay.classList.add('hidden');
 
                 if(recContainer) {
-                    const recs = shuffleVideoArray(videoData.filter(v => v.id !== id && v.status === 'approved'));
+                    const recs = videoData.filter(v => v.id !== id && v.status === 'approved');
                     recContainer.innerHTML = recs.map(v => `
                         <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2 p-2 bg-black/50 hover:bg-black/90 rounded-xl border border-white/5 hover:border-brand-parrot/50 transition cursor-pointer">
                             <div class="w-24 h-14 bg-black rounded-lg overflow-hidden shrink-0 relative">
-                                <img src="${getHighResThumbnail(v.url)}" class="w-full h-full object-cover" loading="lazy">
+                                <iframe src="${cleanEmbedUrl(v.url)}" class="w-full h-full pointer-events-none" frameborder="0"></iframe>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
@@ -1325,121 +1126,41 @@
                 }
 
                 playerBox.classList.remove('hidden');
-                const mainScroll = document.getElementById('mainScrollContainer');
-                if (mainScroll) mainScroll.scrollTo({ top: 0, behavior: 'smooth' });
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                // Recreate clean player container to prevent Android WebView stale iframe lock
-                const wrapper = document.getElementById('ytPlayerWrapper');
-                if (ytPlayer && typeof ytPlayer.destroy === 'function') {
-                    try { ytPlayer.destroy(); } catch(e){}
-                    ytPlayer = null;
-                }
-                if (wrapper) {
-                    wrapper.innerHTML = `<div id="ytPlayerTarget"></div>`;
-                }
-
-                // Initialize YT Player with Android WebView compatibility
-                if (typeof YT !== 'undefined' && YT.Player) {
+                if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+                    ytPlayer.loadVideoById(videoId);
+                } else {
                     ytPlayer = new YT.Player('ytPlayerTarget', {
                         height: '100%',
                         width: '100%',
                         videoId: videoId,
-                        host: 'https://www.youtube.com',
                         playerVars: {
                             'autoplay': 1,
                             'controls': 0,
                             'modestbranding': 1,
                             'rel': 0,
-                            'playsinline': 1,
-                            'iv_load_policy': 3,
-                            'origin': window.location.origin || 'https://youtube.com'
+                            'playsinline': 1
                         },
                         events: {
                             'onReady': onCustomPlayerReady,
-                            'onStateChange': onCustomPlayerStateChange,
-                            'onError': () => loadDirectAndroidFallbackIframe(videoId)
+                            'onStateChange': onCustomPlayerStateChange
                         }
                     });
-
-                    // Android WebView Autoplay Watchdog: If player hasn't started within 2.2s, force start or unmute-play
-                    setTimeout(() => {
-                        if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
-                            const state = ytPlayer.getPlayerState();
-                            if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
-                                try {
-                                    ytPlayer.mute();
-                                    ytPlayer.playVideo();
-                                    setTimeout(() => {
-                                        if (ytPlayer && typeof ytPlayer.unMute === 'function') {
-                                            ytPlayer.unMute();
-                                            ytPlayer.setVolume(100);
-                                        }
-                                    }, 400);
-                                } catch(e) {
-                                    if (fallbackOverlay) fallbackOverlay.classList.remove('hidden');
-                                }
-                            }
-                        }
-                    }, 2200);
-                } else {
-                    loadDirectAndroidFallbackIframe(videoId);
                 }
             }
         }
 
-        function loadDirectAndroidFallbackIframe(videoId) {
-            const wrapper = document.getElementById('ytPlayerWrapper');
-            if (!wrapper) return;
-            wrapper.innerHTML = `
-                <iframe 
-                    id="ytPlayerTarget"
-                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&modestbranding=1&controls=1" 
-                    class="w-full h-full border-0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
-                    allowfullscreen>
-                </iframe>
-            `;
-            isCustomPlaying = true;
-            updatePlayPauseUI(true);
-        }
-
-        window.forceAndroidPlayResume = function(e) {
-            if (e) e.stopPropagation();
-            const fallbackOverlay = document.getElementById('androidPlayFallbackOverlay');
-            if (fallbackOverlay) fallbackOverlay.classList.add('hidden');
-            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-                ytPlayer.unMute();
-                ytPlayer.setVolume(100);
-                ytPlayer.playVideo();
-            }
-        };
-
         function onCustomPlayerReady(event) {
-            try {
-                event.target.playVideo();
-                // Android WebView policy check: if blocked unmuted, briefly mute-play then unmute
-                setTimeout(() => {
-                    if (event.target.getPlayerState() !== YT.PlayerState.PLAYING) {
-                        event.target.mute();
-                        event.target.playVideo();
-                        setTimeout(() => {
-                            event.target.unMute();
-                            event.target.setVolume(100);
-                        }, 350);
-                    }
-                }, 600);
-            } catch(e){}
+            event.target.playVideo();
             isCustomPlaying = true;
             updatePlayPauseUI(true);
             startScrubberTimer();
         }
 
         function onCustomPlayerStateChange(event) {
-            const fallbackOverlay = document.getElementById('androidPlayFallbackOverlay');
             if (event.data === YT.PlayerState.PLAYING) {
                 isCustomPlaying = true;
-                if (fallbackOverlay) fallbackOverlay.classList.add('hidden');
                 updatePlayPauseUI(true);
                 startScrubberTimer();
             } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
@@ -1450,7 +1171,7 @@
         }
 
         window.toggleCustomPlayerPlayPause = function() {
-            if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') return;
+            if (!ytPlayer) return;
             if (isCustomPlaying) {
                 ytPlayer.pauseVideo();
             } else {
@@ -1464,37 +1185,6 @@
             if (centerIcon) centerIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
             if (bottomIcon) bottomIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
             try { lucide.createIcons(); } catch(e){}
-        }
-
-        // SMART BACKGROUND BUFFERING & SCRUBBER ENGINE (Activates after 2.5 mins of watching)
-        function triggerSmartBackgroundBuffering() {
-            if (smartBufferActivated) return;
-            smartBufferActivated = true;
-
-            const badge = document.getElementById('smartBufferBadge');
-            const progTxt = document.getElementById('bufferProgressText');
-            if (badge) {
-                badge.classList.remove('hidden');
-                try { lucide.createIcons(); } catch(e){}
-            }
-
-            // Persist current watched video metadata into offline storage cache
-            try {
-                const target = videoData.find(v => v.id === currentActiveVideoId);
-                if (target) {
-                    const cachedStreams = JSON.parse(localStorage.getItem('NEXRISE_OFFLINE_BUFFER_META') || '[]');
-                    if (!cachedStreams.some(c => c.id === target.id)) {
-                        cachedStreams.unshift({ ...target, cachedAt: Date.now() });
-                        localStorage.setItem('NEXRISE_OFFLINE_BUFFER_META', JSON.stringify(cachedStreams.slice(0, 15)));
-                    }
-                }
-            } catch(e){}
-
-            // Keep YouTube player buffer active smoothly without overloading bandwidth
-            if (ytPlayer && typeof ytPlayer.getVideoLoadedFraction === 'function' && progTxt) {
-                const loadedPct = Math.min(100, Math.round((ytPlayer.getVideoLoadedFraction() || 0.4) * 100));
-                progTxt.innerText = `${loadedPct}% Cached`;
-            }
         }
 
         function startScrubberTimer() {
@@ -1512,19 +1202,6 @@
                     }
                     if (currentTxt) currentTxt.innerText = formatTime(current);
                     if (durTxt) durTxt.innerText = formatTime(duration);
-
-                    if (isCustomPlaying) {
-                        activeWatchSeconds += 0.5;
-                        // Trigger smart background buffering after 2.5 minutes (150s)
-                        if (activeWatchSeconds >= 150) {
-                            triggerSmartBackgroundBuffering();
-                        }
-                        if (smartBufferActivated && typeof ytPlayer.getVideoLoadedFraction === 'function') {
-                            const progTxt = document.getElementById('bufferProgressText');
-                            const loadedPct = Math.min(100, Math.round((ytPlayer.getVideoLoadedFraction() || 0) * 100));
-                            if (progTxt) progTxt.innerText = `${loadedPct}% Cached`;
-                        }
-                    }
                 }
             }, 500);
         }
@@ -1549,16 +1226,8 @@
         }
 
         window.setCustomVolume = function(val) {
-            const label = document.getElementById('volumeValueLabel');
-            if (label) label.innerText = `${val}%`;
-
             if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
-                if (val <= 100) {
-                    ytPlayer.setVolume(val);
-                } else {
-                    ytPlayer.setVolume(100);
-                }
-
+                ytPlayer.setVolume(val);
                 const icon = document.getElementById('volumeMuteIcon');
                 if (icon) {
                     icon.setAttribute('data-lucide', val == 0 ? 'volume-x' : 'volume-2');
@@ -1568,7 +1237,7 @@
         }
 
         window.toggleMuteAudio = function() {
-            if (!ytPlayer || typeof ytPlayer.isMuted !== 'function') return;
+            if (!ytPlayer) return;
             const slider = document.getElementById('volumeControlSlider');
             if (ytPlayer.isMuted()) {
                 ytPlayer.unMute();
@@ -1618,11 +1287,8 @@
 
         window.closeActivePlayer = function() {
             const playerBox = document.getElementById('stickyVideoPlayerBox');
-            currentActiveVideoId = null;
             if (playerBox) {
-                if(ytPlayer && typeof ytPlayer.stopVideo === 'function') {
-                    try { ytPlayer.stopVideo(); } catch(e){}
-                }
+                if(ytPlayer && typeof ytPlayer.stopVideo === 'function') ytPlayer.stopVideo();
                 playerBox.classList.add('hidden');
                 stopBackgroundAudioMode();
                 stopScrubberTimer();
@@ -1630,26 +1296,12 @@
         }
 
         window.toggleIframeFullscreen = function() {
-            const container = document.getElementById('playerHoverContainer');
-            const icon = document.getElementById('fullscreenIcon');
-
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                if (container.requestFullscreen) {
-                    container.requestFullscreen();
-                } else if (container.webkitRequestFullscreen) {
-                    container.webkitRequestFullscreen();
-                }
-                if(icon) icon.setAttribute('data-lucide', 'minimize');
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                }
-                if(icon) icon.setAttribute('data-lucide', 'maximize');
+            const iframe = document.getElementById('playerHoverContainer');
+            if (iframe) {
+                if (iframe.requestFullscreen) iframe.requestFullscreen();
+                else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
             }
-            try { lucide.createIcons(); } catch(e){}
-        };
+        }
 
         window.rotateActiveVideo = function() {
             const target = document.getElementById('playerHoverContainer');
@@ -1659,7 +1311,7 @@
         }
 
         window.adjustVideoBrightness = function(val) {
-            const target = document.getElementById('ytPlayerWrapper');
+            const target = document.getElementById('ytPlayerTarget');
             if (target) {
                 target.style.filter = `brightness(${val}%)`;
             }
@@ -1701,6 +1353,16 @@
             document.getElementById('unlockedAdminDashboard').classList.add('hidden');
         }
 
+        window.exportUpdatedCode = function() {
+            const currentHTML = document.documentElement.outerHTML;
+            navigator.clipboard.writeText(currentHTML).then(() => {
+                alert('Full updated HTML code copied to clipboard successfully!');
+            }).catch(err => {
+                alert('Failed to copy code automatically.');
+            });
+        }
+
+        // NAYA FEATURE: MULTIPLE BULK LINKS BATCH IMPORT FUNCTION
         window.handleBulkMultipleImport = async function() {
             const textarea = document.getElementById('bulkLinksTextarea');
             const defaultCategory = document.getElementById('bulkDefaultCategory').value;
@@ -1753,12 +1415,12 @@
                     url: cleanUrl,
                     title: title,
                     creator: creator,
-                    duration: "05:00",
                     likes: Math.floor(Math.random() * 100) + 20,
                     comments: ["Bulk import via Admin Studio."],
                     status: "approved"
                 };
 
+                // Check Duplication
                 if (!videoData.some(v => v.url.includes(videoId))) {
                     try {
                         const docRef = await addDoc(collection(db, "nexrise_videos"), newItem);
@@ -1781,6 +1443,7 @@
             alert(`Zabardast! Total ${addedCount} videos ek sath kamyabi se aapki app aur Firebase mein add ho chuki hain!`);
         }
 
+        // RENDER ADMIN VIDEO MANAGER WITH SEARCH FILTER
         window.renderAdminVideoManager = function() {
             const container = document.getElementById('adminVideoManagerList');
             if (!container) return;
@@ -1839,7 +1502,6 @@
             const newItem = {
                 type, category,
                 url: cleanUrl, title, creator,
-                duration: "04:30",
                 likes: 0, comments: [], status: "approved"
             };
 
@@ -1870,7 +1532,6 @@
 
             const newItem = {
                 type, category, url: cleanUrl, title, creator,
-                duration: "04:00",
                 likes: 0, comments: [], status: "approved"
             };
 

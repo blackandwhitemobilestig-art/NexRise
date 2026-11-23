@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexRise v2.8.8 — Ethical & Clean Streaming</title>
+    <title>NexRise v2.8.9 — Ethical & Clean Streaming</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -77,7 +77,7 @@
         scroll-snap-align: start;
       }
       .video-rotate-90 {
-        transform: rotate(90deg) scale(1.25);
+        transform: rotate(90deg) scale(1.22);
         transform-origin: center center;
         transition: transform 0.3s ease;
       }
@@ -90,33 +90,40 @@
         pointer-events: none;
       }
       input[type=range].custom-scrubber {
-        height: 4px;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 5px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.25);
+        background: linear-gradient(to right, #39FF14 0%, #39FF14 var(--seek-pct, 0%), rgba(255, 255, 255, 0.25) var(--seek-pct, 0%), rgba(255, 255, 255, 0.25) 100%);
         outline: none;
-        transition: background-color 0.35s ease, height 0.25s ease;
+        transition: height 0.2s ease;
+      }
+      input[type=range].custom-scrubber:hover {
+        height: 7px;
       }
       input[type=range].custom-scrubber.buffer-ready-line {
-        background: linear-gradient(90deg, rgba(134, 239, 172, 0.85) 0%, rgba(187, 247, 208, 0.7) 100%);
-        height: 6px;
+        height: 7px;
       }
       input[type=range].custom-scrubber::-webkit-slider-thumb {
         -webkit-appearance: none;
-        height: 14px;
-        width: 14px;
+        appearance: none;
+        height: 15px;
+        width: 15px;
         border-radius: 50%;
         background: #39FF14;
         cursor: pointer;
-        box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
+        box-shadow: 0 0 8px rgba(57, 255, 20, 0.8);
       }
-      .player-guard-shade {
-        background: linear-gradient(
-          to top,
-          rgba(240, 245, 242, 0.14) 0%,
-          rgba(11, 15, 12, 0.72) 28%,
-          rgba(11, 15, 12, 0.35) 68%,
-          rgba(11, 15, 12, 0.75) 100%
-        );
+      input[type=range].custom-scrubber::-moz-range-thumb {
+        height: 15px;
+        width: 15px;
+        border: none;
+        border-radius: 50%;
+        background: #39FF14;
+        cursor: pointer;
+      }
+      .player-controls-bar {
+        background: rgba(11, 15, 12, 0.92);
       }
     </style>
 </head>
@@ -136,7 +143,7 @@
 
         <div class="text-center z-10">
             <span class="text-[11px] font-black tracking-[0.3em] uppercase text-brand-parrot bg-brand-green/10 border border-brand-green/30 px-4 py-1.5 rounded-full neon-glow">
-                Powered by TiG (v2.8.8)
+                Powered by TiG (v2.8.9)
             </span>
         </div>
 
@@ -162,7 +169,7 @@
                 <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
             </h1>
             <p class="text-[11px] font-bold uppercase tracking-[0.25em] text-gray-300 border-t border-brand-green/30 pt-2 max-w-xs mx-auto">
-                ETHICAL &amp; CLEAN STREAMING • v2.8.8
+                ETHICAL &amp; CLEAN STREAMING • v2.8.9
             </p>
         </div>
     </div>
@@ -217,7 +224,7 @@
                     <div class="font-black tracking-wider text-base block leading-none">
                         <span class="text-white">Nex</span><span class="text-brand-parrot">Rise</span>
                     </div>
-                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.8 • TiG</span>
+                    <span class="text-[8px] text-brand-parrot tracking-widest uppercase font-bold">v2.8.9 • TiG</span>
                 </div>
             </div>
         </div>
@@ -267,7 +274,7 @@
     <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
-                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.8</span>
+                <span class="font-black text-sm text-white tracking-wider">NexRise v2.8.9</span>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -294,7 +301,7 @@
         </div>
 
         <div class="bg-brand-card p-3.5 rounded-xl border border-brand-border space-y-1">
-            <p class="text-[10px] font-extrabold text-brand-parrot uppercase">Powered by TiG • v2.8.8</p>
+            <p class="text-[10px] font-extrabold text-brand-parrot uppercase">Powered by TiG • v2.8.9</p>
             <p class="text-[11px] text-gray-400 leading-tight">Ethically moderated streaming platform.</p>
         </div>
     </aside>
@@ -303,109 +310,110 @@
     <div class="flex-1 flex w-full max-w-7xl mx-auto">
         <main id="mainScrollContainer" class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
 
-            <!-- STICKY MEDIA PLAYER BOX -->
-            <div id="stickyVideoPlayerBox" class="hidden mb-6 bg-brand-card rounded-2xl border-2 border-brand-parrot p-3 shadow-2xl relative">
-                <div class="grid grid-cols-1 desktop:grid-cols-3 gap-5">
+            <!-- CLEAN YOUTUBE-STYLE MEDIA PLAYER & RECOMMENDATIONS -->
+            <div id="stickyVideoPlayerBox" class="hidden mb-6 space-y-4">
+                <div class="grid grid-cols-1 desktop:grid-cols-3 gap-6 items-start">
                     <div class="desktop:col-span-2 space-y-3">
-                        <div id="playerHoverContainer" class="aspect-video-container bg-black rounded-xl overflow-hidden relative group border border-white/10" onmousemove="showPlayerControls()" onclick="showPlayerControls()">
+                        <div id="playerHoverContainer" class="aspect-video-container bg-black rounded-xl overflow-hidden relative group" onmousemove="showPlayerControls()">
                             <div id="ytPlayerWrapper" class="absolute inset-0 w-full h-full">
                                 <div id="ytPlayerTarget"></div>
                             </div>
 
-                            <div id="androidPlayFallbackOverlay" onclick="forceAndroidPlayResume(event)" class="hidden absolute inset-0 z-30 bg-black/60 flex flex-col items-center justify-center cursor-pointer">
-                                <div class="w-16 h-16 rounded-full bg-brand-parrot text-black flex items-center justify-center shadow-2xl animate-pulse">
-                                    <i data-lucide="play" class="w-8 h-8 fill-black ml-1"></i>
+                            <!-- Tap-to-Start / Unmute Fallback Overlay -->
+                            <div id="androidPlayFallbackOverlay" onclick="forceAndroidPlayResume(event)" class="hidden absolute inset-0 z-30 bg-black/50 flex flex-col items-center justify-center cursor-pointer">
+                                <div class="w-14 h-14 rounded-full bg-brand-parrot text-black flex items-center justify-center shadow-xl">
+                                    <i data-lucide="play" class="w-7 h-7 fill-black ml-0.5"></i>
                                 </div>
-                                <span class="text-[11px] font-bold text-white mt-2 bg-black/80 px-3 py-1 rounded-full border border-brand-parrot/50">Tap to Start Stream</span>
+                                <span class="text-[11px] font-semibold text-white mt-2 bg-black/75 px-3 py-1 rounded-full">Tap to Play</span>
                             </div>
 
-                            <div id="gestureTapLayer" onclick="handlePlayerScreenSingleTap(event)" ondblclick="handlePlayerScreenDoubleTap(event)" class="absolute inset-0 z-20 flex">
+                            <!-- Gesture Layer: Single-Click Play/Pause on Desktop/PC; Single-Tap Shows Controls on Mobile; Double-Tap -10s/+10s -->
+                            <div id="gestureTapLayer" onclick="handlePlayerAreaSingleTap(event)" ondblclick="handlePlayerScreenDoubleTap(event)" class="absolute inset-0 z-20 flex">
                                 <div class="w-1/3 h-full flex items-center justify-start pl-4 pointer-events-none">
-                                    <span id="seekRewindBadge" class="opacity-0 transition-opacity duration-200 bg-black/75 text-brand-parrot font-mono text-xs font-black px-2.5 py-1 rounded-full border border-brand-parrot/40">-10s</span>
+                                    <span id="seekRewindBadge" class="opacity-0 transition-opacity duration-200 bg-black/80 text-brand-parrot font-mono text-xs font-bold px-2.5 py-1 rounded-full">-10s</span>
                                 </div>
                                 <div class="w-1/3 h-full pointer-events-none"></div>
                                 <div class="w-1/3 h-full flex items-center justify-end pr-4 pointer-events-none">
-                                    <span id="seekForwardBadge" class="opacity-0 transition-opacity duration-200 bg-black/75 text-brand-parrot font-mono text-xs font-black px-2.5 py-1 rounded-full border border-brand-parrot/40">+10s</span>
+                                    <span id="seekForwardBadge" class="opacity-0 transition-opacity duration-200 bg-black/80 text-brand-parrot font-mono text-xs font-bold px-2.5 py-1 rounded-full">+10s</span>
                                 </div>
                             </div>
 
-                            <div id="customPlayerControlsOverlay" class="absolute inset-0 z-25 player-guard-shade opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3 pointer-events-none">
-                                <div class="flex items-center justify-between pointer-events-auto">
-                                    <button onclick="event.stopPropagation(); toggleBackgroundAudioMode()" title="Background Playback" class="px-3 py-1.5 rounded-lg bg-brand-parrot text-black font-extrabold text-xs shadow-lg flex items-center gap-1.5 hover:bg-green-400 transition">
-                                        <i data-lucide="headphones" class="w-4 h-4"></i> Background Play
+                            <!-- Top Quick Controls (Background Play, Rotate, Fullscreen) -->
+                            <div id="customPlayerTopControls" class="absolute top-2.5 left-2.5 right-2.5 z-25 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                <button onclick="event.stopPropagation(); toggleBackgroundAudioMode()" title="Background Playback" class="pointer-events-auto px-3 py-1 rounded-lg bg-black/80 hover:bg-brand-parrot text-white hover:text-black font-semibold text-xs flex items-center gap-1.5 transition">
+                                    <i data-lucide="headphones" class="w-3.5 h-3.5"></i> Background
+                                </button>
+                                <div class="flex items-center gap-1.5 pointer-events-auto">
+                                    <button onclick="event.stopPropagation(); rotateActiveVideo()" title="Rotate Screen" class="w-8 h-8 rounded-full bg-black/80 hover:bg-brand-parrot hover:text-black flex items-center justify-center text-white transition">
+                                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                                     </button>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="event.stopPropagation(); rotateActiveVideo()" title="Rotate Screen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
-                                            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-                                        </button>
-                                        <button id="fullscreenToggleBtn" onclick="event.stopPropagation(); toggleIframeFullscreen()" title="Toggle Fullscreen" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black border border-white/20 flex items-center justify-center text-white transition shadow-lg">
-                                            <i id="fullscreenIcon" data-lucide="maximize" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center justify-center pointer-events-auto">
-                                    <button onclick="event.stopPropagation(); toggleCustomPlayerPlayPause()" class="w-14 h-14 rounded-full bg-brand-parrot/90 text-black flex items-center justify-center shadow-2xl transform hover:scale-110 transition">
-                                        <i id="centerPlayPauseIcon" data-lucide="pause" class="w-7 h-7 fill-black"></i>
+                                    <button id="fullscreenToggleBtn" onclick="event.stopPropagation(); toggleIframeFullscreen()" title="Toggle Fullscreen" class="w-8 h-8 rounded-full bg-black/80 hover:bg-brand-parrot hover:text-black flex items-center justify-center text-white transition">
+                                        <i id="fullscreenIcon" data-lucide="maximize" class="w-4 h-4"></i>
                                     </button>
-                                </div>
-
-                                <div class="space-y-2 pointer-events-auto bg-gradient-to-t from-white/10 via-black/70 to-transparent rounded-xl p-2" onclick="event.stopPropagation()">
-                                    <div class="flex items-center gap-2">
-                                        <span id="currentTimeText" class="text-[10px] font-mono text-brand-parrot font-bold">0:00</span>
-                                        <input type="range" id="customVideoScrubber" min="0" max="100" value="0" oninput="seekCustomVideo(this.value)" class="flex-1 custom-scrubber accent-brand-parrot cursor-pointer">
-                                        <span id="durationTimeText" class="text-[10px] font-mono text-gray-300">0:00</span>
-                                    </div>
-                                    <div class="flex items-center justify-between pt-1">
-                                        <div class="flex items-center gap-3">
-                                            <button onclick="toggleCustomPlayerPlayPause()" class="text-white hover:text-brand-parrot transition">
-                                                <i id="bottomPlayIcon" data-lucide="pause" class="w-5 h-5"></i>
-                                            </button>
-                                            <div class="flex items-center gap-1.5">
-                                                <button onclick="toggleMuteAudio()" class="text-gray-300 hover:text-brand-parrot transition">
-                                                    <i id="volumeMuteIcon" data-lucide="volume-2" class="w-4 h-4"></i>
-                                                </button>
-                                                <input type="range" id="volumeControlSlider" min="0" max="200" value="100" oninput="setCustomVolume(this.value)" class="w-20 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer" title="Volume Control (Up to 200%)">
-                                                <span id="volumeValueLabel" class="text-[9px] font-mono text-brand-parrot font-bold">100%</span>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-1.5 text-xs">
-                                            <span class="text-[10px] text-gray-300">☀️</span>
-                                            <input type="range" id="brightnessControlSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="w-16 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer">
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="backgroundPlaybackBar" class="hidden bg-black/80 border border-brand-parrot p-3 rounded-xl flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-3 h-3 rounded-full bg-brand-parrot animate-ping"></div>
-                                <span class="text-xs font-bold text-white">Background Audio Playing...</span>
+                        <!-- Always-Accessible Scrubbing Timeline & Player Controls Bar Right Below Video -->
+                        <div id="customPlayerControlsOverlay" class="player-controls-bar rounded-xl p-3 space-y-2.5" onclick="event.stopPropagation()">
+                            <div class="flex items-center gap-2.5">
+                                <span id="currentTimeText" class="text-[11px] font-mono text-gray-200 min-w-[36px]">0:00</span>
+                                <input type="range" id="customVideoScrubber" min="0" max="100" step="0.1" value="0" style="--seek-pct: 0%;" oninput="onScrubberInput(this.value)" onchange="seekCustomVideo(this.value)" class="flex-1 custom-scrubber cursor-pointer" title="Seek Timeline">
+                                <span id="durationTimeText" class="text-[11px] font-mono text-gray-400 min-w-[36px] text-right">0:00</span>
                             </div>
-                            <button onclick="stopBackgroundAudioMode()" class="px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition">
-                                Stop Playback
+
+                            <div class="flex items-center justify-between gap-2 pt-0.5">
+                                <div class="flex items-center gap-3">
+                                    <button onclick="toggleCustomPlayerPlayPause()" class="text-white hover:text-brand-parrot transition p-1" title="Play / Pause">
+                                        <i id="bottomPlayIcon" data-lucide="pause" class="w-5 h-5"></i>
+                                    </button>
+                                    <button onclick="seekRelativeBySeconds(-10); flashSeekBadge('seekRewindBadge')" class="text-xs font-mono text-gray-300 hover:text-brand-parrot transition px-1.5 py-0.5 rounded bg-white/5" title="Rewind 10s">-10s</button>
+                                    <button onclick="seekRelativeBySeconds(10); flashSeekBadge('seekForwardBadge')" class="text-xs font-mono text-gray-300 hover:text-brand-parrot transition px-1.5 py-0.5 rounded bg-white/5" title="Forward 10s">+10s</button>
+
+                                    <div class="flex items-center gap-1.5">
+                                        <button onclick="toggleMuteAudio()" class="text-gray-300 hover:text-brand-parrot transition p-1" title="Mute / Unmute">
+                                            <i id="volumeMuteIcon" data-lucide="volume-2" class="w-4 h-4"></i>
+                                        </button>
+                                        <input type="range" id="volumeControlSlider" min="0" max="200" value="100" oninput="setCustomVolume(this.value)" class="w-16 sm:w-20 h-1 bg-white/25 accent-brand-parrot rounded-lg cursor-pointer" title="Volume (Up to 200%)">
+                                        <span id="volumeValueLabel" class="text-[10px] font-mono text-gray-300">100%</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[11px] text-gray-300">☀️</span>
+                                    <input type="range" id="brightnessControlSlider" min="30" max="150" value="100" oninput="adjustVideoBrightness(this.value)" class="w-14 sm:w-16 h-1 bg-white/25 accent-brand-parrot rounded-lg cursor-pointer" title="Brightness">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="backgroundPlaybackBar" class="hidden bg-brand-card px-3.5 py-2.5 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2.5 h-2.5 rounded-full bg-brand-parrot animate-ping"></div>
+                                <span class="text-xs font-medium text-white">Background Audio Active</span>
+                            </div>
+                            <button onclick="stopBackgroundAudioMode()" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-xs font-semibold hover:bg-red-500 hover:text-white transition">
+                                Stop
                             </button>
                         </div>
 
-                        <div class="flex items-start justify-between gap-3 pt-1 border-t border-white/10">
+                        <div class="flex items-start justify-between gap-3 pt-1">
                             <div>
-                                <h3 id="playerVideoTitle" class="text-sm font-black text-white line-clamp-2">Playing Selected Stream</h3>
-                                <p id="playerVideoCreator" class="text-xs text-brand-parrot font-bold mt-0.5">@NexRise Stream</p>
+                                <h3 id="playerVideoTitle" class="text-base font-bold text-white line-clamp-2">Playing Selected Stream</h3>
+                                <p id="playerVideoCreator" class="text-xs text-gray-400 mt-0.5">@NexRise Stream</p>
                             </div>
-                            <button onclick="closeActivePlayer()" class="p-1 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg">
+                            <button onclick="closeActivePlayer()" class="p-1.5 text-gray-400 hover:text-white rounded-lg" title="Close Player">
                                 <i data-lucide="x" class="w-5 h-5"></i>
                             </button>
                         </div>
                     </div>
 
-                    <div class="space-y-3 border-t desktop:border-t-0 desktop:border-l border-white/10 pt-3 desktop:pt-0 desktop:pl-4">
-                        <h4 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                            <i data-lucide="list-video" class="w-4 h-4"></i> Recommended Streams
-                        </h4>
-                        <div id="playerRecommendationList" class="space-y-2 max-h-[350px] overflow-y-auto no-scrollbar"></div>
+                    <!-- YouTube-Style Clean Recommended List -->
+                    <div class="space-y-2.5">
+                        <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider">Up Next</h4>
+                        <div id="playerRecommendationList" class="space-y-2.5 max-h-[420px] overflow-y-auto no-scrollbar"></div>
                     </div>
                 </div>
+                <hr class="border-white/10">
             </div>
 
             <!-- TAB 1: HOME STREAM -->
@@ -488,7 +496,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-bold">Public Viewer</h3>
-                        <p class="text-xs text-gray-400">NexRise User Account • v2.8.8</p>
+                        <p class="text-xs text-gray-400">NexRise User Account • v2.8.9</p>
                     </div>
                 </div>
 
@@ -496,7 +504,7 @@
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-green-950 via-brand-card to-black border-2 border-brand-parrot space-y-5 shadow-2xl">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
                             <h3 class="text-xs font-black uppercase text-brand-parrot tracking-wider flex items-center gap-2">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.8)
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> TiG Creator Studio (v2.8.9)
                             </h3>
                             <button onclick="lockAdminDashboard()" class="text-xs text-red-400 hover:underline font-bold">Lock Studio</button>
                         </div>
@@ -670,13 +678,13 @@
         </div>
     </div>
 
-    <!-- APP CORE ENGINE v2.8.8 -->
+    <!-- APP CORE ENGINE v2.8.9 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        const LOCAL_STORAGE_KEY = "NEXRISE_V288_DATA";
-        const DEVICE_REEL_CACHE_KEY = "NEXRISE_V288_DEVICE_REELS_CACHE";
+        const LOCAL_STORAGE_KEY = "NEXRISE_V289_DATA";
+        const DEVICE_REEL_CACHE_KEY = "NEXRISE_V289_DEVICE_REELS_CACHE";
         const SECURITY_PIN = "3835";
         const OFFICIAL_EMAIL = "blackandwhitemobilestig@gmail.com";
 
@@ -692,10 +700,9 @@
             }
         };
 
-        // Hard fail-safe so splash screen never stays stuck
         setTimeout(() => {
             if (!splashDismissed) window.forceDismissSplash();
-        }, 1200);
+        }, 1000);
 
         const firebaseConfig = {
             apiKey: "AIzaSyD9Hk71ZWaJHw66p_lJ068wKAz6eIS4f1g",
@@ -719,9 +726,12 @@
 
         let ytPlayer = null;
         let isCustomPlaying = false;
+        let isScrubbing = false;
         let scrubberInterval = null;
-        let hoverHideTimeout = null;
+        let topControlsHideTimeout = null;
         let currentActiveVideoId = null;
+        let currentDurationSeconds = 240;
+        let fallbackSimulatedSeconds = 0;
         let activeWatchSeconds = 0;
         let smartBufferActivated = false;
 
@@ -742,12 +752,26 @@
             }
         ];
 
+        function isDesktopOrPcView() {
+            const hasFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+            const noTouch = !('ontouchstart' in window) || navigator.maxTouchPoints === 0;
+            return (hasFinePointer && noTouch) || window.innerWidth >= 1024;
+        }
+
         function safeRefreshIcons() {
             try {
                 if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
                     lucide.createIcons();
                 }
             } catch(e){}
+        }
+
+        function parseDurationToSeconds(durStr) {
+            if (!durStr || typeof durStr !== 'string') return 240;
+            const parts = durStr.split(':').map(Number);
+            if (parts.length === 2 && !parts.some(isNaN)) return parts[0] * 60 + parts[1];
+            if (parts.length === 3 && !parts.some(isNaN)) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+            return 240;
         }
 
         function normalizeItems(rawList) {
@@ -777,11 +801,11 @@
 
         let existingLocal = null;
         try {
-            existingLocal = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem("NEXRISE_V287_DATA") || "null");
+            existingLocal = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem("NEXRISE_V288_DATA") || "null");
         } catch(e){}
         let videoData = shuffleVideoArray(normalizeItems(existingLocal && existingLocal.length ? existingLocal : defaultData));
 
-        function showEarthLoader(labelText = "searching...", autoHideMs = 450) {
+        function showEarthLoader(labelText = "searching...", autoHideMs = 400) {
             const loader = document.getElementById('centerEarthLoader');
             const txt = document.getElementById('centerEarthLoaderText');
             if (!loader) return;
@@ -801,7 +825,7 @@
         }
 
         window.shuffleAndRefreshFeed = function() {
-            showEarthLoader("searching...", 400);
+            showEarthLoader("searching...", 350);
             try { localStorage.removeItem(DEVICE_REEL_CACHE_KEY); } catch(e){}
             videoData = shuffleVideoArray(videoData);
             renderFeeds();
@@ -876,7 +900,7 @@
             try { updateLiveUsersCounter(); } catch(e){}
 
             try { window.history.replaceState(appNavHistory[0], '', window.location.href); } catch(e){}
-            setTimeout(() => window.forceDismissSplash(), 600);
+            setTimeout(() => window.forceDismissSplash(), 500);
 
             if (!localStorage.getItem("nexrise_permissions_asked")) {
                 const pModal = document.getElementById('permissionModal');
@@ -957,7 +981,7 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 container.appendChild(renderer.domElement);
 
-                const count = 220;
+                const count = 200;
                 const positions = new Float32Array(count * 3);
                 for (let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * 10;
 
@@ -1163,9 +1187,9 @@
                                 ${shorts.map(s => `
                                     <div onclick="playStreamInTopPlayer('${s.id}')" class="flex-shrink-0 w-36 h-56 bg-black rounded-xl border border-white/10 relative overflow-hidden group cursor-pointer">
                                         <img src="${getHighResThumbnail(s.url)}" alt="${s.title}" class="w-full h-full object-cover" loading="lazy">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-2.5 flex flex-col justify-end">
+                                        <div class="p-2 bg-black/85">
                                             <p class="text-[11px] font-bold text-white line-clamp-2">${s.title}</p>
-                                            <p class="text-[9px] text-brand-parrot mt-1">@${s.creator}</p>
+                                            <p class="text-[9px] text-brand-parrot mt-0.5">@${s.creator}</p>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -1193,7 +1217,7 @@
                     <div onclick="toggleReelMuteOrPlay(this, event)" class="reel-item h-full w-full snap-start relative flex items-center justify-center bg-black overflow-hidden cursor-pointer">
                         <img src="${getHighResThumbnail(v.url)}" alt="${v.title}" class="reel-poster absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <iframe data-src="${cleanEmbedUrl(v.url, '&autoplay=1&mute=1&controls=0&loop=1')}" src="${idx === 0 ? cleanEmbedUrl(v.url, '&autoplay=1&mute=1&controls=0&loop=1') : ''}" class="reel-iframe relative z-10 w-full h-full scale-105" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent flex items-end justify-between p-4 z-20 pointer-events-none">
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/80 flex items-end justify-between p-4 z-20 pointer-events-none">
                             <div class="max-w-[72%]">
                                 <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
                                 <p class="text-[10px] text-gray-300 mt-0.5">@${v.creator}</p>
@@ -1247,7 +1271,7 @@
         }
 
         window.startShortcutPreview = function(cardEl, rawUrl) {
-            if ('ontouchstart' in window) return;
+            if (!isDesktopOrPcView()) return;
             const iframe = cardEl.querySelector('.preview-iframe');
             const thumb = cardEl.querySelector('.card-thumbnail');
             if (iframe && thumb) {
@@ -1267,28 +1291,24 @@
             }
         };
 
+        // Clean thumbnail without black shade overlay
         function renderCardHtml(v) {
             return `
-                <div class="feed-video-card bg-brand-card rounded-2xl border border-brand-border overflow-hidden hover:border-brand-parrot/50 transition group">
+                <div class="feed-video-card bg-brand-card rounded-xl overflow-hidden transition group">
                     <div class="aspect-video-container bg-black relative cursor-pointer"
                          onmouseenter="startShortcutPreview(this, '${v.url}')"
                          onmouseleave="stopShortcutPreview(this)"
                          onclick="playStreamInTopPlayer('${v.id}')">
-                        <img src="${getHighResThumbnail(v.url)}" alt="${v.title}" class="card-thumbnail absolute inset-0 w-full h-full object-cover transition duration-300" loading="lazy">
+                        <img src="${getHighResThumbnail(v.url)}" alt="${v.title}" class="card-thumbnail absolute inset-0 w-full h-full object-cover" loading="lazy">
                         <iframe class="preview-iframe absolute inset-0 w-full h-full hidden pointer-events-none" frameborder="0" allow="autoplay; encrypted-media"></iframe>
-                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 flex items-center justify-center transition">
-                            <div class="w-11 h-11 rounded-full bg-black/70 text-brand-parrot flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition border border-brand-parrot/50 shadow-lg">
-                                <i data-lucide="play" class="w-5 h-5 fill-brand-parrot ml-0.5"></i>
-                            </div>
-                        </div>
-                        <div class="absolute bottom-2 right-2 bg-black/80 text-brand-parrot font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-brand-parrot/30 shadow-md">
+                        <div class="absolute bottom-2 right-2 bg-black/85 text-white font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded">
                             ${v.duration || '04:15'}
                         </div>
                     </div>
-                    <div class="p-4 space-y-2">
-                        <span class="text-[9px] font-black uppercase tracking-wider text-brand-parrot bg-brand-green/10 px-2 py-0.5 rounded-md">${v.category}</span>
+                    <div class="p-3 space-y-1.5">
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-brand-parrot">${v.category}</span>
                         <h3 class="font-bold text-sm text-white line-clamp-2 cursor-pointer hover:text-brand-parrot" onclick="playStreamInTopPlayer('${v.id}')">${v.title}</h3>
-                        <div class="flex items-center justify-between pt-2 text-xs text-gray-400 border-t border-white/5">
+                        <div class="flex items-center justify-between pt-1.5 text-xs text-gray-400">
                             <span class="font-medium text-gray-300">${v.creator}</span>
                             <div class="flex items-center gap-3">
                                 <button onclick="toggleLike('${v.id}')" class="hover:text-brand-parrot flex items-center gap-1">👍 ${v.likes}</button>
@@ -1314,45 +1334,112 @@
             setTimeout(() => { badge.classList.remove('opacity-100'); badge.classList.add('opacity-0'); }, 650);
         }
 
-        function seekRelativeBySeconds(deltaSec) {
-            if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function' && typeof ytPlayer.seekTo === 'function') {
-                const current = ytPlayer.getCurrentTime() || 0;
-                const duration = (typeof ytPlayer.getDuration === 'function' ? ytPlayer.getDuration() : 0) || current + Math.abs(deltaSec);
-                ytPlayer.seekTo(Math.max(0, Math.min(duration, current + deltaSec)), true);
-            } else {
-                const scrubber = document.getElementById('customVideoScrubber');
-                if (scrubber) {
-                    const nextVal = Math.max(0, Math.min(100, Number(scrubber.value || 0) + (deltaSec > 0 ? 5 : -5)));
-                    scrubber.value = nextVal;
-                    seekCustomVideo(nextVal);
-                }
+        function syncScrubberVisual(pct, currentSec, durationSec) {
+            const clampedPct = Math.max(0, Math.min(100, Number(pct) || 0));
+            const scrubber = document.getElementById('customVideoScrubber');
+            const currentTxt = document.getElementById('currentTimeText');
+            const durTxt = document.getElementById('durationTimeText');
+
+            if (scrubber) {
+                if (!isScrubbing) scrubber.value = clampedPct;
+                scrubber.style.setProperty('--seek-pct', `${clampedPct}%`);
+            }
+            if (typeof currentSec === 'number' && !isNaN(currentSec) && currentTxt) {
+                currentTxt.innerText = formatTime(currentSec);
+            }
+            if (typeof durationSec === 'number' && !isNaN(durationSec) && durationSec > 0 && durTxt) {
+                durTxt.innerText = formatTime(durationSec);
             }
         }
 
-        window.handlePlayerScreenSingleTap = function() {
+        window.onScrubberInput = function(val) {
+            isScrubbing = true;
+            const pct = Number(val) || 0;
+            const targetSec = (pct / 100) * currentDurationSeconds;
+            syncScrubberVisual(pct, targetSec, currentDurationSeconds);
+        };
+
+        window.seekCustomVideo = function(val) {
+            const pct = Math.max(0, Math.min(100, Number(val) || 0));
+            const targetSec = (pct / 100) * currentDurationSeconds;
+            fallbackSimulatedSeconds = targetSec;
+
+            if (ytPlayer && typeof ytPlayer.getDuration === 'function' && typeof ytPlayer.seekTo === 'function') {
+                const realDur = ytPlayer.getDuration() || currentDurationSeconds;
+                currentDurationSeconds = realDur;
+                ytPlayer.seekTo((pct / 100) * realDur, true);
+            } else {
+                sendFallbackIframeCommand('seekTo', [targetSec, true]);
+            }
+
+            syncScrubberVisual(pct, targetSec, currentDurationSeconds);
+            setTimeout(() => { isScrubbing = false; }, 120);
+        };
+
+        function seekRelativeBySeconds(deltaSec) {
+            let currentSec = fallbackSimulatedSeconds;
+            let totalSec = currentDurationSeconds;
+
+            if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
+                currentSec = ytPlayer.getCurrentTime() || 0;
+                if (typeof ytPlayer.getDuration === 'function' && ytPlayer.getDuration() > 0) {
+                    totalSec = ytPlayer.getDuration();
+                    currentDurationSeconds = totalSec;
+                }
+            }
+
+            const nextSec = Math.max(0, Math.min(totalSec, currentSec + deltaSec));
+            const nextPct = totalSec > 0 ? (nextSec / totalSec) * 100 : 0;
+            fallbackSimulatedSeconds = nextSec;
+
+            if (ytPlayer && typeof ytPlayer.seekTo === 'function') {
+                ytPlayer.seekTo(nextSec, true);
+            } else {
+                sendFallbackIframeCommand('seekTo', [nextSec, true]);
+            }
+
+            syncScrubberVisual(nextPct, nextSec, totalSec);
+        }
+
+        // Single click plays/pauses on Desktop/PC; single tap reveals controls on Mobile/Touch
+        window.handlePlayerAreaSingleTap = function() {
             if (singleTapTimer) clearTimeout(singleTapTimer);
-            singleTapTimer = setTimeout(() => { toggleCustomPlayerPlayPause(); showPlayerControls(); }, 220);
+            singleTapTimer = setTimeout(() => {
+                showPlayerControls();
+                if (isDesktopOrPcView()) {
+                    toggleCustomPlayerPlayPause();
+                }
+            }, 220);
         };
 
         window.handlePlayerScreenDoubleTap = function(e) {
             if (singleTapTimer) { clearTimeout(singleTapTimer); singleTapTimer = null; }
             const rect = e.currentTarget.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
-            if (clickX < rect.width * 0.4) { seekRelativeBySeconds(-10); flashSeekBadge('seekRewindBadge'); }
-            else if (clickX > rect.width * 0.6) { seekRelativeBySeconds(10); flashSeekBadge('seekForwardBadge'); }
-            else toggleCustomPlayerPlayPause();
+            if (clickX < rect.width * 0.4) {
+                seekRelativeBySeconds(-10);
+                flashSeekBadge('seekRewindBadge');
+            } else if (clickX > rect.width * 0.6) {
+                seekRelativeBySeconds(10);
+                flashSeekBadge('seekForwardBadge');
+            } else {
+                toggleCustomPlayerPlayPause();
+            }
         };
 
         window.playStreamInTopPlayer = function(id, recordHistory = true) {
             const target = videoData.find(v => v.id === id);
             if (!target) return;
-            showEarthLoader("loading...", 400);
+            showEarthLoader("loading...", 350);
             currentActiveVideoId = id;
             activeWatchSeconds = 0;
             smartBufferActivated = false;
+            fallbackSimulatedSeconds = 0;
+            currentDurationSeconds = parseDurationToSeconds(target.duration);
 
             const scrubberEl = document.getElementById('customVideoScrubber');
             if (scrubberEl) scrubberEl.classList.remove('buffer-ready-line');
+            syncScrubberVisual(0, 0, currentDurationSeconds);
 
             if (recordHistory) {
                 const activeTab = ['home', 'nextip', 'nexvid', 'upload', 'profile'].find(t => {
@@ -1376,17 +1463,18 @@
 
                 if (recContainer) {
                     const sameCategoryRecs = videoData.filter(v => v.id !== id && v.status === 'approved' && v.category === target.category);
-                    recContainer.innerHTML = sameCategoryRecs.map(v => `
-                        <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2 p-2 bg-black/50 hover:bg-black/90 rounded-xl border border-white/5 hover:border-brand-parrot/50 transition cursor-pointer">
-                            <div class="w-24 h-14 bg-black rounded-lg overflow-hidden shrink-0 relative">
+                    const otherRecs = sameCategoryRecs.length ? sameCategoryRecs : videoData.filter(v => v.id !== id && v.status === 'approved');
+                    recContainer.innerHTML = otherRecs.map(v => `
+                        <div onclick="playStreamInTopPlayer('${v.id}')" class="flex gap-2.5 p-1.5 hover:bg-white/5 rounded-xl transition cursor-pointer">
+                            <div class="w-28 h-16 bg-black rounded-lg overflow-hidden shrink-0 relative">
                                 <img src="${getHighResThumbnail(v.url)}" class="w-full h-full object-cover" loading="lazy">
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs font-bold text-white line-clamp-2">${v.title}</p>
-                                <p class="text-[10px] text-brand-parrot mt-0.5">@${v.creator}</p>
+                                <p class="text-xs font-semibold text-white line-clamp-2">${v.title}</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5">${v.creator}</p>
                             </div>
                         </div>
-                    `).join('') || `<p class="text-xs text-gray-500">No more streams in ${target.category}.</p>`;
+                    `).join('') || `<p class="text-xs text-gray-500">No more streams available.</p>`;
                 }
 
                 playerBox.classList.remove('hidden');
@@ -1401,10 +1489,20 @@
                 }
                 if (wrapper) wrapper.innerHTML = `<div id="ytPlayerTarget"></div>`;
 
+                const isMobileDevice = !isDesktopOrPcView();
                 if (typeof YT !== 'undefined' && YT.Player) {
                     ytPlayer = new YT.Player('ytPlayerTarget', {
                         height: '100%', width: '100%', videoId, host: 'https://www.youtube.com',
-                        playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0, playsinline: 1, iv_load_policy: 3, enablejsapi: 1 },
+                        playerVars: {
+                            autoplay: 1,
+                            mute: isMobileDevice ? 1 : 0,
+                            controls: 0,
+                            modestbranding: 1,
+                            rel: 0,
+                            playsinline: 1,
+                            iv_load_policy: 3,
+                            enablejsapi: 1
+                        },
                         events: {
                             onReady: onCustomPlayerReady,
                             onStateChange: onCustomPlayerStateChange,
@@ -1414,16 +1512,19 @@
                 } else {
                     loadDirectAndroidFallbackIframe(videoId);
                 }
+
+                startScrubberTimer();
             }
         };
 
         function loadDirectAndroidFallbackIframe(videoId) {
             const wrapper = document.getElementById('ytPlayerWrapper');
             if (!wrapper) return;
-            wrapper.innerHTML = `<iframe id="ytPlayerTarget" src="https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&modestbranding=1&controls=0&iv_load_policy=3&enablejsapi=1" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+            wrapper.innerHTML = `<iframe id="ytPlayerTarget" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&controls=0&iv_load_policy=3&enablejsapi=1" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
             isCustomPlaying = true;
             updatePlayPauseUI(true);
             showPlayerControls();
+            startScrubberTimer();
         }
 
         window.forceAndroidPlayResume = function(e) {
@@ -1438,10 +1539,18 @@
             }
             isCustomPlaying = true;
             updatePlayPauseUI(true);
+            startScrubberTimer();
         };
 
         function onCustomPlayerReady(event) {
-            try { event.target.playVideo(); } catch(e){}
+            try {
+                event.target.playVideo();
+                if (!isDesktopOrPcView()) {
+                    setTimeout(() => {
+                        try { event.target.unMute(); event.target.setVolume(100); } catch(err){}
+                    }, 500);
+                }
+            } catch(e){}
             isCustomPlaying = true;
             updatePlayPauseUI(true);
             startScrubberTimer();
@@ -1458,24 +1567,28 @@
             } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
                 isCustomPlaying = false;
                 updatePlayPauseUI(false);
-                stopScrubberTimer();
             }
         }
 
         window.toggleCustomPlayerPlayPause = function() {
+            const fallbackOverlay = document.getElementById('androidPlayFallbackOverlay');
+            if (fallbackOverlay) fallbackOverlay.classList.add('hidden');
+
             if (ytPlayer && typeof ytPlayer.playVideo === 'function' && typeof ytPlayer.pauseVideo === 'function') {
-                if (isCustomPlaying) ytPlayer.pauseVideo(); else ytPlayer.playVideo();
+                try {
+                    if (isCustomPlaying) ytPlayer.pauseVideo();
+                    else { ytPlayer.unMute(); ytPlayer.playVideo(); }
+                } catch(e){}
             } else {
                 sendFallbackIframeCommand(isCustomPlaying ? 'pauseVideo' : 'playVideo');
             }
             isCustomPlaying = !isCustomPlaying;
             updatePlayPauseUI(isCustomPlaying);
+            startScrubberTimer();
         };
 
         function updatePlayPauseUI(playing) {
-            const centerIcon = document.getElementById('centerPlayPauseIcon');
             const bottomIcon = document.getElementById('bottomPlayIcon');
-            if (centerIcon) centerIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
             if (bottomIcon) bottomIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
             safeRefreshIcons();
         }
@@ -1483,21 +1596,39 @@
         function startScrubberTimer() {
             stopScrubberTimer();
             scrubberInterval = setInterval(() => {
+                if (isScrubbing) return;
+
+                let current = fallbackSimulatedSeconds;
+                let duration = currentDurationSeconds;
+
                 if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
-                    const current = ytPlayer.getCurrentTime();
-                    const duration = ytPlayer.getDuration();
+                    const ytCur = ytPlayer.getCurrentTime();
+                    const ytDur = typeof ytPlayer.getDuration === 'function' ? ytPlayer.getDuration() : 0;
+                    if (typeof ytCur === 'number' && !isNaN(ytCur) && ytCur > 0) {
+                        current = ytCur;
+                        fallbackSimulatedSeconds = ytCur;
+                    } else if (isCustomPlaying) {
+                        fallbackSimulatedSeconds = Math.min(duration, fallbackSimulatedSeconds + 0.5);
+                        current = fallbackSimulatedSeconds;
+                    }
+                    if (typeof ytDur === 'number' && !isNaN(ytDur) && ytDur > 0) {
+                        duration = ytDur;
+                        currentDurationSeconds = ytDur;
+                    }
+                } else if (isCustomPlaying) {
+                    fallbackSimulatedSeconds = Math.min(duration, fallbackSimulatedSeconds + 0.5);
+                    current = fallbackSimulatedSeconds;
+                }
+
+                const pct = duration > 0 ? (current / duration) * 100 : 0;
+                syncScrubberVisual(pct, current, duration);
+
+                if (isCustomPlaying) {
+                    activeWatchSeconds += 0.5;
                     const scrubber = document.getElementById('customVideoScrubber');
-                    const currentTxt = document.getElementById('currentTimeText');
-                    const durTxt = document.getElementById('durationTimeText');
-                    if (duration > 0 && scrubber) scrubber.value = (current / duration) * 100;
-                    if (currentTxt) currentTxt.innerText = formatTime(current);
-                    if (durTxt) durTxt.innerText = formatTime(duration);
-                    if (isCustomPlaying) {
-                        activeWatchSeconds += 0.5;
-                        if (activeWatchSeconds >= 150 && !smartBufferActivated) {
-                            smartBufferActivated = true;
-                            if (scrubber) scrubber.classList.add('buffer-ready-line');
-                        }
+                    if (activeWatchSeconds >= 150 && !smartBufferActivated) {
+                        smartBufferActivated = true;
+                        if (scrubber) scrubber.classList.add('buffer-ready-line');
                     }
                 }
             }, 500);
@@ -1508,19 +1639,10 @@
         }
 
         function formatTime(seconds) {
-            const s = Math.floor(seconds || 0);
+            const s = Math.max(0, Math.floor(seconds || 0));
             const m = Math.floor(s / 60);
             return `${m}:${(s % 60) < 10 ? '0' : ''}${s % 60}`;
         }
-
-        window.seekCustomVideo = function(val) {
-            showPlayerControls();
-            if (ytPlayer && typeof ytPlayer.getDuration === 'function' && typeof ytPlayer.seekTo === 'function') {
-                ytPlayer.seekTo((val / 100) * ytPlayer.getDuration(), true);
-            } else {
-                sendFallbackIframeCommand('seekTo', [Number(val) * 3, true]);
-            }
-        };
 
         window.setCustomVolume = function(val) {
             const label = document.getElementById('volumeValueLabel');
@@ -1547,17 +1669,19 @@
         };
 
         window.showPlayerControls = function() {
-            const overlay = document.getElementById('customPlayerControlsOverlay');
-            if (overlay) {
-                overlay.style.opacity = '1';
-                if (hoverHideTimeout) clearTimeout(hoverHideTimeout);
-                hoverHideTimeout = setTimeout(() => { if (isCustomPlaying) overlay.style.opacity = '0'; }, 3000);
+            const topControls = document.getElementById('customPlayerTopControls');
+            if (topControls) {
+                topControls.style.opacity = '1';
+                if (topControlsHideTimeout) clearTimeout(topControlsHideTimeout);
+                topControlsHideTimeout = setTimeout(() => {
+                    if (isCustomPlaying) topControls.style.opacity = '0';
+                }, 3000);
             }
         };
 
         window.toggleBackgroundAudioMode = function() {
             const bgBar = document.getElementById('backgroundPlaybackBar');
-            if (bgBar) { bgBar.classList.remove('hidden'); alert('Background Audio playback activated!'); }
+            if (bgBar) bgBar.classList.remove('hidden');
         };
 
         window.stopBackgroundAudioMode = function() {

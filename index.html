@@ -2,9 +2,11 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NexRise • v2.9.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NexRise v2.9.2 • TiG Stream</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -13,256 +15,219 @@
                     colors: {
                         brand: {
                             parrot: '#39FF14',
-                            green: '#00C853',
-                            dark: '#0A0F0C',
-                            card: '#131A15',
-                            border: '#1F2A22'
+                            green: '#16a34a',
+                            dark: '#09090b',
+                            card: '#121513',
+                            border: '#232925'
                         }
                     },
                     screens: {
-                        'tablet': '640px',
-                        'desktop': '1024px',
+                        tablet: '640px',
+                        desktop: '1024px'
                     }
                 }
             }
-        }
+        };
     </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
     <style>
-        body {
-            background-color: #0A0F0C;
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            background-color: #09090b;
             color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
-        html.light body {
-            background-color: #f4f7f5;
-            color: #0f172a;
+        html.light, html.light body {
+            background-color: #f4f6f5;
+            color: #111827;
         }
-        html.light .bg-brand-dark { background-color: #ffffff !important; }
-        html.light .bg-brand-card { background-color: #ffffff !important; border-color: #cbd5e1 !important; }
-        html.light .border-brand-border { border-color: #cbd5e1 !important; }
-        html.light .text-white { color: #0f172a !important; }
-        html.light .text-gray-300, html.light .text-gray-400 { color: #475569 !important; }
+        html.light .bg-brand-card { background-color: #ffffff; color: #111827; }
+        html.light .bg-brand-dark { background-color: #f4f6f5; color: #111827; }
+        html.light .border-brand-border { border-color: #d1d5db; }
+        html.light .text-white { color: #111827; }
+        html.light .text-gray-300, html.light .text-gray-400 { color: #4b5563; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .neon-glow {
-            box-shadow: 0 0 18px rgba(57, 255, 20, 0.32), 0 0 36px rgba(0, 200, 83, 0.16);
-        }
-
-        .snap-y-mandatory {
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-        }
-        .snap-start {
-            scroll-snap-align: start;
-        }
+        .snap-y-mandatory { scroll-snap-type: y mandatory; }
+        .snap-start { scroll-snap-align: start; }
 
         .aspect-video-container {
             position: relative;
             width: 100%;
             aspect-ratio: 16 / 9;
+            background: #000000;
             overflow: hidden;
-            background: #000;
         }
-        .aspect-video-container iframe,
-        .aspect-video-container img {
+        .aspect-video-container > img,
+        .aspect-video-container > iframe {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
         }
 
-        @keyframes pulseWave {
-            0%, 100% { height: 20%; }
-            50% { height: 100%; }
+        /* Hide native YouTube edge chrome & watermarks via slight zoom */
+        #ytPlayerWrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
-        .wave-bar { animation: pulseWave 1s infinite ease-in-out; }
-
-        .header-transform {
-            transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
-        }
-        .header-hidden {
-            transform: translateY(-100%);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .video-rotate-90 {
-            transform: rotate(90deg) scale(1.25);
-            transition: transform 0.3s ease;
-        }
-
-        @keyframes earthSpin3D {
-            0% { transform: rotateY(0deg) rotateX(12deg); }
-            50% { transform: rotateY(180deg) rotateX(-12deg); }
-            100% { transform: rotateY(360deg) rotateX(12deg); }
-        }
-        .earth-3d-spin {
-            animation: earthSpin3D 2.4s linear infinite;
-            transform-style: preserve-3d;
+        #ytPlayerWrapper iframe,
+        #ytPlayerTarget {
+            width: 100%;
+            height: 100%;
+            transform: scale(1.16);
+            transform-origin: center center;
+            border: 0;
         }
 
         .controls-fade {
             transition: opacity 0.25s ease, visibility 0.25s ease;
         }
         .player-top-gradient {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0));
         }
         .player-bottom-gradient {
-            background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.45) 65%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
         }
 
-        input[type="range"].yt-mx-scrubber {
+        .yt-mx-scrubber {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
-            height: 4px;
+            height: 5px;
             border-radius: 999px;
-            background: linear-gradient(to right, #39FF14 0%, #39FF14 var(--seek-pct, 0%), rgba(255,255,255,0.28) var(--seek-pct, 0%), rgba(255,255,255,0.28) 100%);
-            outline: none;
+            background: linear-gradient(to right, #39FF14 0%, #39FF14 var(--seek-pct, 0%), rgba(255,255,255,0.25) var(--seek-pct, 0%), rgba(255,255,255,0.25) 100%);
             cursor: pointer;
-            transition: height 0.15s ease;
+            outline: none;
         }
-        input[type="range"].yt-mx-scrubber:hover,
-        input[type="range"].yt-mx-scrubber:active {
-            height: 6px;
-        }
-        input[type="range"].yt-mx-scrubber::-webkit-slider-thumb {
+        .yt-mx-scrubber::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 14px;
             height: 14px;
             border-radius: 50%;
             background: #39FF14;
-            border: 2px solid #000;
-            box-shadow: 0 0 8px rgba(57, 255, 20, 0.8);
+            border: 2px solid #000000;
             cursor: pointer;
         }
-        input[type="range"].yt-mx-scrubber::-moz-range-thumb {
+        .yt-mx-scrubber::-moz-range-thumb {
             width: 14px;
             height: 14px;
             border-radius: 50%;
             background: #39FF14;
-            border: 2px solid #000;
-            box-shadow: 0 0 8px rgba(57, 255, 20, 0.8);
+            border: 2px solid #000000;
             cursor: pointer;
         }
+
+        .neon-glow { box-shadow: 0 0 18px rgba(57, 255, 20, 0.35); }
+        .video-rotate-90 { transform: rotate(90deg) scale(0.72); }
+        .header-hidden { transform: translateY(-100%); }
+
+        @keyframes waveAnim {
+            0%, 100% { height: 10px; }
+            50% { height: 42px; }
+        }
+        .wave-bar { animation: waveAnim 0.7s infinite ease-in-out; }
+
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
     </style>
 </head>
-<body class="bg-brand-dark text-white min-h-screen flex flex-col selection:bg-brand-parrot selection:text-black">
+<body class="bg-brand-dark text-white min-h-screen flex flex-col">
+
+    <!-- SPLASH SCREEN -->
+    <div id="splashScreen" onclick="forceDismissSplash()" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center gap-3 transition-opacity duration-300 cursor-pointer">
+        <div class="w-16 h-16 rounded-2xl bg-brand-card border-2 border-brand-parrot flex items-center justify-center text-brand-parrot neon-glow">
+            <i data-lucide="play" class="w-8 h-8 fill-current"></i>
+        </div>
+        <p class="font-black text-lg tracking-wider text-white">NexRise <span class="text-brand-parrot">v2.9.2</span></p>
+        <p class="text-[11px] text-gray-400">Tap to continue</p>
+    </div>
+
+    <!-- CENTER LOADER -->
+    <div id="centerEarthLoader" class="hidden fixed inset-0 z-[90] bg-black/60 backdrop-blur-[2px] flex items-center justify-center pointer-events-none">
+        <div class="bg-brand-card border border-brand-parrot/50 px-5 py-3 rounded-2xl flex items-center gap-3 shadow-2xl">
+            <i data-lucide="globe" class="w-5 h-5 text-brand-parrot animate-spin"></i>
+            <span id="centerEarthLoaderText" class="text-xs font-mono font-bold text-brand-parrot">loading...</span>
+        </div>
+    </div>
 
     <!-- PERMISSION MODAL -->
-    <div id="permissionModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-brand-parrot max-w-sm w-full p-6 rounded-2xl space-y-4 shadow-2xl text-center">
-            <div class="w-12 h-12 rounded-2xl bg-brand-parrot/15 border border-brand-parrot flex items-center justify-center text-brand-parrot mx-auto">
+    <div id="permissionModal" class="hidden fixed inset-0 z-[80] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-brand-parrot/60 max-w-sm w-full p-6 rounded-2xl space-y-4 shadow-2xl text-center">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-brand-parrot/15 border border-brand-parrot flex items-center justify-center text-brand-parrot">
                 <i data-lucide="shield-check" class="w-6 h-6"></i>
             </div>
-            <h3 class="text-base font-extrabold text-white">App Permissions</h3>
-            <p class="text-xs text-gray-300 leading-relaxed">
-                Allow microphone access for voice search and notifications for stream updates.
-            </p>
-            <button onclick="grantAllAppPermissions()" class="w-full py-3 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition">
+            <h3 class="text-base font-bold text-white">Enable App Features</h3>
+            <p class="text-xs text-gray-400 leading-relaxed">Allow voice search and notifications for smooth streaming experience.</p>
+            <button onclick="grantAllAppPermissions()" class="w-full py-2.5 bg-brand-parrot text-black font-extrabold text-xs rounded-xl hover:bg-green-400 transition">
                 Allow &amp; Continue
             </button>
         </div>
     </div>
 
-    <!-- CENTER 3D EARTH LOADER -->
-    <div id="centerEarthLoader" class="hidden fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
-        <div class="bg-black/85 backdrop-blur-md border border-brand-parrot/50 px-5 py-4 rounded-2xl flex flex-col items-center gap-2 shadow-2xl">
-            <div class="w-10 h-10 rounded-full bg-brand-parrot/15 border border-brand-parrot flex items-center justify-center text-brand-parrot earth-3d-spin">
-                <i data-lucide="globe" class="w-6 h-6"></i>
-            </div>
-            <span id="centerEarthLoaderText" class="text-[11px] font-mono font-bold text-brand-parrot tracking-wider lowercase">loading...</span>
-        </div>
-    </div>
-
-    <!-- 1. SPLASH SCREEN -->
-    <div id="splashScreen" onclick="forceDismissSplash()" class="fixed inset-0 z-50 bg-brand-dark flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300 cursor-pointer">
-        <div class="relative flex items-center justify-center mb-6">
-            <div class="w-24 h-24 rounded-2xl bg-brand-card border-2 border-brand-parrot flex items-center justify-center neon-glow">
-                <span class="text-4xl font-black tracking-tighter text-brand-parrot">N</span>
-            </div>
-        </div>
-        <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white">NexRise</h1>
-        <p class="text-xs sm:text-sm text-gray-400 mt-2 max-w-xs font-medium">
-            Ethical &amp; Safe Video Streaming • v2.9.2
-        </p>
-        <div class="mt-8 w-44 h-1 bg-brand-card rounded-full overflow-hidden">
-            <div class="h-full bg-brand-parrot w-2/3 animate-pulse rounded-full"></div>
-        </div>
-        <span class="text-[10px] text-gray-500 mt-4">Tap to continue</span>
-    </div>
-
-    <!-- 2. TOP HEADER & SEARCH BAR -->
-    <header id="mainAppHeader" class="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-brand-border px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-3 header-transform">
-        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <button onclick="toggleSideMenu()" class="p-2 text-gray-300 hover:text-brand-parrot hover:bg-brand-card rounded-xl transition active:scale-95" title="Menu">
-                <i data-lucide="menu" class="w-5 h-5"></i>
-            </button>
-
-            <div class="flex items-center bg-brand-card border border-brand-border rounded-xl p-0.5">
-                <button id="navBackArrowBtn" onclick="navigatePageHistory('back')" class="p-1.5 text-brand-parrot hover:bg-black rounded-lg transition active:scale-95" title="Go Back">
+    <!-- 1. TOP HEADER -->
+    <header id="mainAppHeader" class="sticky top-0 z-40 bg-brand-card/95 backdrop-blur-md border-b border-brand-border transition-transform duration-200">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="toggleSideMenu()" class="p-2 text-gray-300 hover:text-brand-parrot rounded-xl hover:bg-black/40 transition" title="Menu">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <button id="navBackArrowBtn" onclick="navigatePageHistory('back')" class="p-1.5 text-gray-600 rounded-lg transition opacity-50" title="Back">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 </button>
-                <button id="navForwardArrowBtn" onclick="navigatePageHistory('forward')" class="p-1.5 text-gray-600 hover:bg-black rounded-lg transition active:scale-95" title="Go Forward">
+                <button id="navForwardArrowBtn" onclick="navigatePageHistory('forward')" class="p-1.5 text-gray-600 rounded-lg transition opacity-50" title="Forward">
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+                <button onclick="switchTab('home')" class="flex items-center gap-1.5 pl-1 text-left">
+                    <span class="font-black text-sm sm:text-base tracking-tight text-white">Nex<span class="text-brand-parrot">Rise</span></span>
                 </button>
             </div>
 
-            <div onclick="shuffleAndRefreshFeed()" class="flex items-center gap-2 cursor-pointer group pl-0.5" title="Shuffle Feed">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-brand-card border border-brand-parrot flex items-center justify-center text-brand-parrot font-black text-lg sm:text-xl group-hover:scale-105 transition">
-                    N
-                </div>
-                <span class="font-extrabold text-base sm:text-lg tracking-tight hidden sm:inline">NexRise</span>
+            <!-- DESKTOP SEARCH -->
+            <div class="hidden sm:flex items-center flex-1 max-w-md bg-black/70 border border-white/15 focus-within:border-brand-parrot rounded-xl px-3 py-1.5 gap-2">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                <input id="desktopSearchInput" type="text" onkeydown="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search streams or creators..." class="flex-1 bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none">
+                <button onclick="startVoiceTyping('desktopSearchInput')" class="text-gray-400 hover:text-brand-parrot p-0.5" title="Voice Search">
+                    <i data-lucide="mic" class="w-4 h-4"></i>
+                </button>
+                <button onclick="executeSearch('desktopSearchInput')" class="text-xs font-bold text-brand-parrot hover:underline px-1">Go</button>
+            </div>
+
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="shuffleAndRefreshFeed()" class="p-2 text-gray-300 hover:text-brand-parrot bg-black/50 border border-white/10 rounded-xl transition" title="Shuffle Feed">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <button onclick="switchTab('profile')" class="p-2 text-gray-300 hover:text-brand-parrot bg-black/50 border border-white/10 rounded-xl transition" title="Profile & Studio">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
 
-        <div id="desktopSearchContainer" class="hidden sm:flex flex-1 max-w-xl items-center relative mx-2">
-            <span class="absolute left-3.5 pointer-events-none text-gray-400">
-                <i data-lucide="search" class="w-4 h-4"></i>
-            </span>
-            <input type="text" id="desktopSearchInput" onkeypress="if(event.key==='Enter') executeSearch('desktopSearchInput')" placeholder="Search streams, creators, or categories..." class="w-full bg-brand-card border border-brand-border rounded-full pl-10 pr-24 py-2 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-            <button onclick="startVoiceTyping('desktopSearchInput')" class="absolute right-16 text-gray-400 hover:text-brand-parrot p-1.5 rounded-full transition" title="Voice Typing Search">
-                <i data-lucide="mic" class="w-4 h-4"></i>
-            </button>
-            <button onclick="executeSearch('desktopSearchInput')" class="absolute right-1.5 bg-brand-parrot text-black font-extrabold text-xs px-3.5 py-1.5 rounded-full hover:bg-green-400 transition">
-                Search
-            </button>
-        </div>
-
-        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <button onclick="switchTab('profile')" class="p-2 text-gray-300 hover:text-brand-parrot hover:bg-brand-card rounded-xl transition" title="Profile & Studio">
-                <i data-lucide="user" class="w-5 h-5"></i>
-            </button>
-            <button onclick="toggleThemeMode()" class="p-2 bg-brand-card border border-brand-border rounded-xl hover:border-brand-parrot transition" title="Toggle Light/Dark Theme">
-                <span class="text-lg">🌓</span>
-            </button>
+        <!-- MOBILE SEARCH BAR -->
+        <div id="mobileSearchContainer" class="sm:hidden px-3 pb-2.5 transition-transform duration-200">
+            <div class="flex items-center bg-black/80 border border-white/15 focus-within:border-brand-parrot rounded-xl px-3 py-1.5 gap-2">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                <input id="mobileSearchInput" type="text" onkeydown="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Search video or creator..." class="flex-1 bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none">
+                <button onclick="startVoiceTyping('mobileSearchInput')" class="text-brand-parrot p-0.5" title="Voice Search">
+                    <i data-lucide="mic" class="w-4 h-4"></i>
+                </button>
+                <button onclick="executeSearch('mobileSearchInput')" class="text-xs font-bold text-brand-parrot px-1">Search</button>
+            </div>
         </div>
     </header>
 
-    <div id="mobileSearchContainer" class="sm:hidden w-full px-3 pt-3 flex gap-2 header-transform">
-        <div class="relative flex-1 flex items-center">
-            <span class="absolute left-3 pointer-events-none text-gray-400">
-                <i data-lucide="search" class="w-4 h-4"></i>
-            </span>
-            <input type="text" id="mobileSearchInput" onkeypress="if(event.key==='Enter') executeSearch('mobileSearchInput')" placeholder="Voice or text search..." class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-parrot transition">
-            <button onclick="startVoiceTyping('mobileSearchInput')" class="absolute right-2 text-gray-400 hover:text-brand-parrot p-1.5 rounded-lg transition" title="Voice Typing Search">
-                <i data-lucide="mic" class="w-4 h-4"></i>
-            </button>
-        </div>
-        <button onclick="executeSearch('mobileSearchInput')" class="px-3 py-2 bg-brand-parrot text-black font-extrabold text-xs rounded-xl">
-            Search
-        </button>
-    </div>
+    <!-- 2. SIDE DRAWER OVERLAY -->
+    <div id="sideDrawerOverlay" onclick="toggleSideMenu()" class="hidden fixed inset-0 z-40 bg-black/75 backdrop-blur-xs"></div>
 
-    <!-- 3. COLLAPSIBLE SIDE DRAWER MENU -->
-    <div id="sideDrawerOverlay" onclick="toggleSideMenu()" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity"></div>
-    <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-5 space-y-6 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col justify-between">
-        <div class="space-y-6">
+    <!-- 3. COLLAPSIBLE SIDEBAR DRAWER -->
+    <aside id="collapsibleSidebar" class="fixed top-0 left-0 bottom-0 z-50 w-64 bg-brand-dark border-r border-brand-border p-4 flex flex-col justify-between -translate-x-full transition-transform duration-200">
+        <div class="space-y-5">
             <div class="flex items-center justify-between border-b border-brand-border pb-4">
                 <span class="font-black text-sm text-white tracking-wider">NexRise v2.9.2</span>
                 <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white p-1">
@@ -300,7 +265,7 @@
     <div class="flex-1 flex w-full max-w-7xl mx-auto">
         <main id="mainScrollContainer" class="flex-1 p-3 sm:p-6 pb-20 sm:pb-6 overflow-y-auto">
 
-            <!-- INTERNATIONAL YOUTUBE + MX PLAYER STYLE STREAMING PLAYER -->
+            <!-- DEDICATED CUSTOM STREAMING PLAYER (ONLY NEXRISE HUD CONTROLS VISIBLE) -->
             <div id="stickyVideoPlayerBox" class="hidden mb-6 space-y-4">
                 <div class="grid grid-cols-1 desktop:grid-cols-3 gap-6 items-start">
                     <div class="desktop:col-span-2 space-y-3">
@@ -310,15 +275,18 @@
                              ontouchmove="onPlayerTouchMove(event)"
                              ontouchend="onPlayerTouchEnd(event)">
 
-                            <!-- Underlying Video Engine -->
-                            <div id="ytPlayerWrapper" class="w-full h-full">
+                            <!-- Underlying Video Engine (non-interactive so native YouTube UI never intercepts taps) -->
+                            <div id="ytPlayerWrapper" class="w-full h-full pointer-events-none">
                                 <div id="ytPlayerTarget"></div>
                             </div>
 
-                            <!-- Edge-only Gesture Zone so center taps & native mobile play stay completely open -->
-                            <div id="gestureEdgeZone" class="absolute inset-y-0 left-0 right-0 z-20 flex justify-between pointer-events-none">
-                                <div onclick="handleEdgeZoneTap()" ondblclick="handleEdgeZoneDoubleTap('left')" class="w-1/5 h-full pointer-events-auto cursor-pointer"></div>
-                                <div onclick="handleEdgeZoneTap()" ondblclick="handleEdgeZoneDoubleTap('right')" class="w-1/5 h-full pointer-events-auto cursor-pointer"></div>
+                            <!-- Custom Touch/Click Shield -->
+                            <div id="customPlayerShield" onclick="handlePlayerShieldTap()" class="absolute inset-0 z-20 cursor-pointer">
+                                <div class="flex w-full h-full">
+                                    <div onclick="event.stopPropagation(); handleShieldSideDoubleTap('left')" class="w-1/4 h-full"></div>
+                                    <div onclick="handlePlayerShieldTap()" class="w-2/4 h-full"></div>
+                                    <div onclick="event.stopPropagation(); handleShieldSideDoubleTap('right')" class="w-1/4 h-full"></div>
+                                </div>
                             </div>
 
                             <!-- MX Player Vertical Brightness Indicator (Left) -->
@@ -340,39 +308,39 @@
                             </div>
 
                             <!-- Seek Feedback Badges -->
-                            <div id="seekRewindBadge" class="opacity-0 transition-opacity duration-200 absolute left-8 top-1/2 -translate-y-1/2 z-30 bg-black/80 border border-brand-parrot/40 text-brand-parrot font-mono text-xs font-bold px-3 py-1.5 rounded-full pointer-events-none flex items-center gap-1">
+                            <div id="seekRewindBadge" class="opacity-0 transition-opacity duration-200 absolute left-8 top-1/2 -translate-y-1/2 z-30 bg-black/85 border border-brand-parrot/40 text-brand-parrot font-mono text-xs font-bold px-3 py-1.5 rounded-full pointer-events-none flex items-center gap-1">
                                 <i data-lucide="rewind" class="w-3.5 h-3.5"></i> -10s
                             </div>
-                            <div id="seekForwardBadge" class="opacity-0 transition-opacity duration-200 absolute right-8 top-1/2 -translate-y-1/2 z-30 bg-black/80 border border-brand-parrot/40 text-brand-parrot font-mono text-xs font-bold px-3 py-1.5 rounded-full pointer-events-none flex items-center gap-1">
+                            <div id="seekForwardBadge" class="opacity-0 transition-opacity duration-200 absolute right-8 top-1/2 -translate-y-1/2 z-30 bg-black/85 border border-brand-parrot/40 text-brand-parrot font-mono text-xs font-bold px-3 py-1.5 rounded-full pointer-events-none flex items-center gap-1">
                                 +10s <i data-lucide="fast-forward" class="w-3.5 h-3.5"></i>
                             </div>
 
                             <!-- TOP HUD BAR -->
                             <div id="playerTopHud" class="controls-fade player-top-gradient absolute top-0 left-0 right-0 z-30 px-3 py-2.5 flex items-center justify-between gap-2">
                                 <div class="flex items-center gap-2 min-w-0">
-                                    <button onclick="event.stopPropagation(); closeActivePlayer()" class="w-8 h-8 rounded-full bg-black/60 hover:bg-white/20 flex items-center justify-center text-white transition shrink-0" title="Close Player">
+                                    <button onclick="event.stopPropagation(); closeActivePlayer()" class="w-8 h-8 rounded-full bg-black/70 hover:bg-white/20 flex items-center justify-center text-white transition shrink-0" title="Close Player">
                                         <i data-lucide="chevron-down" class="w-4 h-4"></i>
                                     </button>
                                     <span id="hudTopVideoTitle" class="text-xs font-semibold text-white truncate">Now Playing</span>
                                 </div>
 
                                 <div class="flex items-center gap-1.5 shrink-0">
-                                    <button onclick="event.stopPropagation(); cyclePlaybackSpeed()" id="playbackSpeedBtn" class="px-2 py-1 rounded-lg bg-black/65 hover:bg-brand-parrot hover:text-black text-[11px] font-mono font-bold text-white border border-white/15 transition" title="Playback Speed">
+                                    <button onclick="event.stopPropagation(); cyclePlaybackSpeed()" id="playbackSpeedBtn" class="px-2 py-1 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black text-[11px] font-mono font-bold text-white border border-white/15 transition" title="Playback Speed">
                                         1.0x
                                     </button>
-                                    <button onclick="event.stopPropagation(); toggleBackgroundAudioMode()" class="px-2.5 py-1 rounded-lg bg-black/65 hover:bg-brand-parrot hover:text-black text-[11px] font-semibold text-white border border-white/15 flex items-center gap-1 transition" title="Background Audio">
+                                    <button onclick="event.stopPropagation(); toggleBackgroundAudioMode()" class="px-2.5 py-1 rounded-lg bg-black/70 hover:bg-brand-parrot hover:text-black text-[11px] font-semibold text-white border border-white/15 flex items-center gap-1 transition" title="Background Audio">
                                         <i data-lucide="headphones" class="w-3.5 h-3.5"></i>
                                         <span class="hidden sm:inline">Audio</span>
                                     </button>
-                                    <button onclick="event.stopPropagation(); rotateActiveVideo()" class="w-8 h-8 rounded-full bg-black/65 hover:bg-brand-parrot hover:text-black flex items-center justify-center text-white border border-white/15 transition" title="Rotate Screen">
+                                    <button onclick="event.stopPropagation(); rotateActiveVideo()" class="w-8 h-8 rounded-full bg-black/70 hover:bg-brand-parrot hover:text-black flex items-center justify-center text-white border border-white/15 transition" title="Rotate Screen">
                                         <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
                                     </button>
                                 </div>
                             </div>
 
                             <!-- CENTER FLOATING CONTROLS -->
-                            <div id="playerCenterHud" class="controls-fade absolute inset-0 z-25 flex items-center justify-center gap-7 sm:gap-10 pointer-events-none">
-                                <button onclick="event.stopPropagation(); skipSeconds(-10)" class="pointer-events-auto w-11 h-11 rounded-full bg-black/60 hover:bg-black/85 backdrop-blur-sm border border-white/15 flex items-center justify-center text-white active:scale-90 transition" title="Rewind 10s">
+                            <div id="playerCenterHud" class="controls-fade absolute inset-0 z-30 flex items-center justify-center gap-7 sm:gap-10 pointer-events-none">
+                                <button onclick="event.stopPropagation(); skipSeconds(-10)" class="pointer-events-auto w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-sm border border-white/15 flex items-center justify-center text-white active:scale-90 transition" title="Rewind 10s">
                                     <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
                                 </button>
 
@@ -380,7 +348,7 @@
                                     <i id="centerPlayIcon" data-lucide="play" class="w-7 h-7 fill-current"></i>
                                 </button>
 
-                                <button onclick="event.stopPropagation(); skipSeconds(10)" class="pointer-events-auto w-11 h-11 rounded-full bg-black/60 hover:bg-black/85 backdrop-blur-sm border border-white/15 flex items-center justify-center text-white active:scale-90 transition" title="Forward 10s">
+                                <button onclick="event.stopPropagation(); skipSeconds(10)" class="pointer-events-auto w-11 h-11 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-sm border border-white/15 flex items-center justify-center text-white active:scale-90 transition" title="Forward 10s">
                                     <i data-lucide="rotate-cw" class="w-5 h-5"></i>
                                 </button>
                             </div>
@@ -399,7 +367,7 @@
                                             <i id="volumeMuteIcon" data-lucide="volume-2" class="w-4 h-4"></i>
                                         </button>
 
-                                        <input type="range" id="volumeControlSlider" min="0" max="100" value="100" oninput="setCustomVolume(this.value)" class="hidden sm:block w-16 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer" title="Volume">
+                                        <input type="range" id="volumeControlSlider" min="0" max="100" value="100" oninput="setCustomVolume(this.value)" class="w-16 sm:w-20 h-1 bg-white/30 accent-brand-parrot rounded-lg cursor-pointer" title="Volume">
 
                                         <div class="font-mono text-[11px] text-gray-200 flex items-center gap-1">
                                             <span id="currentTimeText" class="text-white font-semibold">0:00</span>
@@ -521,14 +489,19 @@
 
             <!-- TAB 5: PROFILE & SECRET UNLOCKED STUDIO -->
             <section id="tab-profile" class="hidden space-y-6 max-w-3xl mx-auto">
-                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-black border border-brand-parrot flex items-center justify-center text-brand-parrot">
-                        <i data-lucide="user" class="w-6 h-6"></i>
+                <div class="bg-brand-card p-5 rounded-2xl border border-brand-border flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-black border border-brand-parrot flex items-center justify-center text-brand-parrot">
+                            <i data-lucide="user" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold">Public Viewer</h3>
+                            <p class="text-xs text-gray-400">NexRise User Account • v2.9.2</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold">Public Viewer</h3>
-                        <p class="text-xs text-gray-400">NexRise User Account • v2.9.2</p>
-                    </div>
+                    <button onclick="triggerAdminSecretPrompt()" class="px-3 py-1.5 rounded-xl bg-black/70 border border-white/15 text-[11px] font-bold text-brand-parrot hover:border-brand-parrot transition">
+                        Creator Studio
+                    </button>
                 </div>
 
                 <div id="unlockedAdminDashboard" class="hidden space-y-6">
@@ -740,6 +713,7 @@
             let scrubberInterval = null;
             let hudHideTimeout = null;
             let currentActiveVideoId = null;
+            let currentPendingVideoId = "jNQXAC9IVRw";
             let currentDurationSeconds = 240;
             let fallbackSimulatedSeconds = 0;
 
@@ -756,7 +730,7 @@
 
             let nextipUsageSeconds = 0;
             let nextipSessionTimer = null;
-            let edgeTapTimer = null;
+            let shieldTapTimer = null;
             let earthLoaderTimeout = null;
 
             let appNavHistory = [{ tab: 'home', category: 'All', videoId: null }];
@@ -1133,7 +1107,7 @@
                 const originParam = (window.location.origin && window.location.origin.indexOf('http') === 0)
                     ? '&origin=' + encodeURIComponent(window.location.origin)
                     : '';
-                return "https://www.youtube.com/embed/" + id + "?rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3" + originParam + extraParams;
+                return "https://www.youtube.com/embed/" + id + "?rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&fs=0&disablekb=1" + originParam + extraParams;
             }
 
             function getPrimaryThumbnail(url) {
@@ -1370,7 +1344,7 @@
             function sendPlayerCommand(funcName, args) {
                 if (!args) args = [];
                 if (ytPlayer && typeof ytPlayer[funcName] === 'function') {
-                    try { ytPlayer[funcName].apply(ytPlayer, args); return; } catch (e) {}
+                    try { ytPlayer[funcName].apply(ytPlayer, args); } catch (e) {}
                 }
                 const iframe = document.querySelector('#ytPlayerWrapper iframe');
                 if (iframe && iframe.contentWindow) {
@@ -1401,6 +1375,25 @@
                 }, 3200);
             };
 
+            window.handlePlayerShieldTap = function() {
+                if (touchMoved) return;
+                if (shieldTapTimer) clearTimeout(shieldTapTimer);
+                shieldTapTimer = setTimeout(() => {
+                    revealPlayerHud();
+                }, 200);
+            };
+
+            window.handleShieldSideDoubleTap = function(side) {
+                if (shieldTapTimer) { clearTimeout(shieldTapTimer); shieldTapTimer = null; }
+                if (side === 'left') {
+                    skipSeconds(-10);
+                    flashSeekBadge('seekRewindBadge');
+                } else {
+                    skipSeconds(10);
+                    flashSeekBadge('seekForwardBadge');
+                }
+            };
+
             window.onPlayerTouchStart = function(e) {
                 if (!e.touches || e.touches.length !== 1) return;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -1408,15 +1401,16 @@
                 touchStartY = e.touches[0].clientY;
                 touchMoved = false;
 
-                if (touchStartX - rect.left < rect.width * 0.2) {
+                if (touchStartX - rect.left < rect.width * 0.25) {
                     touchGestureMode = 'brightness';
                     touchStartVal = currentBrightness;
-                } else if (touchStartX - rect.left > rect.width * 0.8) {
+                } else if (touchStartX - rect.left > rect.width * 0.75) {
                     touchGestureMode = 'volume';
                     touchStartVal = currentVolume;
                 } else {
                     touchGestureMode = null;
                 }
+                revealPlayerHud();
             };
 
             window.onPlayerTouchMove = function(e) {
@@ -1458,25 +1452,6 @@
                     if (vHud) vHud.classList.add('hidden');
                 }, 400);
                 touchGestureMode = null;
-            };
-
-            window.handleEdgeZoneTap = function() {
-                if (touchMoved) return;
-                if (edgeTapTimer) clearTimeout(edgeTapTimer);
-                edgeTapTimer = setTimeout(() => {
-                    revealPlayerHud();
-                }, 220);
-            };
-
-            window.handleEdgeZoneDoubleTap = function(side) {
-                if (edgeTapTimer) { clearTimeout(edgeTapTimer); edgeTapTimer = null; }
-                if (side === 'left') {
-                    skipSeconds(-10);
-                    flashSeekBadge('seekRewindBadge');
-                } else {
-                    skipSeconds(10);
-                    flashSeekBadge('seekForwardBadge');
-                }
             };
 
             function flashSeekBadge(badgeId) {
@@ -1578,12 +1553,77 @@
                 return isCustomPlaying;
             }
 
+            function mountYouTubePlayerInstance(videoId) {
+                const wrapper = document.getElementById('ytPlayerWrapper');
+                if (!wrapper) return;
+
+                if (ytPlayer && typeof ytPlayer.destroy === 'function') {
+                    try { ytPlayer.destroy(); } catch (e) {}
+                    ytPlayer = null;
+                }
+                wrapper.innerHTML = '<div id="ytPlayerTarget"></div>';
+
+                const originParam = (window.location.origin && window.location.origin.indexOf('http') === 0)
+                    ? window.location.origin
+                    : undefined;
+
+                if (typeof YT !== 'undefined' && YT.Player) {
+                    try {
+                        ytPlayer = new YT.Player('ytPlayerTarget', {
+                            height: '100%',
+                            width: '100%',
+                            videoId: videoId,
+                            playerVars: {
+                                autoplay: 1,
+                                controls: 0,
+                                modestbranding: 1,
+                                rel: 0,
+                                playsinline: 1,
+                                iv_load_policy: 3,
+                                fs: 0,
+                                disablekb: 1,
+                                enablejsapi: 1,
+                                origin: originParam
+                            },
+                            events: {
+                                onReady: onCustomPlayerReady,
+                                onStateChange: onCustomPlayerStateChange,
+                                onError: () => loadDirectAndroidFallbackIframe(videoId)
+                            }
+                        });
+                        return;
+                    } catch (e) {}
+                }
+                loadDirectAndroidFallbackIframe(videoId);
+            }
+
+            window.onYouTubeIframeAPIReady = function() {
+                if (currentActiveVideoId && currentPendingVideoId) {
+                    mountYouTubePlayerInstance(currentPendingVideoId);
+                }
+            };
+
+            function loadDirectAndroidFallbackIframe(videoId) {
+                const wrapper = document.getElementById('ytPlayerWrapper');
+                if (!wrapper) return;
+                const originStr = (window.location.origin && window.location.origin.indexOf('http') === 0)
+                    ? '&origin=' + encodeURIComponent(window.location.origin)
+                    : '';
+                wrapper.innerHTML = '<iframe id="ytPlayerTarget" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&playsinline=1&rel=0&modestbranding=1&controls=0&iv_load_policy=3&fs=0&disablekb=1&enablejsapi=1' + originStr + '" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                isCustomPlaying = true;
+                updatePlayPauseUI(true);
+                revealPlayerHud();
+                startScrubberTimer();
+            }
+
             window.playStreamInTopPlayer = function(id, recordHistory) {
                 if (typeof recordHistory === 'undefined') recordHistory = true;
                 const target = videoData.find(v => v.id === id);
                 if (!target) return;
 
                 currentActiveVideoId = id;
+                const videoId = extractYouTubeId(target.url);
+                currentPendingVideoId = videoId;
                 fallbackSimulatedSeconds = 0;
                 currentDurationSeconds = parseDurationToSeconds(target.duration);
                 currentSpeedIdx = 2;
@@ -1605,7 +1645,6 @@
                 const hudTitleEl = document.getElementById('hudTopVideoTitle');
                 const creatorEl = document.getElementById('playerVideoCreator');
                 const recContainer = document.getElementById('playerRecommendationList');
-                const videoId = extractYouTubeId(target.url);
 
                 if (playerBox) {
                     if (titleEl) titleEl.innerText = target.title;
@@ -1633,81 +1672,30 @@
                     if (mainScroll) mainScroll.scrollTo({ top: 0, behavior: 'auto' });
                     try { window.scrollTo({ top: 0, behavior: 'auto' }); } catch (e) {}
 
-                    const wrapper = document.getElementById('ytPlayerWrapper');
-                    if (ytPlayer && typeof ytPlayer.destroy === 'function') {
-                        try { ytPlayer.destroy(); } catch (e) {}
-                        ytPlayer = null;
-                    }
-                    if (wrapper) wrapper.innerHTML = '<div id="ytPlayerTarget"></div>';
-
-                    isCustomPlaying = false;
-                    updatePlayPauseUI(false);
-
-                    if (typeof YT !== 'undefined' && YT.Player) {
-                        try {
-                            ytPlayer = new YT.Player('ytPlayerTarget', {
-                                height: '100%',
-                                width: '100%',
-                                videoId: videoId,
-                                playerVars: {
-                                    autoplay: isMobileDevice() ? 0 : 1,
-                                    controls: 1,
-                                    modestbranding: 1,
-                                    rel: 0,
-                                    playsinline: 1,
-                                    iv_load_policy: 3,
-                                    enablejsapi: 1,
-                                    origin: (window.location.origin && window.location.origin.indexOf('http') === 0) ? window.location.origin : undefined
-                                },
-                                events: {
-                                    onReady: onCustomPlayerReady,
-                                    onStateChange: onCustomPlayerStateChange,
-                                    onError: () => loadDirectMobileIframe(videoId)
-                                }
-                            });
-                        } catch (e) {
-                            loadDirectMobileIframe(videoId);
-                        }
-                    } else {
-                        loadDirectMobileIframe(videoId);
-                    }
-
+                    isCustomPlaying = true;
+                    updatePlayPauseUI(true);
+                    mountYouTubePlayerInstance(videoId);
                     revealPlayerHud();
                     startScrubberTimer();
                 }
             };
-
-            function loadDirectMobileIframe(videoId) {
-                const wrapper = document.getElementById('ytPlayerWrapper');
-                if (!wrapper) return;
-                const autoplayFlag = isMobileDevice() ? '0' : '1';
-                const originParam = (window.location.origin && window.location.origin.indexOf('http') === 0)
-                    ? '&origin=' + encodeURIComponent(window.location.origin)
-                    : '';
-                wrapper.innerHTML = '<iframe id="ytPlayerTarget" src="https://www.youtube.com/embed/' + videoId + '?autoplay=' + autoplayFlag + '&playsinline=1&rel=0&modestbranding=1&controls=1&iv_load_policy=3&enablejsapi=1' + originParam + '" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>';
-                isCustomPlaying = !isMobileDevice();
-                updatePlayPauseUI(isCustomPlaying);
-                revealPlayerHud();
-                startScrubberTimer();
-            }
 
             function onCustomPlayerReady(event) {
                 try {
                     event.target.setVolume(currentVolume);
                     if (currentVolume === 0) event.target.mute();
                     else event.target.unMute();
-                    if (!isMobileDevice()) {
-                        event.target.playVideo();
-                    }
+                    event.target.playVideo();
                 } catch (e) {}
-                syncPlayStateFromPlayer();
+                isCustomPlaying = true;
+                updatePlayPauseUI(true);
                 startScrubberTimer();
                 revealPlayerHud();
             }
 
             function onCustomPlayerStateChange(event) {
                 if (typeof YT !== 'undefined' && YT.PlayerState) {
-                    if (event.data === YT.PlayerState.PLAYING) {
+                    if (event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.BUFFERING) {
                         isCustomPlaying = true;
                         updatePlayPauseUI(true);
                         startScrubberTimer();
@@ -1734,8 +1722,15 @@
                             isCustomPlaying = true;
                         }
                     } catch (e) {
-                        sendPlayerCommand('playVideo');
-                        isCustomPlaying = true;
+                        if (isCustomPlaying) {
+                            sendPlayerCommand('pauseVideo');
+                            isCustomPlaying = false;
+                        } else {
+                            if (currentVolume > 0) sendPlayerCommand('unMute');
+                            sendPlayerCommand('setVolume', [currentVolume || 100]);
+                            sendPlayerCommand('playVideo');
+                            isCustomPlaying = true;
+                        }
                     }
                 } else {
                     if (isCustomPlaying) {

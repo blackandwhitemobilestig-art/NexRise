@@ -505,7 +505,10 @@ jobs:
           }
           EOF
 
-          gradle wrapper --gradle-version 8.7 --distribution-type bin
+          curl -sSL "https://services.gradle.org/distributions/gradle-8.7-bin.zip" -o /tmp/gradle-8.7.zip
+          unzip -q /tmp/gradle-8.7.zip -d /tmp/gradle
+          (cd android-webview && /tmp/gradle/gradle-8.7/bin/gradle wrapper --gradle-version 8.7 --distribution-type bin)
+          rm -rf /tmp/gradle-8.7.zip /tmp/gradle
 
       - name: Build Debug APK
         working-directory: android-webview

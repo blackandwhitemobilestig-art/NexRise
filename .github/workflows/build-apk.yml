@@ -101,7 +101,7 @@ jobs:
                   applicationId = "com.nexrise.webview"
                   minSdk = 24
                   targetSdk = 34
-                  versionCode = 1
+                  versionCode = 5
                   versionName = "2.9.1"
               }
 
@@ -313,8 +313,10 @@ jobs:
           import android.content.pm.PackageManager
           import android.graphics.Color
           import android.os.Bundle
+          import android.os.Message
           import android.view.View
           import android.view.WindowManager
+          import android.webkit.CookieManager
           import android.webkit.PermissionRequest
           import android.webkit.WebChromeClient
           import android.webkit.WebResourceRequest
@@ -360,6 +362,9 @@ jobs:
                   webView.setBackgroundColor(Color.parseColor("#0B0F0C"))
                   webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
+                  CookieManager.getInstance().setAcceptCookie(true)
+                  CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
+
                   val settings = webView.settings
                   settings.javaScriptEnabled = true
                   settings.domStorageEnabled = true
@@ -373,8 +378,6 @@ jobs:
                   settings.loadWithOverviewMode = true
                   settings.useWideViewPort = true
                   settings.cacheMode = WebSettings.LOAD_DEFAULT
-                  settings.userAgentString =
-                      "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36"
 
                   webView.webViewClient = object : WebViewClient() {
                       override fun shouldOverrideUrlLoading(
@@ -392,6 +395,19 @@ jobs:
                   }
 
                   webView.webChromeClient = object : WebChromeClient() {
+                      override fun onCreateWindow(
+                          view: WebView?,
+                          isDialog: Boolean,
+                          isUserGesture: Boolean,
+                          resultMsg: Message?
+                      ): Boolean {
+                          val hitUrl = view?.hitTestResult?.extra
+                          if (!hitUrl.isNullOrBlank() && (hitUrl.startsWith("http://") || hitUrl.startsWith("https://"))) {
+                              view.loadUrl(hitUrl)
+                          }
+                          return false
+                      }
+
                       override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
                           if (customView != null) {
                               callback?.onCustomViewHidden()
